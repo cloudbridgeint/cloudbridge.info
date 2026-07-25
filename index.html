@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CloudBridge — Study Abroad Consultancy (Design Preview)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          bridge: {50:'#eef2f9',100:'#d7e0ef',200:'#b0c1df',300:'#7f9bc9',400:'#4d70a8',500:'#2f5182',600:'#233f68',700:'#1c3255',800:'#162743',900:'#0f1c30',950:'#0a1220'},
+          sunrise: {50:'#fff8ec',100:'#ffedc7',200:'#ffd888',300:'#ffc04d',400:'#f7a827',500:'#e88f14',600:'#c26f0d',700:'#9a530f'},
+          harbor: {500:'#1c9c82',600:'#157e69'},
+          ink: '#1e2430',
+          cloud: '#f7f9fc',
+        },
+        fontFamily: {
+          display: ['Inter','ui-sans-serif','system-ui','sans-serif'],
+          body: ['Lato','ui-sans-serif','system-ui','sans-serif'],
+        },
+        backgroundImage: {
+          'dusk-gradient': 'linear-gradient(160deg, #0f1c30 0%, #1c3255 45%, #2f5182 100%)',
+        },
+        maxWidth: { container: '1240px' },
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Lato', sans-serif; }
+  h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Inter', sans-serif; }
+  .btn-primary { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; background:#f7a827; padding:0.75rem 1.5rem; font-weight:600; color:#0f1c30; transition:.15s; cursor:pointer; border:none; }
+  .btn-primary:hover { background:#ffc04d; }
+  .btn-secondary { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; border:1px solid rgba(255,255,255,.3); padding:0.75rem 1.5rem; font-weight:600; color:#fff; transition:.15s; cursor:pointer; background:transparent; }
+  .btn-secondary:hover { background:rgba(255,255,255,.1); }
+  .btn-outline { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; border:1px solid #0f1c30; padding:0.65rem 1.3rem; font-weight:600; color:#0f1c30; transition:.15s; cursor:pointer; background:transparent; font-size:.875rem; }
+  .btn-outline:hover { background:#0f1c30; color:#fff; }
+  .section-heading { font-size:2rem; font-weight:800; letter-spacing:-0.01em; color:#0f1c30; }
+  @media (min-width:768px){ .section-heading{ font-size:2.5rem; } }
+  .path-line { stroke-dasharray:1000; stroke-dashoffset:1000; animation: draw 2.2s ease-out forwards; }
+  @keyframes draw { to { stroke-dashoffset:0; } }
+  @keyframes floaty { 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-8px);} }
+  .float-slow { animation: floaty 6s ease-in-out infinite; }
+  .card-photo { background-size:cover; background-position:center; }
+  :focus-visible { outline: 2px solid #f7a827; outline-offset: 2px; }
+  .nav-link { cursor:pointer; }
+  .nav-link.active { color:#e88f14 !important; }
+  .nav-drop { position:relative; }
+  .nav-drop-panel { display:none; position:absolute; left:0; top:100%; min-width:190px; background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:.6rem; box-shadow:0 10px 30px rgba(0,0,0,.08); padding:.4rem 0; }
+  .nav-drop:hover .nav-drop-panel { display:block; }
+  .crumb { font-size:.8rem; color:rgba(255,255,255,.6); }
+  .crumb a { cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
+  #heroSlider .slider-arrow { position:absolute; top:40%; transform:translateY(-50%); width:2.5rem; height:2.5rem; border-radius:9999px; background:rgba(255,255,255,.12); border:none; color:#fff; font-size:1.5rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10; transition:.15s; }
+  #heroSlider .slider-arrow:hover { background:rgba(255,255,255,.22); }
+  .slider-dot { transition:.2s; cursor:pointer; border:none; }
+  .course-tab-btn.active { background:#0f1c30; color:#fff; }
+  @media (max-width:767px){ #heroSlider .slider-arrow { display:none; } }
+</style>
+</head>
+<body class="bg-cloud text-ink antialiased">
+
+<div class="bg-sunrise-400 text-bridge-950 text-center text-sm font-semibold py-2 px-4">
+  ডিজাইন প্রিভিউ — মাল্টি-পেজ নেভিগেশন ডেমো (স্ট্যাটিক ফাইল, কোনো CMS/ডাটাবেস কানেক্টেড না)
+</div>
+
+<!-- Header (static across all pages) -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-black/5">
+  <div class="max-w-container mx-auto px-4 md:px-8 py-3 flex items-center justify-between">
+    <a onclick="go('home')" class="flex items-center gap-2 font-display text-xl font-bold text-bridge-900 nav-link">
+      <span class="w-8 h-8 rounded bg-sunrise-400 inline-block"></span>
+      CloudBridge
+    </a>
+    <nav class="hidden md:flex items-center gap-1 text-sm font-medium font-display">
+      <a onclick="go('home')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="home">Home</a>
+      <div class="nav-drop">
+        <span class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block">Study Abroad ▾</span>
+        <div class="nav-drop-panel">
+          <a onclick="go('dest-uk')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Study in UK</a>
+          <a onclick="go('dest-usa')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Study in USA</a>
+          <a onclick="go('dest-malaysia')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Study in Malaysia</a>
+        </div>
+      </div>
+      <a onclick="go('programs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Programs</a>
+      <a onclick="go('destinations')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="destinations">Study Destination</a>
+      <a onclick="go('about')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="about">About us</a>
+      <div class="nav-drop">
+        <span class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block">Service ▾</span>
+        <div class="nav-drop-panel">
+          <a onclick="go('student-visa')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Student Visa</a>
+          <a onclick="go('spouse-visa')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Spouse Visa</a>
+        </div>
+      </div>
+      <a onclick="go('blogs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="blogs">Blogs</a>
+      <a onclick="go('contact')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="contact">Contact Us</a>
+      <a onclick="go('home','lead-form')" class="btn-primary ml-2 !px-5 !py-2 text-sm">Apply Now</a>
+    </nav>
+    <button id="mobileToggle" class="md:hidden w-10 h-10 flex items-center justify-center">
+      <div class="space-y-1.5">
+        <span class="block w-6 h-0.5 bg-bridge-900"></span>
+        <span class="block w-6 h-0.5 bg-bridge-900"></span>
+        <span class="block w-6 h-0.5 bg-bridge-900"></span>
+      </div>
+    </button>
+  </div>
+  <nav id="mobileMenu" class="hidden md:hidden px-4 pb-4 border-t border-black/5 text-sm font-display font-medium">
+    <a onclick="go('home')" class="nav-link block py-2 text-bridge-900">Home</a>
+    <a onclick="go('dest-uk')" class="nav-link block py-2 pl-3 text-bridge-700">Study in UK</a>
+    <a onclick="go('dest-usa')" class="nav-link block py-2 pl-3 text-bridge-700">Study in USA</a>
+    <a onclick="go('dest-malaysia')" class="nav-link block py-2 pl-3 text-bridge-700">Study in Malaysia</a>
+    <a onclick="go('programs')" class="nav-link block py-2 text-bridge-900">Programs</a>
+    <a onclick="go('destinations')" class="nav-link block py-2 text-bridge-900">Study Destination</a>
+    <a onclick="go('about')" class="nav-link block py-2 text-bridge-900">About us</a>
+    <a onclick="go('student-visa')" class="nav-link block py-2 pl-3 text-bridge-700">Student Visa</a>
+    <a onclick="go('spouse-visa')" class="nav-link block py-2 pl-3 text-bridge-700">Spouse Visa</a>
+    <a onclick="go('blogs')" class="nav-link block py-2 text-bridge-900">Blogs</a>
+    <a onclick="go('contact')" class="nav-link block py-2 text-bridge-900">Contact Us</a>
+    <a onclick="go('home','lead-form')" class="btn-primary w-full !py-2 text-sm mt-2 block text-center">Apply Now</a>
+  </nav>
+</header>
+
+<!-- Page content swaps here -->
+<main id="pageRoot"></main>
+
+<!-- Footer (static across all pages) -->
+<footer class="bg-dusk-gradient text-white/80">
+  <div class="max-w-container mx-auto px-4 md:px-8 py-14">
+    <div class="grid md:grid-cols-4 gap-10">
+      <div>
+        <p class="font-display text-xl font-bold text-white">CloudBridge</p>
+        <p class="mt-2 max-w-xs text-sm text-white/60">Your trusted partner for studying abroad from Bangladesh.</p>
+      </div>
+      <div class="text-sm">
+        <p class="font-display font-semibold text-white mb-2">Quick Links</p>
+        <p class="mt-1"><a onclick="go('about')" class="nav-link hover:text-sunrise-300">About us</a></p>
+        <p class="mt-1"><a onclick="go('programs')" class="nav-link hover:text-sunrise-300">Programs</a></p>
+        <p class="mt-1"><a onclick="go('destinations')" class="nav-link hover:text-sunrise-300">Study Destination</a></p>
+        <p class="mt-1"><a onclick="go('blogs')" class="nav-link hover:text-sunrise-300">Blogs</a></p>
+      </div>
+      <div class="text-sm">
+        <p class="font-display font-semibold text-white mb-2">Contact</p>
+        <p>Email: apply@cloudbridge.info</p>
+        <p class="mt-1">Phone: +880 1686 007004</p>
+      </div>
+      <div class="flex gap-4 text-sm items-start">
+        <a href="#" class="text-white/70 hover:text-sunrise-300">Facebook</a>
+        <a href="#" class="text-white/70 hover:text-sunrise-300">Instagram</a>
+        <a href="#" class="text-white/70 hover:text-sunrise-300">TikTok</a>
+      </div>
+    </div>
+    <div class="mt-10 pt-6 border-t border-white/10 text-xs text-white/50">© 2026 CloudBridge. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   PAGE CONTENT — each key below is a separate "page". Clicking
+   any nav link calls go('pageId') which swaps #pageRoot's HTML.
+   This mirrors the click-through pattern from the reference file.
+   ============================================================ */
+const pages = {
+
+home: `
+<section class="relative overflow-hidden bg-dusk-gradient text-white" id="heroSlider">
+  <div class="max-w-container mx-auto px-4 md:px-8 pt-16 md:pt-20 relative">
+    <button onclick="sliderMove(-1)" class="slider-arrow" style="left:0" aria-label="Previous slide">‹</button>
+    <button onclick="sliderMove(1)" class="slider-arrow" style="right:0" aria-label="Next slide">›</button>
+
+    <div class="slider-slide grid md:grid-cols-2 gap-10 items-center" data-slide="0">
+      <div>
+        <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Overseas Education Consultancy</p>
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">Your Bridge to Studying Abroad</h1>
+        <p class="mt-5 max-w-md text-white/75">From university selection to visa approval — CloudBridge guides students across Bangladesh into universities in the UK, Malaysia, and the USA.</p>
+        <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
+      </div>
+      <div class="rounded-2xl h-56 md:h-80" style="background-image:linear-gradient(160deg,#2e4a7a,#4d70a8)"></div>
+    </div>
+
+    <div class="slider-slide hidden grid md:grid-cols-2 gap-10 items-center" data-slide="1">
+      <div>
+        <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Admissions Open</p>
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">Fall 2026 Intake Now Open</h1>
+        <p class="mt-5 max-w-md text-white/75">100% free end-to-end counseling and application processing — from shortlisting your university to visa approval.</p>
+        <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
+      </div>
+      <div class="rounded-2xl h-56 md:h-80" style="background-image:linear-gradient(160deg,#1e786e,#22a396)"></div>
+    </div>
+
+    <div class="slider-slide hidden grid md:grid-cols-2 gap-10 items-center" data-slide="2">
+      <div>
+        <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Scholarships</p>
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">Scholarships at 500+ Universities</h1>
+        <p class="mt-5 max-w-md text-white/75">Let our counsellors match you with funding you actually qualify for — most students never even check.</p>
+        <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
+      </div>
+      <div class="rounded-2xl h-56 md:h-80" style="background-image:linear-gradient(160deg,#963c3c,#c25a5a)"></div>
+    </div>
+  </div>
+
+  <div class="flex justify-center gap-2 pt-8 pb-2 relative">
+    <button class="slider-dot w-2.5 h-2.5 rounded-full bg-sunrise-400" data-dot="0" onclick="sliderGoTo(0)" aria-label="Slide 1"></button>
+    <button class="slider-dot w-2.5 h-2.5 rounded-full bg-white/30" data-dot="1" onclick="sliderGoTo(1)" aria-label="Slide 2"></button>
+    <button class="slider-dot w-2.5 h-2.5 rounded-full bg-white/30" data-dot="2" onclick="sliderGoTo(2)" aria-label="Slide 3"></button>
+  </div>
+
+  <div class="max-w-container mx-auto px-4 md:px-8 relative mt-6 pb-16">
+    <div class="relative h-24 w-full max-w-3xl">
+      <svg viewBox="0 0 800 100" class="absolute inset-0 w-full h-full" fill="none" preserveAspectRatio="none">
+        <path d="M 20 80 Q 400 -20 780 80" stroke="#F7A827" stroke-width="2" stroke-linecap="round" class="path-line" pathLength="1000"/>
+      </svg>
+      <div class="absolute left-0 top-[68px] flex flex-col items-center gap-2">
+        <span class="w-9 h-9 rounded-full bg-white text-bridge-900 text-xs font-bold flex items-center justify-center">BD</span>
+        <span class="text-xs text-white/60">Bangladesh</span>
+      </div>
+      <div class="absolute right-0 top-0 flex gap-6">
+        <div class="flex flex-col items-center gap-2 float-slow" style="animation-delay:0s">
+          <span class="w-9 h-9 rounded-full bg-white/90 text-bridge-900 text-[10px] font-bold flex items-center justify-center">UK</span>
+          <span class="text-xs text-white/60">UK</span>
+        </div>
+        <div class="flex flex-col items-center gap-2 float-slow" style="animation-delay:.4s">
+          <span class="w-9 h-9 rounded-full bg-white/90 text-bridge-900 text-[10px] font-bold flex items-center justify-center">MY</span>
+          <span class="text-xs text-white/60">Malaysia</span>
+        </div>
+        <div class="flex flex-col items-center gap-2 float-slow" style="animation-delay:.8s">
+          <span class="w-9 h-9 rounded-full bg-white/90 text-bridge-900 text-[10px] font-bold flex items-center justify-center">US</span>
+          <span class="text-xs text-white/60">USA</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl">
+      <h2 class="section-heading">Choose Your Destination</h2>
+      <p class="mt-3 text-ink/60">Every country we work with, hand-picked for strong outcomes for Bangladeshi students.</p>
+    </div>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <a onclick="go('dest-uk')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#2e4a7a,#4d70a8)">
+        <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
+        <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">United Kingdom</h3><p class="mt-1 text-sm text-white/75">Globally respected degrees and diverse study opportunities.</p></div>
+      </a>
+      <a onclick="go('dest-malaysia')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#1e786e,#22a396)">
+        <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
+        <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">Malaysia</h3><p class="mt-1 text-sm text-white/75">English-medium education with affordable living costs.</p></div>
+      </a>
+      <a onclick="go('dest-usa')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#963c3c,#c25a5a)">
+        <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
+        <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">USA</h3><p class="mt-1 text-sm text-white/75">Small classes, academic freedom, strong mentorship.</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="py-12 bg-white border-y border-black/5">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="text-center text-xs font-semibold uppercase tracking-wide text-ink/40 mb-6">Featured Partner Universities</p>
+    <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden sm:flex">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden lg:flex">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden lg:flex">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden lg:flex">LOGO</div>
+    </div>
+    <p class="text-center text-xs text-ink/30 mt-4">(placeholder — real partner university logos go here)</p>
+  </div>
+</section>
+
+<section class="py-16 bg-bridge-50/50">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10 items-center">
+    <div class="order-2 md:order-1 rounded-2xl h-64 md:h-80" style="background-image:linear-gradient(160deg,#1c3255,#4d70a8)"></div>
+    <div class="order-1 md:order-2">
+      <p class="text-sunrise-600 font-display font-semibold text-sm uppercase tracking-wide mb-3">Free Consultation</p>
+      <h2 class="section-heading">Talk with University Admission Expert</h2>
+      <p class="mt-4 text-ink/60">Get personalised guidance from our expert counsellors on choosing the right university, course, and destination for your goals — completely free, with no obligation.</p>
+      <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-6 inline-flex">Send Admission Query</a>
+    </div>
+  </div>
+</section>
+
+<section class="bg-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl mx-auto text-center">
+      <h2 class="section-heading">Trusted education consultant</h2>
+      <p class="mt-3 text-ink/60">Our company has grown by helping international students find admission to universities abroad.</p>
+    </div>
+    <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target="10000">0</p><p class="mt-2 text-sm font-medium text-ink/60">Students Placed</p></div>
+      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target="500">0</p><p class="mt-2 text-sm font-medium text-ink/60">Partner Universities</p></div>
+      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target="13" data-suffix="">0</p><p class="mt-2 text-sm font-medium text-ink/60">Years of Experience</p></div>
+      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target="99" data-suffix="%">0</p><p class="mt-2 text-sm font-medium text-ink/60">Visa Success Rate</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-bridge-50/50">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10">
+    <div>
+      <h2 class="section-heading">Get Your Entry Requirements</h2>
+      <p class="mt-3 text-ink/60">Fill up the form and we'll send you the exact entry requirements for your destination, university, and program of choice.</p>
+    </div>
+    <form class="demo-form grid sm:grid-cols-2 gap-4 bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5 h-fit">
+      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70 sm:col-span-2"><option value="">Preferred office</option><option>Dhaka Office</option><option>Sylhet Office</option></select>
+      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Preferred destination</option><option>United Kingdom</option><option>Malaysia</option><option>USA</option></select>
+      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Most recently completed</option><option>SSC / O Levels</option><option>HSC / A Levels</option><option>Bachelor</option><option>Masters</option></select>
+      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70 sm:col-span-2"><option value="">Interested program</option><option>Foundation</option><option>Diploma</option><option>Bachelor</option><option>Masters</option><option>Ph.D.</option></select>
+      <button type="submit" class="btn-primary sm:col-span-2">Get Entry Requirements</button>
+    </form>
+    <div class="demo-form-thanks hidden sm:col-start-2 mt-2 rounded-2xl bg-harbor-500/10 p-6 text-center text-harbor-600 font-display font-semibold">
+      Thanks! We'll email your entry requirements shortly. <span class="block text-xs font-normal text-ink/40 mt-1">(demo only)</span>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-white">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl mx-auto text-center">
+      <h2 class="section-heading">Our Special Key Features</h2>
+      <p class="mt-3 text-ink/60">We are dedicated to providing quality educational services with experienced staff and honest guidance.</p>
+    </div>
+    <div class="mt-10 grid sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+      <div class="flex gap-3"><span class="text-harbor-500 font-bold">✓</span><p class="text-sm text-ink/70">Courses for every academic background</p></div>
+      <div class="flex gap-3"><span class="text-harbor-500 font-bold">✓</span><p class="text-sm text-ink/70">Support after arrival and during studies</p></div>
+      <div class="flex gap-3"><span class="text-harbor-500 font-bold">✓</span><p class="text-sm text-ink/70">Transparent, upfront tuition guidance</p></div>
+      <div class="flex gap-3"><span class="text-harbor-500 font-bold">✓</span><p class="text-sm text-ink/70">Experienced application support team</p></div>
+      <div class="flex gap-3"><span class="text-harbor-500 font-bold">✓</span><p class="text-sm text-ink/70">Multiple intake start dates every year</p></div>
+      <div class="flex gap-3"><span class="text-harbor-500 font-bold">✓</span><p class="text-sm text-ink/70">Personal, one-on-one counsellor attention</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-bridge-50/50">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl mx-auto text-center">
+      <h2 class="section-heading">Courses to Study Abroad</h2>
+      <p class="mt-3 text-ink/60">Know your course and choose the right level for your higher study and future career.</p>
+    </div>
+    <div class="mt-8 flex flex-wrap justify-center gap-2" id="courseTabs">
+      <button class="course-tab-btn btn-outline !text-xs active" data-tab="foundation">Foundation</button>
+      <button class="course-tab-btn btn-outline !text-xs" data-tab="undergrad">Undergraduate</button>
+      <button class="course-tab-btn btn-outline !text-xs" data-tab="postgrad">Postgraduate</button>
+      <button class="course-tab-btn btn-outline !text-xs" data-tab="phd">PHD</button>
+    </div>
+    <div class="mt-8 max-w-2xl mx-auto text-center bg-white rounded-2xl p-8 ring-1 ring-black/5">
+      <div class="course-tab-panel" data-panel="foundation"><h3 class="font-display font-bold text-bridge-900">Foundation Programs</h3><p class="mt-2 text-sm text-ink/60">A one-year bridge program preparing HSC graduates for direct entry into undergraduate degrees abroad.</p></div>
+      <div class="course-tab-panel hidden" data-panel="undergrad"><h3 class="font-display font-bold text-bridge-900">Undergraduate Programs</h3><p class="mt-2 text-sm text-ink/60">3-4 year Bachelor's degrees across Business, Engineering, Computing, and more — our most popular pathway.</p></div>
+      <div class="course-tab-panel hidden" data-panel="postgrad"><h3 class="font-display font-bold text-bridge-900">Postgraduate Programs</h3><p class="mt-2 text-sm text-ink/60">1-2 year Master's degrees, including MBA and MSc routes, at 500+ partner universities.</p></div>
+      <div class="course-tab-panel hidden" data-panel="phd"><h3 class="font-display font-bold text-bridge-900">Ph.D. Programs</h3><p class="mt-2 text-sm text-ink/60">Funded and self-funded research degrees — the highest globally recognised postgraduate qualification.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-white">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <h2 class="section-heading text-center">Why Choose CloudBridge?</h2>
+    <div class="mt-10 grid sm:grid-cols-2 gap-x-10 gap-y-6 max-w-3xl mx-auto">
+      <div><h3 class="font-display font-semibold text-bridge-900">Inclusive Course Offerings</h3><p class="mt-1 text-sm text-ink/60">We offer courses for every academic background and qualification level.</p></div>
+      <div><h3 class="font-display font-semibold text-bridge-900">Flexible Start Dates</h3><p class="mt-1 text-sm text-ink/60">Course start dates throughout the year, so you can begin when you're ready.</p></div>
+      <div><h3 class="font-display font-semibold text-bridge-900">Affordable Tuition Guidance</h3><p class="mt-1 text-sm text-ink/60">We help you find programs that fit your budget without cutting corners.</p></div>
+      <div><h3 class="font-display font-semibold text-bridge-900">Expert Application Support</h3><p class="mt-1 text-sm text-ink/60">Our team helps with every step of the application process, start to finish.</p></div>
+      <div><h3 class="font-display font-semibold text-bridge-900">High Visa Success Rate</h3><p class="mt-1 text-sm text-ink/60">A 99% visa success rate built on careful, honest documentation.</p></div>
+      <div><h3 class="font-display font-semibold text-bridge-900">Personal Care</h3><p class="mt-1 text-sm text-ink/60">We reply promptly and give every student individual attention.</p></div>
+      <div><h3 class="font-display font-semibold text-bridge-900">Direct Team Support</h3><p class="mt-1 text-sm text-ink/60">Speak directly with our counsellors — no call centres, no runaround.</p></div>
+      <div><h3 class="font-display font-semibold text-bridge-900">Post-Arrival Assistance</h3><p class="mt-1 text-sm text-ink/60">Our support continues after your visa is approved and you've landed.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="py-14 bg-bridge-50/50">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="text-center text-xs font-semibold uppercase tracking-wide text-ink/40 mb-6">Membership &amp; Recognition</p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <div class="h-16 w-40 rounded-lg bg-white ring-1 ring-black/5 flex items-center justify-center text-[11px] text-ink/40 font-semibold">Membership Badge</div>
+      <div class="h-16 w-40 rounded-lg bg-white ring-1 ring-black/5 flex items-center justify-center text-[11px] text-ink/40 font-semibold">Membership Badge</div>
+      <div class="h-16 w-40 rounded-lg bg-white ring-1 ring-black/5 flex items-center justify-center text-[11px] text-ink/40 font-semibold">Membership Badge</div>
+    </div>
+    <p class="text-center text-xs text-ink/30 mt-4">(placeholder — swap in real accreditation/membership badges once confirmed)</p>
+  </div>
+</section>
+
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl">
+      <h2 class="section-heading">CloudBridge Highlights</h2>
+      <p class="mt-3 text-ink/60">Hear from our students, in their own words.</p>
+    </div>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div>
+        <button class="yt-facade relative w-full aspect-video rounded-xl overflow-hidden bg-bridge-900 group" data-id="dQw4w9WgXcQ">
+          <img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" class="w-full h-full object-cover opacity-90 group-hover:opacity-100" onerror="this.style.display='none'">
+          <span class="absolute inset-0 flex items-center justify-center"><span class="w-16 h-16 rounded-full bg-sunrise-400/95 flex items-center justify-center shadow-lg group-hover:scale-110 transition"><svg viewBox="0 0 24 24" class="w-7 h-7 fill-bridge-950 ml-1"><path d="M8 5v14l11-7z"/></svg></span></span>
+        </button>
+        <p class="mt-4 font-display font-semibold text-bridge-900">Nusrat J.</p>
+        <p class="text-sm text-ink/50">MSc Data Science, University of Sheffield</p>
+      </div>
+      <div>
+        <button class="yt-facade relative w-full aspect-video rounded-xl overflow-hidden bg-bridge-900 group" data-id="dQw4w9WgXcQ">
+          <img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" class="w-full h-full object-cover opacity-90 group-hover:opacity-100" onerror="this.style.display='none'">
+          <span class="absolute inset-0 flex items-center justify-center"><span class="w-16 h-16 rounded-full bg-sunrise-400/95 flex items-center justify-center shadow-lg group-hover:scale-110 transition"><svg viewBox="0 0 24 24" class="w-7 h-7 fill-bridge-950 ml-1"><path d="M8 5v14l11-7z"/></svg></span></span>
+        </button>
+        <p class="mt-4 font-display font-semibold text-bridge-900">Rakib H.</p>
+        <p class="text-sm text-ink/50">BSc Computer Science, Sunway University</p>
+      </div>
+      <div>
+        <button class="yt-facade relative w-full aspect-video rounded-xl overflow-hidden bg-bridge-900 group" data-id="dQw4w9WgXcQ">
+          <img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" class="w-full h-full object-cover opacity-90 group-hover:opacity-100" onerror="this.style.display='none'">
+          <span class="absolute inset-0 flex items-center justify-center"><span class="w-16 h-16 rounded-full bg-sunrise-400/95 flex items-center justify-center shadow-lg group-hover:scale-110 transition"><svg viewBox="0 0 24 24" class="w-7 h-7 fill-bridge-950 ml-1"><path d="M8 5v14l11-7z"/></svg></span></span>
+        </button>
+        <p class="mt-4 font-display font-semibold text-bridge-900">Farhan A.</p>
+        <p class="text-sm text-ink/50">MBA, Northumbria University</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-bridge-50/50">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl">
+      <h2 class="section-heading">Upcoming Events</h2>
+      <p class="mt-3 text-ink/60">Join our expos, seminars, and info sessions to get expert guidance in person.</p>
+    </div>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+        <div class="h-36" style="background:linear-gradient(160deg,#2e4a7a,#4d70a8)"></div>
+        <div class="p-5"><p class="text-xs text-ink/50">3 May 2026 · 2PM–5PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">UK Open Assessment Day — Dhaka</h3></div>
+      </div>
+      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+        <div class="h-36" style="background:linear-gradient(160deg,#1e786e,#22a396)"></div>
+        <div class="p-5"><p class="text-xs text-ink/50">17 May 2026 · 10AM–6PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">Multi-Destination Education Expo — Dhaka</h3></div>
+      </div>
+      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+        <div class="h-36" style="background:linear-gradient(160deg,#963c3c,#c25a5a)"></div>
+        <div class="p-5"><p class="text-xs text-ink/50">9 May 2026 · 11AM–5PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">Study Abroad Expo — Sylhet</h3></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-white">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl">
+      <h2 class="section-heading">Latest Articles</h2>
+      <p class="mt-3 text-ink/60">Insights, updates, and expert guidance to help you study abroad with confidence.</p>
+    </div>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <a onclick="go('blogs')" class="nav-link rounded-2xl border border-black/10 overflow-hidden block">
+        <div class="h-40" style="background:linear-gradient(160deg,#2e4a7a,#4d70a8)"></div>
+        <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Visa Tips</p><h3 class="mt-1 font-display font-bold text-bridge-900">5 documents students forget before their visa interview</h3></div>
+      </a>
+      <a onclick="go('blogs')" class="nav-link rounded-2xl border border-black/10 overflow-hidden block">
+        <div class="h-40" style="background:linear-gradient(160deg,#1e786e,#22a396)"></div>
+        <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Scholarships</p><h3 class="mt-1 font-display font-bold text-bridge-900">How to find scholarships you actually qualify for</h3></div>
+      </a>
+      <a onclick="go('blogs')" class="nav-link rounded-2xl border border-black/10 overflow-hidden block">
+        <div class="h-40" style="background:linear-gradient(160deg,#963c3c,#c25a5a)"></div>
+        <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Life Abroad</p><h3 class="mt-1 font-display font-bold text-bridge-900">Your first month abroad: a practical checklist</h3></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-dusk-gradient text-white text-center">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <h2 class="text-2xl md:text-3xl font-extrabold">We're Here to Help You</h2>
+    <p class="mt-3 text-white/70 max-w-xl mx-auto">Know your course and choose the right level for your higher study and future career.</p>
+    <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-6 inline-flex">Check Your Eligibility</a>
+  </div>
+</section>
+
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <h2 class="section-heading">Visit Us</h2>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="rounded-2xl border border-black/10 p-6"><h3 class="font-display font-bold text-bridge-900">Dhaka Office</h3><p class="mt-2 text-sm text-ink/60">House 27, Road 21, Level 3, Nikunja-2, Dhaka</p><p class="mt-1 text-sm text-ink/70">+880 1686 007004</p><p class="text-sm text-ink/70">apply@cloudbridge.info</p></div>
+      <div class="rounded-2xl border border-black/10 p-6"><h3 class="font-display font-bold text-bridge-900">Sylhet Office</h3><p class="mt-2 text-sm text-ink/60">405-406 Manru Shopping City, 4th Floor, Chowhatta, Sylhet</p><p class="mt-1 text-sm text-ink/70">+880 1619 130469</p><p class="text-sm text-ink/70">studyabroad.sylhet@cloudbridge.info</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-bridge-50/50">
+  <div class="max-w-container mx-auto px-4 md:px-8 max-w-3xl">
+    <h2 class="section-heading text-center">Frequently Asked Questions</h2>
+    <div class="mt-10 border border-black/10 rounded-2xl divide-y divide-black/10 bg-white">
+      <div>
+        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Is CloudBridge's consultation really free?<span class="faq-icon transition-transform">+</span></button>
+        <p class="faq-answer px-6 pb-5 text-sm text-ink/70">Yes — the initial consultation, university shortlisting, and application support are all free of charge.</p>
+      </div>
+      <div>
+        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Do I need IELTS to apply?<span class="faq-icon transition-transform">+</span></button>
+        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">Not always. Many universities accept alternative English tests or an MOI certificate — your counsellor will confirm what applies to you.</p>
+      </div>
+      <div>
+        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">How long does the visa process take?<span class="faq-icon transition-transform">+</span></button>
+        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">It varies by country, but we start preparing your documents as soon as you receive an offer to avoid delays.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="lead-form" class="py-16 bg-white">
+  <div class="max-w-container mx-auto px-4 md:px-8 max-w-2xl">
+    <h2 class="section-heading text-center">Start Your Journey Now</h2>
+    <p class="mt-3 text-center text-ink/60">Tell us a little about your goals and a counsellor will call you back.</p>
+    <form class="demo-form mt-8 grid sm:grid-cols-2 gap-4 bg-bridge-50/50 rounded-2xl p-6 ring-1 ring-black/5">
+      <input required placeholder="Full name" class="rounded-lg border border-black/10 px-4 py-3 text-sm bg-white">
+      <input required placeholder="Phone number" class="rounded-lg border border-black/10 px-4 py-3 text-sm bg-white">
+      <input type="email" placeholder="Email (optional)" class="rounded-lg border border-black/10 px-4 py-3 text-sm sm:col-span-2 bg-white">
+      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70 bg-white"><option value="">Preferred destination</option><option>United Kingdom</option><option>Malaysia</option><option>USA</option></select>
+      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70 bg-white"><option value="">Interested program</option><option>Foundation</option><option>Diploma</option><option>Bachelor</option><option>Masters</option><option>Ph.D.</option></select>
+      <button type="submit" class="btn-primary sm:col-span-2">Get Free Consultation</button>
+    </form>
+    <div class="demo-form-thanks hidden mt-8 rounded-2xl bg-harbor-500/10 p-6 text-center text-harbor-600 font-display font-semibold">
+      Thanks! One of our counsellors will call you shortly. <span class="block text-xs font-normal text-ink/40 mt-1">(demo only — nothing was actually sent)</span>
+    </div>
+  </div>
+</section>
+`,
+
+about: `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / About us</p>
+    <p class="inline-block mt-4 mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">About CloudBridge</p>
+    <h1 class="text-3xl md:text-5xl font-extrabold leading-tight max-w-2xl">Your partner from application to arrival</h1>
+    <p class="mt-4 max-w-xl text-white/75">We've spent over a decade helping Bangladeshi students find the right university abroad — and making sure they actually get there.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-3 gap-8">
+    <div class="rounded-2xl border border-black/10 p-6">
+      <h3 class="font-display font-bold text-bridge-900">Experienced Counsellors</h3>
+      <p class="mt-2 text-sm text-ink/60">Every student is matched with a counsellor who knows their destination country's admissions and visa rules inside out.</p>
+    </div>
+    <div class="rounded-2xl border border-black/10 p-6">
+      <h3 class="font-display font-bold text-bridge-900">Transparent Process</h3>
+      <p class="mt-2 text-sm text-ink/60">No hidden fees, no surprise costs — you'll always know exactly what happens next in your application.</p>
+    </div>
+    <div class="rounded-2xl border border-black/10 p-6">
+      <h3 class="font-display font-bold text-bridge-900">Post-Arrival Support</h3>
+      <p class="mt-2 text-sm text-ink/60">Our support doesn't stop at the visa stamp — we help with accommodation, banking, and settling in too.</p>
+    </div>
+  </div>
+</section>
+<section class="bg-bridge-50/50 py-14">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+    <div><p class="font-display text-3xl font-extrabold text-bridge-700">10,000+</p><p class="mt-1 text-sm text-ink/60">Students Placed</p></div>
+    <div><p class="font-display text-3xl font-extrabold text-bridge-700">500+</p><p class="mt-1 text-sm text-ink/60">Partner Universities</p></div>
+    <div><p class="font-display text-3xl font-extrabold text-bridge-700">13</p><p class="mt-1 text-sm text-ink/60">Years of Experience</p></div>
+    <div><p class="font-display text-3xl font-extrabold text-bridge-700">99%</p><p class="mt-1 text-sm text-ink/60">Visa Success Rate</p></div>
+  </div>
+</section>
+<section class="py-16 bg-dusk-gradient text-white text-center">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <h2 class="text-2xl md:text-3xl font-extrabold">Ready to start your journey?</h2>
+    <a onclick="go('contact')" class="btn-primary nav-link mt-6 inline-flex">Talk to a Counsellor</a>
+  </div>
+</section>
+`,
+
+destinations: `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / Study Destination</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Choose Your Destination</h1>
+    <p class="mt-4 max-w-xl text-white/75">Every country we work with, hand-picked for strong outcomes for Bangladeshi students.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <a onclick="go('dest-uk')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#2e4a7a,#4d70a8)">
+      <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
+      <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">United Kingdom</h3><p class="mt-1 text-sm text-white/75">Globally respected degrees and diverse study opportunities.</p></div>
+    </a>
+    <a onclick="go('dest-malaysia')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#1e786e,#22a396)">
+      <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
+      <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">Malaysia</h3><p class="mt-1 text-sm text-white/75">English-medium education with affordable living costs.</p></div>
+    </a>
+    <a onclick="go('dest-usa')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#963c3c,#c25a5a)">
+      <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
+      <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">USA</h3><p class="mt-1 text-sm text-white/75">Small classes, academic freedom, strong mentorship.</p></div>
+    </a>
+  </div>
+</section>
+`,
+
+'dest-uk': `
+<section class="text-white py-20" style="background-image:linear-gradient(160deg,#0f1c30,#2e4a7a); background-size:cover;">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / <a onclick="go('destinations')">Study Destination</a> / United Kingdom</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Study in the United Kingdom</h1>
+    <p class="mt-4 max-w-xl text-white/80">Globally respected degrees, world-class research, and a huge international student community.</p>
+    <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-8 inline-flex">Book Free Consultation</a>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10">
+    <div>
+      <h2 class="font-display text-xl font-bold text-bridge-900">Why study in the UK?</h2>
+      <ul class="mt-4 space-y-3 text-sm text-ink/70">
+        <li>• 99% visa success rate with our application support</li>
+        <li>• 150+ partner universities across the UK</li>
+        <li>• 1-2 year Master's programs — faster than most countries</li>
+        <li>• Post-study Graduate Route visa (2 years)</li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="font-display text-xl font-bold text-bridge-900">Popular programs</h2>
+      <ul class="mt-4 space-y-3 text-sm text-ink/70">
+        <li>• Business & Management (MSc/MBA)</li>
+        <li>• Computer Science & Data Science</li>
+        <li>• Civil & Mechanical Engineering</li>
+        <li>• Public Health & Nursing</li>
+      </ul>
+    </div>
+  </div>
+</section>
+`,
+
+'dest-malaysia': `
+<section class="text-white py-20" style="background-image:linear-gradient(160deg,#0f1c30,#1e786e); background-size:cover;">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / <a onclick="go('destinations')">Study Destination</a> / Malaysia</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Study in Malaysia</h1>
+    <p class="mt-4 max-w-xl text-white/80">Globally recognized English-medium education with affordable tuition and living costs.</p>
+    <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-8 inline-flex">Book Free Consultation</a>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10">
+    <div>
+      <h2 class="font-display text-xl font-bold text-bridge-900">Why study in Malaysia?</h2>
+      <ul class="mt-4 space-y-3 text-sm text-ink/70">
+        <li>• Lower cost of living than UK, USA, or Australia</li>
+        <li>• Branch campuses of respected international universities</li>
+        <li>• English-taught programs, no need for a second language</li>
+        <li>• Simple, fast student visa process</li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="font-display text-xl font-bold text-bridge-900">Popular programs</h2>
+      <ul class="mt-4 space-y-3 text-sm text-ink/70">
+        <li>• Computer Science & IT</li>
+        <li>• Business Administration</li>
+        <li>• Hospitality & Tourism Management</li>
+        <li>• Engineering (Electrical, Mechanical)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+`,
+
+'dest-usa': `
+<section class="text-white py-20" style="background-image:linear-gradient(160deg,#0f1c30,#963c3c); background-size:cover;">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / <a onclick="go('destinations')">Study Destination</a> / USA</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Study in the USA</h1>
+    <p class="mt-4 max-w-xl text-white/80">Small classes, academic freedom, and strong mentorship at world-renowned universities.</p>
+    <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-8 inline-flex">Book Free Consultation</a>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10">
+    <div>
+      <h2 class="font-display text-xl font-bold text-bridge-900">Why study in the USA?</h2>
+      <ul class="mt-4 space-y-3 text-sm text-ink/70">
+        <li>• World's largest network of research universities</li>
+        <li>• Flexible course selection, especially at undergrad level</li>
+        <li>• Optional Practical Training (OPT) work authorization</li>
+        <li>• Huge Bangladeshi student community in major cities</li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="font-display text-xl font-bold text-bridge-900">Popular programs</h2>
+      <ul class="mt-4 space-y-3 text-sm text-ink/70">
+        <li>• Computer Science & Data Analytics</li>
+        <li>• MBA & Finance</li>
+        <li>• Biomedical & Electrical Engineering</li>
+        <li>• Public Policy & International Relations</li>
+      </ul>
+    </div>
+  </div>
+</section>
+`,
+
+programs: `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / Programs</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Available Programs</h1>
+    <p class="mt-4 max-w-xl text-white/75">Whichever stage you're at, there's a path forward — from foundation year to Ph.D.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5"><div class="w-11 h-11 rounded-lg bg-sunrise-100 text-sunrise-600 flex items-center justify-center font-display font-bold mb-4">F</div><h3 class="font-display font-bold text-bridge-900">Foundation</h3><p class="mt-2 text-sm text-ink/60">A one-year bridge program preparing HSC graduates for direct entry into undergraduate degrees abroad.</p></div>
+    <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5"><div class="w-11 h-11 rounded-lg bg-sunrise-100 text-sunrise-600 flex items-center justify-center font-display font-bold mb-4">D</div><h3 class="font-display font-bold text-bridge-900">Diploma</h3><p class="mt-2 text-sm text-ink/60">Focused, career-oriented training that qualifies you for a specific field in 1-2 years.</p></div>
+    <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5"><div class="w-11 h-11 rounded-lg bg-sunrise-100 text-sunrise-600 flex items-center justify-center font-display font-bold mb-4">B</div><h3 class="font-display font-bold text-bridge-900">Bachelor</h3><p class="mt-2 text-sm text-ink/60">A first degree — the foundation of most international academic and career paths, typically 3-4 years.</p></div>
+    <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5"><div class="w-11 h-11 rounded-lg bg-sunrise-100 text-sunrise-600 flex items-center justify-center font-display font-bold mb-4">M</div><h3 class="font-display font-bold text-bridge-900">Masters</h3><p class="mt-2 text-sm text-ink/60">Specialise further and benefit from some of the world's fastest-growing academic hubs.</p></div>
+    <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5"><div class="w-11 h-11 rounded-lg bg-sunrise-100 text-sunrise-600 flex items-center justify-center font-display font-bold mb-4">P</div><h3 class="font-display font-bold text-bridge-900">Ph.D.</h3><p class="mt-2 text-sm text-ink/60">The highest globally recognised postgraduate academic degree, usually with funded research positions.</p></div>
+  </div>
+  <div class="mt-8"><a onclick="go('home','lead-form')" class="btn-primary nav-link">Talk to a counsellor about your program</a></div>
+</section>
+`,
+
+'student-visa': `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / Service / Student Visa</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Student Visa Support</h1>
+    <p class="mt-4 max-w-xl text-white/75">We prepare your documents, coach you for the interview, and track every deadline — so nothing gets left to chance.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-8">
+    <div class="rounded-2xl border border-black/10 p-6"><span class="font-display font-bold text-sunrise-600">Step 1</span><h3 class="mt-1 font-display font-bold text-bridge-900">Document Preparation</h3><p class="mt-2 text-sm text-ink/60">We help you gather and organise financial, academic, and identity documents to the exact requirements of your destination country.</p></div>
+    <div class="rounded-2xl border border-black/10 p-6"><span class="font-display font-bold text-sunrise-600">Step 2</span><h3 class="mt-1 font-display font-bold text-bridge-900">Application Filing</h3><p class="mt-2 text-sm text-ink/60">Our team submits your visa application and monitors its progress, flagging any issues before they become delays.</p></div>
+    <div class="rounded-2xl border border-black/10 p-6"><span class="font-display font-bold text-sunrise-600">Step 3</span><h3 class="mt-1 font-display font-bold text-bridge-900">Interview Coaching</h3><p class="mt-2 text-sm text-ink/60">Mock interviews and common-question prep so you walk in confident, if your destination requires an interview.</p></div>
+    <div class="rounded-2xl border border-black/10 p-6"><span class="font-display font-bold text-sunrise-600">Step 4</span><h3 class="mt-1 font-display font-bold text-bridge-900">Pre-Departure Briefing</h3><p class="mt-2 text-sm text-ink/60">Once your visa is approved, we brief you on travel, accommodation, and what to expect in your first weeks.</p></div>
+  </div>
+  <div class="mt-8"><a onclick="go('home','lead-form')" class="btn-primary nav-link">Start your visa process</a></div>
+</section>
+`,
+
+'spouse-visa': `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / Service / Spouse Visa</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Spouse Visa Support</h1>
+    <p class="mt-4 max-w-xl text-white/75">Studying abroad shouldn't mean leaving your family behind. We help eligible students bring their spouse along.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-8">
+    <div class="rounded-2xl border border-black/10 p-6"><h3 class="font-display font-bold text-bridge-900">Eligibility Check</h3><p class="mt-2 text-sm text-ink/60">Not every course or destination allows dependent visas — we check your eligibility before you apply, not after.</p></div>
+    <div class="rounded-2xl border border-black/10 p-6"><h3 class="font-display font-bold text-bridge-900">Financial Documentation</h3><p class="mt-2 text-sm text-ink/60">Dependent visas usually need extra proof of funds — we help you plan and document this correctly the first time.</p></div>
+    <div class="rounded-2xl border border-black/10 p-6"><h3 class="font-display font-bold text-bridge-900">Application Support</h3><p class="mt-2 text-sm text-ink/60">We prepare and file the dependent visa application alongside your own student visa application.</p></div>
+    <div class="rounded-2xl border border-black/10 p-6"><h3 class="font-display font-bold text-bridge-900">Settling In Together</h3><p class="mt-2 text-sm text-ink/60">Guidance on accommodation, healthcare registration, and work rights for accompanying spouses.</p></div>
+  </div>
+  <div class="mt-8"><a onclick="go('home','lead-form')" class="btn-primary nav-link">Ask about spouse visas</a></div>
+</section>
+`,
+
+blogs: `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / Blogs</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Blogs</h1>
+    <p class="mt-4 max-w-xl text-white/75">Guidance, tips, and updates for students planning to study abroad.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="rounded-2xl border border-black/10 overflow-hidden">
+      <div class="h-40" style="background:linear-gradient(160deg,#2e4a7a,#4d70a8)"></div>
+      <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Visa Tips</p><h3 class="mt-1 font-display font-bold text-bridge-900">5 documents students forget before their visa interview</h3><p class="mt-2 text-sm text-ink/60">A quick checklist to make sure your file is complete before submission day.</p></div>
+    </div>
+    <div class="rounded-2xl border border-black/10 overflow-hidden">
+      <div class="h-40" style="background:linear-gradient(160deg,#1e786e,#22a396)"></div>
+      <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Scholarships</p><h3 class="mt-1 font-display font-bold text-bridge-900">How to find scholarships you actually qualify for</h3><p class="mt-2 text-sm text-ink/60">Beyond the big-name awards — where smaller, less competitive funding hides.</p></div>
+    </div>
+    <div class="rounded-2xl border border-black/10 overflow-hidden">
+      <div class="h-40" style="background:linear-gradient(160deg,#963c3c,#c25a5a)"></div>
+      <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Life Abroad</p><h3 class="mt-1 font-display font-bold text-bridge-900">Your first month abroad: a practical checklist</h3><p class="mt-2 text-sm text-ink/60">Banking, SIM cards, groceries — the small things that make the first weeks easier.</p></div>
+    </div>
+  </div>
+  <p class="mt-8 text-sm text-ink/50">More articles coming soon.</p>
+</section>
+`,
+
+contact: `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / Contact Us</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Contact Us</h1>
+    <p class="mt-4 max-w-xl text-white/75">Visit one of our offices, or send us a message and a counsellor will get back to you.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid sm:grid-cols-2 gap-6 mb-14">
+    <div class="rounded-2xl border border-black/10 p-6">
+      <h3 class="font-display font-bold text-bridge-900">Dhaka Office</h3>
+      <p class="mt-2 text-sm text-ink/60">House 27, Road 21, Level 3, Nikunja-2, Dhaka</p>
+      <p class="mt-1 text-sm text-ink/70">+880 1686 007004</p>
+      <p class="text-sm text-ink/70">apply@cloudbridge.info</p>
+    </div>
+    <div class="rounded-2xl border border-black/10 p-6">
+      <h3 class="font-display font-bold text-bridge-900">Sylhet Office</h3>
+      <p class="mt-2 text-sm text-ink/60">405-406 Manru Shopping City, 4th Floor, Chowhatta, Sylhet</p>
+      <p class="mt-1 text-sm text-ink/70">+880 1619 130469</p>
+      <p class="text-sm text-ink/70">studyabroad.sylhet@cloudbridge.info</p>
+    </div>
+  </div>
+  <div class="max-w-2xl">
+    <h2 class="section-heading">Send a Message</h2>
+    <form class="demo-form mt-6 grid sm:grid-cols-2 gap-4 bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
+      <input required placeholder="Full name" class="rounded-lg border border-black/10 px-4 py-3 text-sm">
+      <input required placeholder="Phone number" class="rounded-lg border border-black/10 px-4 py-3 text-sm">
+      <input type="email" placeholder="Email (optional)" class="rounded-lg border border-black/10 px-4 py-3 text-sm sm:col-span-2">
+      <textarea placeholder="How can we help?" rows="3" class="rounded-lg border border-black/10 px-4 py-3 text-sm sm:col-span-2"></textarea>
+      <button type="submit" class="btn-primary sm:col-span-2">Send Message</button>
+    </form>
+    <div class="demo-form-thanks hidden mt-8 rounded-2xl bg-harbor-500/10 p-6 text-center text-harbor-600 font-display font-semibold">
+      Thanks! One of our counsellors will call you shortly. <span class="block text-xs font-normal text-ink/40 mt-1">(demo only — nothing was actually sent)</span>
+    </div>
+  </div>
+</section>
+`,
+
+};
+
+/* ============================================================
+   NAVIGATION ENGINE — swaps #pageRoot content and re-initialises
+   the interactive bits (FAQ, counters, video facade, forms) that
+   exist on whichever page was just rendered.
+   ============================================================ */
+/* ============================================================
+   HERO SLIDER — 3 slides, auto-rotates every 5s, arrows + dots.
+   Only present on the Home page; guarded so other pages are fine.
+   ============================================================ */
+let sliderIndex = 0;
+let sliderTimer = null;
+function sliderShow(i) {
+  const slides = document.querySelectorAll('#heroSlider .slider-slide');
+  if (!slides.length) return;
+  sliderIndex = (i + slides.length) % slides.length;
+  slides.forEach((s, idx) => s.classList.toggle('hidden', idx !== sliderIndex));
+  document.querySelectorAll('#heroSlider .slider-dot').forEach((d, idx) => {
+    d.classList.toggle('bg-sunrise-400', idx === sliderIndex);
+    d.classList.toggle('bg-white/30', idx !== sliderIndex);
+  });
+}
+function sliderMove(delta) { sliderShow(sliderIndex + delta); resetSliderTimer(); }
+function sliderGoTo(i) { sliderShow(i); resetSliderTimer(); }
+function resetSliderTimer() {
+  if (sliderTimer) clearInterval(sliderTimer);
+  if (!document.getElementById('heroSlider')) return;
+  sliderTimer = setInterval(() => sliderShow(sliderIndex + 1), 5000);
+}
+window.sliderMove = sliderMove;
+window.sliderGoTo = sliderGoTo;
+
+function go(id, scrollToId) {
+  const root = document.getElementById('pageRoot');
+  root.innerHTML = pages[id] || pages.home;
+  document.querySelectorAll('.nav-link[data-page]').forEach(a => a.classList.toggle('active', a.dataset.page === id));
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (mobileMenu) mobileMenu.classList.add('hidden');
+  initPageScripts();
+  if (scrollToId) {
+    setTimeout(() => { const el = document.getElementById(scrollToId); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60);
+  } else {
+    window.scrollTo(0, 0);
+  }
+}
+window.go = go;
+
+function initPageScripts() {
+  // Hero slider (home page only)
+  sliderIndex = 0;
+  sliderShow(0);
+  resetSliderTimer();
+
+  // Course tabs (home page only)
+  document.querySelectorAll('.course-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('.course-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.course-tab-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
+    });
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const answer = btn.nextElementSibling;
+      const icon = btn.querySelector('.faq-icon');
+      const isOpen = !answer.classList.contains('hidden');
+      document.querySelectorAll('.faq-answer').forEach(a => a.classList.add('hidden'));
+      document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = 'rotate(0deg)');
+      if (!isOpen) { answer.classList.remove('hidden'); icon.style.transform = 'rotate(45deg)'; }
+    });
+  });
+
+  // YouTube facade -> real embed on click
+  document.querySelectorAll('.yt-facade').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1';
+      iframe.className = 'w-full h-full';
+      iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+      iframe.allowFullscreen = true;
+      btn.replaceWith(iframe);
+      iframe.parentElement.classList.add('aspect-video');
+    });
+  });
+
+  // Stat counters
+  const counters = document.querySelectorAll('.counter');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.target, 10);
+        const suffix = el.dataset.suffix ?? '+';
+        const start = performance.now();
+        const duration = 1200;
+        function tick(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          el.textContent = Math.floor(progress * target).toLocaleString() + suffix;
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+        io.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => io.observe(c));
+
+  // Demo forms (no backend — just show a thank-you state)
+  document.querySelectorAll('.demo-form').forEach(form => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      form.classList.add('hidden');
+      const thanks = form.nextElementSibling;
+      if (thanks) thanks.classList.remove('hidden');
+    });
+  });
+}
+
+// Mobile menu toggle (bound once — header is static across pages)
+document.getElementById('mobileToggle').addEventListener('click', () => {
+  document.getElementById('mobileMenu').classList.toggle('hidden');
+});
+
+// Boot into the homepage
+go('home');
+</script>
+
+</body>
+</html>
