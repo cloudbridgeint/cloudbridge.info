@@ -56,7 +56,7 @@
   .nav-drop:hover .nav-drop-panel { display:block; }
   .crumb { font-size:.8rem; color:rgba(255,255,255,.6); }
   .crumb a { cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
-  #heroSlider .slider-arrow { position:absolute; top:40%; transform:translateY(-50%); width:2.5rem; height:2.5rem; border-radius:9999px; background:rgba(255,255,255,.12); border:none; color:#fff; font-size:1.5rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10; transition:.15s; }
+  #heroSlider .slider-arrow { position:absolute; bottom:1.35rem; width:2.5rem; height:2.5rem; border-radius:9999px; background:rgba(255,255,255,.12); border:none; color:#fff; font-size:1.5rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:20; transition:.15s; }
   #heroSlider .slider-arrow:hover { background:rgba(255,255,255,.22); }
   .slider-dot { transition:.2s; cursor:pointer; border:none; }
   .course-tab-btn.active { background:#0f1c30; color:#fff; }
@@ -162,49 +162,93 @@
 const pages = {
 
 home: `
-<section class="relative overflow-hidden bg-dusk-gradient text-white" id="heroSlider">
-  <div class="max-w-container mx-auto px-4 md:px-8 pt-16 md:pt-20 relative">
-    <button onclick="sliderMove(-1)" class="slider-arrow" style="left:0" aria-label="Previous slide">‹</button>
-    <button onclick="sliderMove(1)" class="slider-arrow" style="right:0" aria-label="Next slide">›</button>
+<section class="relative overflow-hidden bg-bridge-950 text-white" id="heroSlider">
 
-    <div class="slider-slide grid md:grid-cols-2 gap-10 items-center" data-slide="0">
-      <div>
+  <div class="slider-slide relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="0">
+    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 1400 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs><linearGradient id="g0" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1c3255"/><stop offset="100%" stop-color="#0a1220"/></linearGradient></defs>
+      <rect width="1400" height="600" fill="url(#g0)"/>
+      <g opacity="0.55" fill="none" stroke="#7f9bc9" stroke-width="3">
+        <path d="M 480 420 Q 700 250 920 420"/>
+        <path d="M 560 420 L 560 460 M 700 260 L 700 460 M 840 420 L 840 460"/>
+      </g>
+      <rect x="420" y="418" width="560" height="8" fill="#4d70a8" opacity="0.6"/>
+      <g fill="#0c1730">
+        <rect x="40" y="300" width="70" height="180"/>
+        <rect x="120" y="340" width="55" height="140"/>
+        <rect x="1230" y="280" width="60" height="200"/>
+        <rect x="1300" y="330" width="70" height="150"/>
+      </g>
+    </svg>
+    <div class="absolute inset-0 bg-gradient-to-r from-bridge-950 via-bridge-950/75 to-transparent"></div>
+    <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
+      <div class="max-w-xl">
         <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Overseas Education Consultancy</p>
         <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">Your Bridge to Studying Abroad</h1>
         <p class="mt-5 max-w-md text-white/75">From university selection to visa approval — CloudBridge guides students across Bangladesh into universities in the UK, Malaysia, and the USA.</p>
         <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
       </div>
-      <div class="rounded-2xl h-56 md:h-80" style="background-image:linear-gradient(160deg,#2e4a7a,#4d70a8)"></div>
     </div>
+  </div>
 
-    <div class="slider-slide hidden grid md:grid-cols-2 gap-10 items-center" data-slide="1">
-      <div>
+  <div class="slider-slide hidden relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="1">
+    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 1400 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#134b42"/><stop offset="100%" stop-color="#0a1220"/></linearGradient></defs>
+      <rect width="1400" height="600" fill="url(#g1)"/>
+      <circle cx="1080" cy="300" r="220" fill="none" stroke="#5fc2af" stroke-width="1.5" opacity="0.4"/>
+      <ellipse cx="1080" cy="300" rx="220" ry="70" fill="none" stroke="#5fc2af" stroke-width="1" opacity="0.35"/>
+      <ellipse cx="1080" cy="300" rx="70" ry="220" fill="none" stroke="#5fc2af" stroke-width="1" opacity="0.35"/>
+    </svg>
+    <div class="absolute inset-0 bg-gradient-to-r from-bridge-950 via-bridge-950/75 to-transparent"></div>
+    <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
+      <div class="max-w-xl">
         <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Admissions Open</p>
         <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">Fall 2026 Intake Now Open</h1>
         <p class="mt-5 max-w-md text-white/75">100% free end-to-end counseling and application processing — from shortlisting your university to visa approval.</p>
         <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
       </div>
-      <div class="rounded-2xl h-56 md:h-80" style="background-image:linear-gradient(160deg,#1e786e,#22a396)"></div>
     </div>
+  </div>
 
-    <div class="slider-slide hidden grid md:grid-cols-2 gap-10 items-center" data-slide="2">
-      <div>
+  <div class="slider-slide hidden relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="2">
+    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 1400 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4a2020"/><stop offset="100%" stop-color="#0a1220"/></linearGradient></defs>
+      <rect width="1400" height="600" fill="url(#g2)"/>
+      <g opacity="0.45" fill="none" stroke="#e0a9a9" stroke-width="2">
+        <path d="M 1000 220 L 1150 280 L 1000 340 L 850 280 Z"/>
+        <path d="M 1000 340 L 1000 400"/>
+      </g>
+      <circle cx="1000" cy="410" r="8" fill="#f7a827"/>
+    </svg>
+    <div class="absolute inset-0 bg-gradient-to-r from-bridge-950 via-bridge-950/75 to-transparent"></div>
+    <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
+      <div class="max-w-xl">
         <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Scholarships</p>
         <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">Scholarships at 500+ Universities</h1>
         <p class="mt-5 max-w-md text-white/75">Let our counsellors match you with funding you actually qualify for — most students never even check.</p>
         <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
       </div>
-      <div class="rounded-2xl h-56 md:h-80" style="background-image:linear-gradient(160deg,#963c3c,#c25a5a)"></div>
     </div>
   </div>
 
-  <div class="flex justify-center gap-2 pt-8 pb-2 relative">
+  <div class="hidden lg:flex absolute right-10 top-1/2 -translate-y-1/2 z-20 flex-col items-center justify-center w-52 aspect-square rounded-2xl text-center shadow-2xl px-5" style="background-image:linear-gradient(135deg,#2f5182,#c26f0d)">
+    <p class="font-display text-5xl font-extrabold leading-none">13<span class="text-sunrise-100 align-top text-2xl">+</span></p>
+    <p class="mt-1 text-base font-semibold">years</p>
+    <p class="mt-2 text-xs text-white/85 leading-snug">of student service excellence</p>
+  </div>
+
+  <button onclick="sliderMove(-1)" class="slider-arrow" style="left:1rem" aria-label="Previous slide">‹</button>
+  <button onclick="sliderMove(1)" class="slider-arrow" style="right:1rem" aria-label="Next slide">›</button>
+
+  <div class="absolute bottom-5 inset-x-0 z-20 flex justify-center gap-2">
     <button class="slider-dot w-2.5 h-2.5 rounded-full bg-sunrise-400" data-dot="0" onclick="sliderGoTo(0)" aria-label="Slide 1"></button>
     <button class="slider-dot w-2.5 h-2.5 rounded-full bg-white/30" data-dot="1" onclick="sliderGoTo(1)" aria-label="Slide 2"></button>
     <button class="slider-dot w-2.5 h-2.5 rounded-full bg-white/30" data-dot="2" onclick="sliderGoTo(2)" aria-label="Slide 3"></button>
   </div>
+</section>
 
-  <div class="max-w-container mx-auto px-4 md:px-8 relative mt-6 pb-16">
+<section class="bg-dusk-gradient text-white">
+  <div class="max-w-container mx-auto px-4 md:px-8 relative pt-10 pb-16">
     <div class="relative h-24 w-full max-w-3xl">
       <svg viewBox="0 0 800 100" class="absolute inset-0 w-full h-full" fill="none" preserveAspectRatio="none">
         <path d="M 20 80 Q 400 -20 780 80" stroke="#F7A827" stroke-width="2" stroke-linecap="round" class="path-line" pathLength="1000"/>
