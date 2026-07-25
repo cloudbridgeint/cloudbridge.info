@@ -124,34 +124,98 @@
 <main id="pageRoot"></main>
 
 <!-- Footer (static across all pages) -->
-<footer class="bg-dusk-gradient text-white/80">
-  <div class="max-w-container mx-auto px-4 md:px-8 py-14">
-    <div class="grid md:grid-cols-4 gap-10">
-      <div>
-        <p class="font-display text-xl font-bold text-white">CloudBridge</p>
-        <p class="mt-2 max-w-xs text-sm text-white/60">Your trusted partner for studying abroad from Bangladesh.</p>
+<footer class="bg-dusk-gradient text-white/70">
+
+  <!-- Contact strip -->
+  <div class="max-w-container mx-auto px-4 md:px-8 -mt-10 md:-mt-12 relative z-10">
+    <div class="rounded-2xl p-6 md:p-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6 shadow-xl" style="background-image:linear-gradient(120deg,#e88f14,#c26f0d)">
+      <div class="flex items-start gap-4">
+        <span class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="#c26f0d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/></svg>
+        </span>
+        <div>
+          <p class="font-display font-semibold text-white">Call Us Anytime</p>
+          <p class="text-sm text-white/90 mt-1">+880 1686 007004 <span class="text-white/60">(Dhaka)</span></p>
+          <p class="text-sm text-white/90">+880 1XXX XXXXXX <span class="text-white/60">(Sylhet)</span></p>
+        </div>
       </div>
-      <div class="text-sm">
-        <p class="font-display font-semibold text-white mb-2">Quick Links</p>
-        <p class="mt-1"><a onclick="go('about')" class="nav-link hover:text-sunrise-300">About us</a></p>
-        <p class="mt-1"><a onclick="go('programs')" class="nav-link hover:text-sunrise-300">Programs</a></p>
-        <p class="mt-1"><a onclick="go('destinations')" class="nav-link hover:text-sunrise-300">Study Destination</a></p>
-        <p class="mt-1"><a onclick="go('blogs')" class="nav-link hover:text-sunrise-300">Blogs</a></p>
+      <div class="flex items-start gap-4">
+        <span class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="#c26f0d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/></svg>
+        </span>
+        <div>
+          <p class="font-display font-semibold text-white">Send Mail</p>
+          <p class="text-sm text-white/90 mt-1">apply@cloudbridge.info</p>
+          <p class="text-sm text-white/90">info@cloudbridge.info</p>
+        </div>
       </div>
-      <div class="text-sm">
-        <p class="font-display font-semibold text-white mb-2">Contact</p>
-        <p>Email: apply@cloudbridge.info</p>
-        <p class="mt-1">Phone: +880 1686 007004</p>
-      </div>
-      <div class="flex gap-4 text-sm items-start">
-        <a href="#" class="text-white/70 hover:text-sunrise-300">Facebook</a>
-        <a href="#" class="text-white/70 hover:text-sunrise-300">Instagram</a>
-        <a href="#" class="text-white/70 hover:text-sunrise-300">TikTok</a>
+      <div class="flex items-start gap-4">
+        <span class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="#c26f0d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        </span>
+        <div>
+          <p class="font-display font-semibold text-white">Our Address</p>
+          <p class="text-sm text-white/90 mt-1"><span class="font-semibold">Dhaka —</span> [street address], Dhaka</p>
+          <p class="text-sm text-white/90"><span class="font-semibold">Sylhet —</span> [street address], Sylhet</p>
+        </div>
       </div>
     </div>
-    <div class="mt-10 pt-6 border-t border-white/10 text-xs text-white/50">© 2026 CloudBridge. All rights reserved.</div>
+  </div>
+
+  <div class="max-w-container mx-auto px-4 md:px-8 pt-12 pb-14">
+    <div class="grid md:grid-cols-4 gap-10">
+      <div>
+        <a onclick="go('home')" class="nav-link flex items-center gap-2 font-display text-xl font-bold text-white">
+          <span class="w-8 h-8 rounded bg-sunrise-400 inline-block"></span>
+          CloudBridge
+        </a>
+        <p class="mt-3 max-w-xs text-sm text-white/60">Your trusted partner for studying abroad — from university shortlisting to visa approval.</p>
+        <a onclick="go('about')" class="nav-link btn-outline mt-5 !border-white/30 !text-white hover:!bg-white hover:!text-bridge-900 inline-flex">Read More</a>
+      </div>
+
+      <div class="text-sm">
+        <p class="font-display font-semibold text-white mb-3">Study Destinations</p>
+        <p class="mt-2"><a onclick="go('dest-uk')" class="nav-link hover:text-sunrise-300"><span class="text-sunrise-400">»</span> Study in UK</a></p>
+        <p class="mt-2"><a onclick="go('dest-usa')" class="nav-link hover:text-sunrise-300"><span class="text-sunrise-400">»</span> Study in USA</a></p>
+        <p class="mt-2"><a onclick="go('dest-malaysia')" class="nav-link hover:text-sunrise-300"><span class="text-sunrise-400">»</span> Study in Malaysia</a></p>
+        <p class="mt-2"><a onclick="go('student-visa')" class="nav-link hover:text-sunrise-300"><span class="text-sunrise-400">»</span> Student Visa</a></p>
+        <p class="mt-2"><a onclick="go('spouse-visa')" class="nav-link hover:text-sunrise-300"><span class="text-sunrise-400">»</span> Spouse Visa</a></p>
+      </div>
+
+      <div class="text-sm">
+        <p class="font-display font-semibold text-white mb-3">Useful Links</p>
+        <p class="mt-2"><a onclick="go('home')" class="nav-link hover:text-sunrise-300"><span class="text-sunrise-400">»</span> Home</a></p>
+        <p class="mt-2"><a onclick="go('about')" class="nav-link hover:text-sunrise-300"><span class="text-sunrise-400">»</span> About Us</a></p>
+        <p class="mt-2"><a onclick="go('programs')" class="nav-link hover:text-sunrise-300"><span class="text-sunrise-400">»</span> Programs</a></p>
+        <p class="mt-2"><a onclick="go('blogs')" class="nav-link hover:text-sunrise-300"><span class="text-sunrise-400">»</span> Blogs</a></p>
+        <p class="mt-2"><a onclick="go('contact')" class="nav-link hover:text-sunrise-300"><span class="text-sunrise-400">»</span> Contact Us</a></p>
+      </div>
+
+      <div class="text-sm">
+        <p class="font-display font-semibold text-white mb-3">Newsletter</p>
+        <p class="text-white/60 mb-4">Sign up for alerts, our latest blogs, thoughts, and insights.</p>
+        <form class="demo-form flex flex-col gap-3">
+          <input type="email" required placeholder="Your email address" class="rounded-lg px-4 py-2.5 text-sm text-ink w-full border-none">
+          <button type="submit" class="btn-primary w-full !py-2.5 text-sm">Subscribe Now</button>
+        </form>
+        <p class="demo-form-thanks hidden text-sm text-harbor-500 mt-2 font-medium">Thanks! You're subscribed. <span class="block text-xs text-white/40 font-normal">(demo only)</span></p>
+      </div>
+    </div>
+
+    <div class="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
+      <p>© 2026 CloudBridge. All rights reserved.</p>
+      <div class="flex gap-3">
+        <a href="#" class="w-9 h-9 rounded-full bg-white/10 hover:bg-sunrise-400 hover:text-bridge-950 flex items-center justify-center transition font-display font-bold text-sm" aria-label="Facebook">f</a>
+        <a href="#" class="w-9 h-9 rounded-full bg-white/10 hover:bg-sunrise-400 hover:text-bridge-950 flex items-center justify-center transition font-display font-bold text-[11px]" aria-label="Instagram">IG</a>
+        <a href="#" class="w-9 h-9 rounded-full bg-white/10 hover:bg-sunrise-400 hover:text-bridge-950 flex items-center justify-center transition font-display font-bold text-[11px]" aria-label="TikTok">TT</a>
+      </div>
+    </div>
   </div>
 </footer>
+
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top" class="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-sunrise-400 text-bridge-950 shadow-lg flex items-center justify-center hover:bg-sunrise-300 transition">
+  <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>
+</button>
 
 <script>
 /* ============================================================
