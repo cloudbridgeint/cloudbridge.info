@@ -336,12 +336,12 @@ home: `
 
 <section class="py-12 bg-white border-y border-black/5">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <h2 class="section-heading text-center mb-6" id="uniTabLabel">Featured UK Universities</h2>
+    <h2 class="section-heading text-center mb-6">Featured Universities</h2>
     <div class="flex flex-wrap justify-center gap-2 mb-8">
-      <button class="uni-tab-btn btn-outline !text-xs active" data-tab="uk" data-label="Featured UK Universities">UK</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="usa" data-label="Featured USA Universities">USA</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="canada" data-label="Featured Canada Universities">Canada</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="malta" data-label="Featured Malta Universities">Malta</button>
+      <button class="uni-tab-btn btn-outline !text-xs active" data-tab="uk">UK</button>
+      <button class="uni-tab-btn btn-outline !text-xs" data-tab="usa">USA</button>
+      <button class="uni-tab-btn btn-outline !text-xs" data-tab="canada">Canada</button>
+      <button class="uni-tab-btn btn-outline !text-xs" data-tab="malta">Malta</button>
     </div>
     <div class="uni-tab-panel" data-panel="uk">
       <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-4">
@@ -1124,8 +1124,6 @@ function initPageScripts() {
       document.querySelectorAll('.uni-tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.querySelectorAll('.uni-tab-panel').forEach(p => p.classList.toggle('hidden', p.dataset.panel !== tab));
-      const label = document.getElementById('uniTabLabel');
-      if (label) label.textContent = btn.dataset.label;
     });
   });
 
