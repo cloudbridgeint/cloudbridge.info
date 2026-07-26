@@ -66,6 +66,7 @@
   .uni-filter-check { accent-color:#e12d38; width:1rem; height:1rem; cursor:pointer; }
   .uni-filter-check-label { display:flex; align-items:center; gap:.5rem; font-size:.8rem; color:#3d4451; cursor:pointer; }
   .uni-intake-badge { font-size:.65rem; font-weight:600; padding:.2rem .55rem; border-radius:9999px; background:#eef2f9; color:#233f68; }
+  .uni-card-btn { border-radius:0.5rem; }
   .crumb { font-size:.8rem; color:rgba(255,255,255,.6); }
   .crumb a { cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
   #heroSlider .slider-arrow { position:absolute; bottom:1.35rem; width:2.5rem; height:2.5rem; border-radius:9999px; background:rgba(255,255,255,.12); border:none; color:#fff; font-size:1.5rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:20; transition:.15s; }
@@ -1125,6 +1126,8 @@ programs: `
 <section class="py-10 md:py-14 bg-white">
   <div class="max-w-container mx-auto px-4 md:px-8">
 
+    <h2 class="section-heading text-center mx-auto mb-8">Select Your Preferred University and Apply Today</h2>
+
     <button id="uniFilterToggle" class="lg:hidden w-full mb-4 flex items-center justify-between rounded-xl border border-black/10 px-4 py-3 font-display font-semibold text-bridge-900">
       <span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M2.5 4.5A1 1 0 013.5 3.5h13a1 1 0 01.8 1.6l-5.3 6.9v4a1 1 0 01-.45.834l-2 1.333A1 1 0 017.5 17V12l-5.3-6.9a1 1 0 01-.2-.6z" clip-rule="evenodd" /></svg>Filters</span>
       <svg id="uniFilterToggleIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 transition-transform"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
@@ -1168,6 +1171,8 @@ programs: `
             <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Intake</label>
             <div id="uniFilterIntake" class="space-y-1.5"></div>
           </div>
+
+          <button id="uniApplyFilters" class="btn-primary w-full !rounded-lg justify-center">Apply Filters</button>
 
         </div>
       </aside>
@@ -1426,46 +1431,46 @@ function initUniCarousels() {
    client-side against the static dataset below.
    ============================================================ */
 const universityDirectory = [
-  {name:"Aston University", country:"UK", city:"Birmingham", feeMin:13000, feeMax:17000, intake:["September","January"], logo:"assets/universities/aston.png"},
-  {name:"Arden University", country:"UK", city:"Coventry", feeMin:7000, feeMax:9500, intake:["September","January","May"], logo:"assets/universities/arden.png"},
-  {name:"Birmingham City University", country:"UK", city:"Birmingham", feeMin:12500, feeMax:16000, intake:["September","January"], logo:"assets/universities/bcu.png"},
-  {name:"Bangor University", country:"UK", city:"Bangor", feeMin:11500, feeMax:15500, intake:["September","January"], logo:"assets/universities/bangor.png"},
-  {name:"Abertay University", country:"UK", city:"Dundee", feeMin:11000, feeMax:14500, intake:["September","January"], logo:"assets/universities/abertay.png"},
-  {name:"De Montfort University", country:"UK", city:"Leicester", feeMin:12000, feeMax:15500, intake:["September","January"], logo:"assets/universities/demontfort.png"},
-  {name:"Northeastern University", country:"USA", city:"Boston", feeMin:35000, feeMax:48000, intake:["September","January"]},
-  {name:"Arizona State University", country:"USA", city:"Tempe", feeMin:22000, feeMax:29000, intake:["September","January"]},
-  {name:"University of Illinois Chicago", country:"USA", city:"Chicago", feeMin:24000, feeMax:31000, intake:["September","January"]},
-  {name:"University of Dayton", country:"USA", city:"Dayton", feeMin:20000, feeMax:26000, intake:["September","January"]},
-  {name:"University of Toronto", country:"Canada", city:"Toronto", feeMin:28000, feeMax:42000, intake:["September","January"]},
-  {name:"Simon Fraser University", country:"Canada", city:"Burnaby", feeMin:22000, feeMax:30000, intake:["September","January","May"]},
-  {name:"University of Manitoba", country:"Canada", city:"Winnipeg", feeMin:18000, feeMax:24000, intake:["September","January"]},
-  {name:"Toronto Metropolitan University", country:"Canada", city:"Toronto", feeMin:21000, feeMax:27000, intake:["September","January"]},
-  {name:"University of Malta", country:"Malta", city:"Msida", feeMin:8000, feeMax:12000, intake:["September","February"]},
-  {name:"MCAST", country:"Malta", city:"Paola", feeMin:6000, feeMax:9000, intake:["September","February"]},
-  {name:"American University of Malta", country:"Malta", city:"Bormla", feeMin:9000, feeMax:13000, intake:["September","January"]},
-  {name:"Sorbonne University", country:"France", city:"Paris", feeMin:9000, feeMax:14000, intake:["September"]},
-  {name:"Sciences Po", country:"France", city:"Paris", feeMin:15000, feeMax:22000, intake:["September","January"]},
-  {name:"EM Lyon Business School", country:"France", city:"Lyon", feeMin:16000, feeMax:24000, intake:["September","January"]},
-  {name:"Toulouse Business School", country:"France", city:"Toulouse", feeMin:13000, feeMax:19000, intake:["September"]},
-  {name:"IE University", country:"Spain", city:"Madrid", feeMin:18000, feeMax:26000, intake:["September","January"]},
-  {name:"University of Barcelona", country:"Spain", city:"Barcelona", feeMin:8000, feeMax:12000, intake:["September"]},
-  {name:"ESADE", country:"Spain", city:"Barcelona", feeMin:19000, feeMax:27000, intake:["September"]},
-  {name:"Universidad Complutense Madrid", country:"Spain", city:"Madrid", feeMin:7000, feeMax:11000, intake:["September"]},
-  {name:"University of Helsinki", country:"Finland", city:"Helsinki", feeMin:10000, feeMax:15000, intake:["September"]},
-  {name:"Aalto University", country:"Finland", city:"Espoo", feeMin:12000, feeMax:16000, intake:["September"]},
-  {name:"LUT University", country:"Finland", city:"Lappeenranta", feeMin:9000, feeMax:13000, intake:["September","January"]},
-  {name:"University of Auckland", country:"New Zealand", city:"Auckland", feeMin:24000, feeMax:33000, intake:["February","July"]},
-  {name:"University of Otago", country:"New Zealand", city:"Dunedin", feeMin:22000, feeMax:30000, intake:["February","July"]},
-  {name:"Victoria University of Wellington", country:"New Zealand", city:"Wellington", feeMin:21000, feeMax:28000, intake:["February","July"]},
-  {name:"Massey University", country:"New Zealand", city:"Palmerston North", feeMin:20000, feeMax:27000, intake:["February","July"]},
-  {name:"University of Amsterdam", country:"Netherlands", city:"Amsterdam", feeMin:11000, feeMax:18000, intake:["September","February"]},
-  {name:"Erasmus University Rotterdam", country:"Netherlands", city:"Rotterdam", feeMin:12000, feeMax:19000, intake:["September"]},
-  {name:"Tilburg University", country:"Netherlands", city:"Tilburg", feeMin:9000, feeMax:15000, intake:["September","February"]},
-  {name:"Maastricht University", country:"Netherlands", city:"Maastricht", feeMin:10000, feeMax:16000, intake:["September","February"]},
-  {name:"Sunway University", country:"Malaysia", city:"Petaling Jaya", feeMin:6000, feeMax:9500, intake:["September","January","May"]},
-  {name:"Taylor's University", country:"Malaysia", city:"Subang Jaya", feeMin:6500, feeMax:10000, intake:["September","January","May"]},
-  {name:"Monash University Malaysia", country:"Malaysia", city:"Bandar Sunway", feeMin:8000, feeMax:12500, intake:["September","January","May"]},
-  {name:"University of Nottingham Malaysia", country:"Malaysia", city:"Semenyih", feeMin:8500, feeMax:13000, intake:["September","January"]}
+  {name:"Aston University", country:"UK", city:"Birmingham", feeMin:13000, feeMax:17000, intake:["September","January"], scholarship:true, logo:"assets/universities/aston.png"},
+  {name:"Arden University", country:"UK", city:"Coventry", feeMin:7000, feeMax:9500, intake:["September","January","May"], scholarship:true, logo:"assets/universities/arden.png"},
+  {name:"Birmingham City University", country:"UK", city:"Birmingham", feeMin:12500, feeMax:16000, intake:["September","January"], scholarship:true, logo:"assets/universities/bcu.png"},
+  {name:"Bangor University", country:"UK", city:"Bangor", feeMin:11500, feeMax:15500, intake:["September","January"], scholarship:false, logo:"assets/universities/bangor.png"},
+  {name:"Abertay University", country:"UK", city:"Dundee", feeMin:11000, feeMax:14500, intake:["September","January"], scholarship:true, logo:"assets/universities/abertay.png"},
+  {name:"De Montfort University", country:"UK", city:"Leicester", feeMin:12000, feeMax:15500, intake:["September","January"], scholarship:true, logo:"assets/universities/demontfort.png"},
+  {name:"Northeastern University", country:"USA", city:"Boston", feeMin:35000, feeMax:48000, intake:["September","January"], scholarship:true, logo:"assets/universities/northeastern.png"},
+  {name:"Arizona State University", country:"USA", city:"Tempe", feeMin:22000, feeMax:29000, intake:["September","January"], scholarship:true, logo:"assets/universities/asu.png"},
+  {name:"University of Illinois Chicago", country:"USA", city:"Chicago", feeMin:24000, feeMax:31000, intake:["September","January"], scholarship:false, logo:"assets/universities/uic.png"},
+  {name:"University of Dayton", country:"USA", city:"Dayton", feeMin:20000, feeMax:26000, intake:["September","January"], scholarship:true, logo:"assets/universities/dayton.png"},
+  {name:"University of Toronto", country:"Canada", city:"Toronto", feeMin:28000, feeMax:42000, intake:["September","January"], scholarship:true, logo:"assets/universities/toronto.png"},
+  {name:"Simon Fraser University", country:"Canada", city:"Burnaby", feeMin:22000, feeMax:30000, intake:["September","January","May"], scholarship:true, logo:"assets/universities/sfu.png"},
+  {name:"University of Manitoba", country:"Canada", city:"Winnipeg", feeMin:18000, feeMax:24000, intake:["September","January"], scholarship:false, logo:"assets/universities/manitoba.png"},
+  {name:"Toronto Metropolitan University", country:"Canada", city:"Toronto", feeMin:21000, feeMax:27000, intake:["September","January"], scholarship:true, logo:"assets/universities/tmu.png"},
+  {name:"University of Malta", country:"Malta", city:"Msida", feeMin:8000, feeMax:12000, intake:["September","February","November"], scholarship:true, logo:"assets/universities/malta.png"},
+  {name:"MCAST", country:"Malta", city:"Paola", feeMin:6000, feeMax:9000, intake:["September","February","December"], scholarship:false, logo:"assets/universities/mcast.png"},
+  {name:"American University of Malta", country:"Malta", city:"Bormla", feeMin:9000, feeMax:13000, intake:["September","January","November"], scholarship:true, logo:"assets/universities/aum.png"},
+  {name:"Sorbonne University", country:"France", city:"Paris", feeMin:9000, feeMax:14000, intake:["September"], scholarship:true, logo:"assets/universities/sorbonne.png"},
+  {name:"Sciences Po", country:"France", city:"Paris", feeMin:15000, feeMax:22000, intake:["September","January"], scholarship:true, logo:"assets/universities/sciencespo.png"},
+  {name:"EM Lyon Business School", country:"France", city:"Lyon", feeMin:16000, feeMax:24000, intake:["September","January"], scholarship:false, logo:"assets/universities/emlyon.png"},
+  {name:"Toulouse Business School", country:"France", city:"Toulouse", feeMin:13000, feeMax:19000, intake:["September"], scholarship:true, logo:"assets/universities/tbs.png"},
+  {name:"IE University", country:"Spain", city:"Madrid", feeMin:18000, feeMax:26000, intake:["September","January"], scholarship:true, logo:"assets/universities/ie.png"},
+  {name:"University of Barcelona", country:"Spain", city:"Barcelona", feeMin:8000, feeMax:12000, intake:["September"], scholarship:false, logo:"assets/universities/barcelona.png"},
+  {name:"ESADE", country:"Spain", city:"Barcelona", feeMin:19000, feeMax:27000, intake:["September"], scholarship:true, logo:"assets/universities/esade.png"},
+  {name:"Universidad Complutense Madrid", country:"Spain", city:"Madrid", feeMin:7000, feeMax:11000, intake:["September"], scholarship:false, logo:"assets/universities/complutense.png"},
+  {name:"University of Helsinki", country:"Finland", city:"Helsinki", feeMin:10000, feeMax:15000, intake:["September"], scholarship:true, logo:"assets/universities/helsinki.png"},
+  {name:"Aalto University", country:"Finland", city:"Espoo", feeMin:12000, feeMax:16000, intake:["September"], scholarship:true, logo:"assets/universities/aalto.png"},
+  {name:"LUT University", country:"Finland", city:"Lappeenranta", feeMin:9000, feeMax:13000, intake:["September","January"], scholarship:false, logo:"assets/universities/lut.png"},
+  {name:"University of Auckland", country:"New Zealand", city:"Auckland", feeMin:24000, feeMax:33000, intake:["February","July"], scholarship:true, logo:"assets/universities/auckland.png"},
+  {name:"University of Otago", country:"New Zealand", city:"Dunedin", feeMin:22000, feeMax:30000, intake:["February","July"], scholarship:true, logo:"assets/universities/otago.png"},
+  {name:"Victoria University of Wellington", country:"New Zealand", city:"Wellington", feeMin:21000, feeMax:28000, intake:["February","July"], scholarship:false, logo:"assets/universities/vuw.png"},
+  {name:"Massey University", country:"New Zealand", city:"Palmerston North", feeMin:20000, feeMax:27000, intake:["February","July"], scholarship:true, logo:"assets/universities/massey.png"},
+  {name:"University of Amsterdam", country:"Netherlands", city:"Amsterdam", feeMin:11000, feeMax:18000, intake:["September","February"], scholarship:true, logo:"assets/universities/amsterdam.png"},
+  {name:"Erasmus University Rotterdam", country:"Netherlands", city:"Rotterdam", feeMin:12000, feeMax:19000, intake:["September"], scholarship:true, logo:"assets/universities/erasmus.png"},
+  {name:"Tilburg University", country:"Netherlands", city:"Tilburg", feeMin:9000, feeMax:15000, intake:["September","February"], scholarship:false, logo:"assets/universities/tilburg.png"},
+  {name:"Maastricht University", country:"Netherlands", city:"Maastricht", feeMin:10000, feeMax:16000, intake:["September","February"], scholarship:true, logo:"assets/universities/maastricht.png"},
+  {name:"Sunway University", country:"Malaysia", city:"Petaling Jaya", feeMin:6000, feeMax:9500, intake:["September","January","May"], scholarship:true, logo:"assets/universities/sunway.png"},
+  {name:"Taylor's University", country:"Malaysia", city:"Subang Jaya", feeMin:6500, feeMax:10000, intake:["September","January","May"], scholarship:true, logo:"assets/universities/taylors.png"},
+  {name:"Monash University Malaysia", country:"Malaysia", city:"Bandar Sunway", feeMin:8000, feeMax:12500, intake:["September","January","May"], scholarship:false, logo:"assets/universities/monash.png"},
+  {name:"University of Nottingham Malaysia", country:"Malaysia", city:"Semenyih", feeMin:8500, feeMax:13000, intake:["September","January"], scholarship:true, logo:"assets/universities/nottingham_my.png"}
 ];
 const uniFeeBrackets = [0,5000,10000,15000,20000,25000,30000,35000,40000,50000];
 function uniInitials(name) {
@@ -1485,17 +1490,9 @@ function initUniversityDirectory() {
   const emptyState = document.getElementById('uniEmptyState');
 
   const countries = [...new Set(universityDirectory.map(u => u.country))].sort();
-  const cities = [...new Set(universityDirectory.map(u => u.city))].sort();
-  const intakes = [...new Set(universityDirectory.flatMap(u => u.intake))].sort();
 
   countryBox.innerHTML = countries.map(c => `
     <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="country" value="${c}"> ${c}</label>
-  `).join('');
-  cityBox.innerHTML = cities.map(c => `
-    <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="city" value="${c}"> ${c}</label>
-  `).join('');
-  intakeBox.innerHTML = intakes.map(i => `
-    <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="intake" value="${i}"> ${i}</label>
   `).join('');
 
   feeMinSel.innerHTML = uniFeeBrackets.map(v => `<option value="${v}">$${v.toLocaleString()}</option>`).join('');
@@ -1503,31 +1500,68 @@ function initUniversityDirectory() {
   feeMinSel.value = "0";
   feeMaxSel.value = "999999";
 
+  function getChecked(group) {
+    return [...document.querySelectorAll(`.uni-filter-check[data-group="${group}"]:checked`)].map(el => el.value);
+  }
+
+  function updateDependentFilters() {
+    const checkedCountries = getChecked('country');
+    const prevCheckedCities = getChecked('city');
+    const prevCheckedIntakes = getChecked('intake');
+
+    const relevant = checkedCountries.length
+      ? universityDirectory.filter(u => checkedCountries.includes(u.country))
+      : universityDirectory;
+
+    const availableCities = [...new Set(relevant.map(u => u.city))].sort();
+    const availableIntakes = [...new Set(relevant.flatMap(u => u.intake))].sort();
+
+    cityBox.innerHTML = availableCities.map(c => `
+      <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="city" value="${c}" ${prevCheckedCities.includes(c) ? 'checked' : ''}> ${c}</label>
+    `).join('');
+    intakeBox.innerHTML = availableIntakes.map(i => `
+      <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="intake" value="${i}" ${prevCheckedIntakes.includes(i) ? 'checked' : ''}> ${i}</label>
+    `).join('');
+  }
+
   function cardHTML(u) {
     const logo = u.logo
       ? `<img src="${u.logo}" alt="${u.name}" class="max-h-10 max-w-10 object-contain">`
       : `<span class="font-display font-bold text-bridge-700">${uniInitials(u.name)}</span>`;
     const intakeBadges = u.intake.map(i => `<span class="uni-intake-badge">${i}</span>`).join('');
+    const scholarshipText = u.scholarship
+      ? `<span class="font-semibold text-harbor-600">Available</span>`
+      : `<span class="font-semibold text-ink/40">Not Available</span>`;
     return `
       <div class="university-card rounded-2xl border border-black/10 shadow-sm p-5 flex flex-col bg-white">
         <div class="flex items-center gap-3">
-          <div class="w-14 h-14 shrink-0 rounded-lg bg-bridge-50 border border-black/10 flex items-center justify-center overflow-hidden p-1.5">${logo}</div>
+          <div class="w-14 h-14 shrink-0 rounded-lg bg-white border border-black/10 flex items-center justify-center overflow-hidden p-1.5">${logo}</div>
           <div class="min-w-0">
             <p class="font-display font-bold text-bridge-900 leading-tight text-sm">${u.name}</p>
             <p class="text-xs text-ink/50 mt-0.5">${u.city}, ${u.country}</p>
           </div>
         </div>
-        <div class="mt-4 flex items-center justify-between text-sm border-t border-black/5 pt-3">
-          <span class="text-ink/50 text-xs">Tuition / year</span>
-          <span class="font-semibold text-bridge-900">$${u.feeMin.toLocaleString()} - $${u.feeMax.toLocaleString()}</span>
+        <div class="mt-4 space-y-2 text-xs border-t border-black/5 pt-3">
+          <div class="flex items-center justify-between">
+            <span class="text-ink/50">Tuition / year</span>
+            <span class="font-semibold text-bridge-900">$${u.feeMin.toLocaleString()} - $${u.feeMax.toLocaleString()}</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-ink/50">Scholarships</span>
+            ${scholarshipText}
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-ink/50">About the university</span>
+            <a onclick="go('home','lead-form')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View Profile</a>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-ink/50">Find Courses</span>
+            <a onclick="go('programs')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View All</a>
+          </div>
         </div>
         <div class="mt-3 flex flex-wrap gap-1.5">${intakeBadges}</div>
-        <a onclick="go('home','lead-form')" class="btn-outline !text-xs mt-4 w-full text-center nav-link">Get Info</a>
+        <a onclick="go('home','lead-form')" class="btn-outline uni-card-btn !text-xs mt-4 w-full text-center nav-link">Apply Now</a>
       </div>`;
-  }
-
-  function getChecked(group) {
-    return [...document.querySelectorAll(`.uni-filter-check[data-group="${group}"]:checked`)].map(el => el.value);
   }
 
   function applyFilters() {
@@ -1561,13 +1595,14 @@ function initUniversityDirectory() {
     feeMinSel.value = "0";
     feeMaxSel.value = "999999";
     searchInput.value = "";
+    updateDependentFilters();
     applyFilters();
   }
 
-  document.querySelectorAll('.uni-filter-check').forEach(el => el.addEventListener('change', applyFilters));
-  feeMinSel.addEventListener('change', applyFilters);
-  feeMaxSel.addEventListener('change', applyFilters);
-  searchInput.addEventListener('input', applyFilters);
+  countryBox.querySelectorAll('.uni-filter-check').forEach(el => el.addEventListener('change', updateDependentFilters));
+
+  const applyBtn = document.getElementById('uniApplyFilters');
+  if (applyBtn) applyBtn.addEventListener('click', applyFilters);
   const clearBtn = document.getElementById('uniClearFilters');
   if (clearBtn) clearBtn.addEventListener('click', clearAll);
   const emptyClearBtn = document.getElementById('uniEmptyClear');
@@ -1583,6 +1618,7 @@ function initUniversityDirectory() {
     });
   }
 
+  updateDependentFilters();
   applyFilters();
 }
 
