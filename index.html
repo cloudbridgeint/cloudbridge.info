@@ -71,6 +71,9 @@
   .uni-filter-chip { display:inline-flex; align-items:center; gap:.4rem; background:#0f1c30; color:#fff; font-size:.78rem; font-weight:600; padding:.4rem .5rem .4rem .85rem; border-radius:9999px; }
   .uni-filter-chip button { display:flex; align-items:center; justify-content:center; width:1.1rem; height:1.1rem; border-radius:9999px; background:rgba(255,255,255,.15); cursor:pointer; border:none; color:#fff; flex-shrink:0; }
   .uni-filter-chip button:hover { background:rgba(255,255,255,.3); }
+  .course-badge { display:inline-flex; align-items:center; gap:.3rem; font-size:.75rem; font-weight:600; padding:.3rem .65rem; border-radius:9999px; background:#eef2f9; color:#162743; }
+  .course-detail-btn { display:inline-flex; align-items:center; justify-content:center; background:#e12d38; color:#fff; font-weight:600; padding:.65rem 1.25rem; border-radius:.5rem; font-size:.85rem; transition:.15s; cursor:pointer; border:none; white-space:nowrap; }
+  .course-detail-btn:hover { background:#c01822; }
   .uni-accordion-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:.8rem 1rem; border:1px solid rgba(0,0,0,.12); border-radius:.75rem; font-family:'Inter',sans-serif; font-weight:600; font-size:.9rem; color:#162743; background:#fff; cursor:pointer; transition:.15s; }
   .uni-accordion-btn:hover { border-color:rgba(0,0,0,.28); }
   .uni-accordion-chevron { transition:transform .2s; width:1rem; height:1rem; color:#162743; flex-shrink:0; }
@@ -1069,22 +1072,76 @@ destinations: `
 programs: `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / Programs</p>
-    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Available Programs</h1>
-    <p class="mt-4 max-w-xl text-white/75">Whichever stage you're at, there's a path forward — from foundation year to Ph.D.</p>
+    <p class="crumb"><a onclick="go('home')">Home</a> / Course</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Available Courses</h1>
+    <p class="mt-4 max-w-xl text-white/75">Search and filter real courses from our 40 partner universities across 10 countries — find the one that fits your subject, level, and schedule.</p>
   </div>
 </section>
-<section class="py-16">
-  <div class="max-w-container mx-auto px-4 md:px-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5"><div class="w-11 h-11 rounded-lg bg-sunrise-100 text-sunrise-600 flex items-center justify-center font-display font-bold mb-4">F</div><h3 class="font-display font-bold text-bridge-900">Foundation</h3><p class="mt-2 text-sm text-ink/60">A one-year bridge program preparing HSC graduates for direct entry into undergraduate degrees abroad.</p></div>
-    <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5"><div class="w-11 h-11 rounded-lg bg-sunrise-100 text-sunrise-600 flex items-center justify-center font-display font-bold mb-4">D</div><h3 class="font-display font-bold text-bridge-900">Diploma</h3><p class="mt-2 text-sm text-ink/60">Focused, career-oriented training that qualifies you for a specific field in 1-2 years.</p></div>
-    <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5"><div class="w-11 h-11 rounded-lg bg-sunrise-100 text-sunrise-600 flex items-center justify-center font-display font-bold mb-4">B</div><h3 class="font-display font-bold text-bridge-900">Bachelor</h3><p class="mt-2 text-sm text-ink/60">A first degree — the foundation of most international academic and career paths, typically 3-4 years.</p></div>
-    <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5"><div class="w-11 h-11 rounded-lg bg-sunrise-100 text-sunrise-600 flex items-center justify-center font-display font-bold mb-4">M</div><h3 class="font-display font-bold text-bridge-900">Masters</h3><p class="mt-2 text-sm text-ink/60">Specialise further and benefit from some of the world's fastest-growing academic hubs.</p></div>
-    <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5"><div class="w-11 h-11 rounded-lg bg-sunrise-100 text-sunrise-600 flex items-center justify-center font-display font-bold mb-4">P</div><h3 class="font-display font-bold text-bridge-900">Ph.D.</h3><p class="mt-2 text-sm text-ink/60">The highest globally recognised postgraduate academic degree, usually with funded research positions.</p></div>
+
+<section class="py-10 md:py-14 bg-white">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+
+    <h2 class="section-heading text-center mx-auto mb-2">Find Your Course and Apply Today</h2>
+    <p id="courseResultsCount" class="text-sm text-ink/60 mb-8 text-center">Showing all courses</p>
+
+    <button id="courseFilterToggle" class="lg:hidden w-full mb-4 flex items-center justify-between rounded-xl border border-black/10 px-4 py-3 font-display font-semibold text-bridge-900">
+      <span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M2.5 4.5A1 1 0 013.5 3.5h13a1 1 0 01.8 1.6l-5.3 6.9v4a1 1 0 01-.45.834l-2 1.333A1 1 0 017.5 17V12l-5.3-6.9a1 1 0 01-.2-.6z" clip-rule="evenodd" /></svg>Filters</span>
+      <svg id="courseFilterToggleIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 transition-transform"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+    </button>
+
+    <div class="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8 lg:items-start">
+
+      <aside id="courseFilterPanel" class="hidden lg:block mb-6 lg:mb-0">
+        <div class="lg:sticky lg:top-24 rounded-2xl border border-black/10 shadow-sm p-5 space-y-4 max-h-[calc(100vh-7rem)] overflow-y-auto">
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Search</label>
+            <input id="courseSearchInput" type="text" placeholder="Search course..." class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sunrise-400">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Subject</label>
+            <select id="courseFilterSubject" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm"><option value="">Select</option></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Study Level</label>
+            <select id="courseFilterLevel" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm"><option value="">Select</option></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Delivery Method</label>
+            <select id="courseFilterDelivery" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm"><option value="">Select</option></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Duration</label>
+            <select id="courseFilterDuration" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm"><option value="">Select</option></select>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button id="courseResetFilters" class="btn-outline !rounded-lg !text-sm flex-1">Reset</button>
+            <button id="courseApplyFilters" class="btn-primary !rounded-lg !text-sm flex-1 justify-center">Apply</button>
+          </div>
+
+        </div>
+      </aside>
+
+      <div>
+        <div id="courseDirectoryList" class="space-y-4"></div>
+
+        <div id="courseEmptyState" class="hidden text-center py-16">
+          <p class="font-display font-bold text-bridge-900 text-lg">No courses match your filters</p>
+          <p class="mt-1 text-sm text-ink/60">Try clearing a filter to see more results.</p>
+          <button id="courseEmptyClear" class="btn-outline mt-4">Clear all filters</button>
+        </div>
+      </div>
+
+    </div>
   </div>
-  <div class="mt-8"><a onclick="go('home','lead-form')" class="btn-primary nav-link">Talk to a counsellor about your program</a></div>
 </section>
 `,
+
 
 'student-visa': `
 <section class="bg-dusk-gradient text-white py-16">
@@ -1570,6 +1627,89 @@ const uniFeeBrackets = [0,5000,10000,15000,20000,25000,30000,35000,40000,50000];
 function uniInitials(name) {
   return name.split(' ').filter(w => w[0] === w[0].toUpperCase() && /[A-Za-z]/.test(w[0])).slice(0,2).map(w => w[0]).join('').toUpperCase() || name.slice(0,2).toUpperCase();
 }
+const courseDirectory = [
+  {name:"BSc Biomedical Science", university:"Aston University", country:"UK", city:"Birmingham", level:"Undergraduate", subject:"Life Sciences", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/aston.png"},
+  {name:"BA Business Management", university:"Aston University", country:"UK", city:"Birmingham", level:"Undergraduate", subject:"Business", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/aston.png"},
+  {name:"LLB Law", university:"Arden University", country:"UK", city:"Coventry", level:"Undergraduate", subject:"Law", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/arden.png"},
+  {name:"BA Business Management", university:"Arden University", country:"UK", city:"Coventry", level:"Undergraduate", subject:"Business", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/arden.png"},
+  {name:"BSc Computing", university:"Birmingham City University", country:"UK", city:"Birmingham", level:"Undergraduate", subject:"Computing", delivery:"Online", duration:"3 Years", logo:"assets/universities/bcu.png"},
+  {name:"BA Fashion Design", university:"Birmingham City University", country:"UK", city:"Birmingham", level:"Undergraduate", subject:"Art & Design", delivery:"Online", duration:"3 Years", logo:"assets/universities/bcu.png"},
+  {name:"BSc Chemistry", university:"Bangor University", country:"UK", city:"Bangor", level:"Undergraduate", subject:"Natural Sciences", delivery:"Blended", duration:"3 Years", logo:"assets/universities/bangor.png"},
+  {name:"MSc Environmental Science", university:"Bangor University", country:"UK", city:"Bangor", level:"Postgraduate", subject:"Natural Sciences", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/bangor.png"},
+  {name:"BA Business Management", university:"Abertay University", country:"UK", city:"Dundee", level:"Undergraduate", subject:"Business", delivery:"Blended", duration:"3 Years", logo:"assets/universities/abertay.png"},
+  {name:"MSc Games Technology", university:"Abertay University", country:"UK", city:"Dundee", level:"Postgraduate", subject:"Computer Games", delivery:"Online", duration:"1 Year", logo:"assets/universities/abertay.png"},
+  {name:"BSc Cyber Security", university:"De Montfort University", country:"UK", city:"Leicester", level:"Undergraduate", subject:"Computing", delivery:"Online", duration:"3 Years", logo:"assets/universities/demontfort.png"},
+  {name:"MSc International Business", university:"De Montfort University", country:"UK", city:"Leicester", level:"Postgraduate", subject:"Business", delivery:"Online", duration:"1 Year", logo:"assets/universities/demontfort.png"},
+  {name:"PhD in Engineering", university:"Northeastern University", country:"USA", city:"Boston", level:"PhD", subject:"Engineering", delivery:"Online", duration:"3-4 Years", logo:"assets/universities/northeastern.png"},
+  {name:"PhD in Management", university:"Northeastern University", country:"USA", city:"Boston", level:"PhD", subject:"Business", delivery:"On-Campus", duration:"3-4 Years", logo:"assets/universities/northeastern.png"},
+  {name:"BEng Mechanical Engineering", university:"Arizona State University", country:"USA", city:"Tempe", level:"Undergraduate", subject:"Engineering", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/asu.png"},
+  {name:"MEng Advanced Engineering", university:"Arizona State University", country:"USA", city:"Tempe", level:"Postgraduate", subject:"Engineering", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/asu.png"},
+  {name:"MSc Marketing Management", university:"University of Illinois Chicago", country:"USA", city:"Chicago", level:"Postgraduate", subject:"Business", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/uic.png"},
+  {name:"MSc Robotics", university:"University of Illinois Chicago", country:"USA", city:"Chicago", level:"Postgraduate", subject:"Engineering", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/uic.png"},
+  {name:"MSc Finance & Investment", university:"University of Dayton", country:"USA", city:"Dayton", level:"Postgraduate", subject:"Business", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/dayton.png"},
+  {name:"BA Business Management", university:"University of Dayton", country:"USA", city:"Dayton", level:"Undergraduate", subject:"Business", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/dayton.png"},
+  {name:"MSc Engineering Management", university:"University of Toronto", country:"Canada", city:"Toronto", level:"Postgraduate", subject:"Engineering", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/toronto.png"},
+  {name:"BEng Electrical Engineering", university:"University of Toronto", country:"Canada", city:"Toronto", level:"Undergraduate", subject:"Engineering", delivery:"Blended", duration:"3 Years", logo:"assets/universities/toronto.png"},
+  {name:"PhD in Management", university:"Simon Fraser University", country:"Canada", city:"Burnaby", level:"PhD", subject:"Business", delivery:"Online", duration:"3-4 Years", logo:"assets/universities/sfu.png"},
+  {name:"BA Marketing", university:"Simon Fraser University", country:"Canada", city:"Burnaby", level:"Undergraduate", subject:"Business", delivery:"Blended", duration:"3 Years", logo:"assets/universities/sfu.png"},
+  {name:"BA Business Management", university:"University of Manitoba", country:"Canada", city:"Winnipeg", level:"Undergraduate", subject:"Business", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/manitoba.png"},
+  {name:"BSc Agriculture", university:"University of Manitoba", country:"Canada", city:"Winnipeg", level:"Undergraduate", subject:"Agriculture", delivery:"Online", duration:"3 Years", logo:"assets/universities/manitoba.png"},
+  {name:"MSc Finance & Investment", university:"Toronto Metropolitan University", country:"Canada", city:"Toronto", level:"Postgraduate", subject:"Business", delivery:"Online", duration:"1 Year", logo:"assets/universities/tmu.png"},
+  {name:"MSc Robotics", university:"Toronto Metropolitan University", country:"Canada", city:"Toronto", level:"Postgraduate", subject:"Engineering", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/tmu.png"},
+  {name:"PhD in Medical Sciences", university:"University of Malta", country:"Malta", city:"Msida", level:"PhD", subject:"Medicine", delivery:"Online", duration:"3-4 Years", logo:"assets/universities/malta.png"},
+  {name:"PhD in Law", university:"University of Malta", country:"Malta", city:"Msida", level:"PhD", subject:"Law", delivery:"On-Campus", duration:"3-4 Years", logo:"assets/universities/malta.png"},
+  {name:"BA Business Management", university:"MCAST", country:"Malta", city:"Paola", level:"Undergraduate", subject:"Business", delivery:"Blended", duration:"3 Years", logo:"assets/universities/mcast.png"},
+  {name:"BEng Electrical Engineering", university:"MCAST", country:"Malta", city:"Paola", level:"Undergraduate", subject:"Engineering", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/mcast.png"},
+  {name:"BA Hospitality Management", university:"American University of Malta", country:"Malta", city:"Bormla", level:"Undergraduate", subject:"Hospitality", delivery:"Online", duration:"3 Years", logo:"assets/universities/aum.png"},
+  {name:"BSc Information Technology", university:"American University of Malta", country:"Malta", city:"Bormla", level:"Undergraduate", subject:"Information Technology", delivery:"Online", duration:"3 Years", logo:"assets/universities/aum.png"},
+  {name:"MSc Public Health", university:"Sorbonne University", country:"France", city:"Paris", level:"Postgraduate", subject:"Medicine", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/sorbonne.png"},
+  {name:"BSc Mathematics", university:"Sorbonne University", country:"France", city:"Paris", level:"Undergraduate", subject:"Sciences", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/sorbonne.png"},
+  {name:"MA International Affairs", university:"Sciences Po", country:"France", city:"Paris", level:"Postgraduate", subject:"International Affairs", delivery:"Online", duration:"1 Year", logo:"assets/universities/sciencespo.png"},
+  {name:"BA Political Science", university:"Sciences Po", country:"France", city:"Paris", level:"Undergraduate", subject:"Political Science", delivery:"Online", duration:"3 Years", logo:"assets/universities/sciencespo.png"},
+  {name:"MSc Finance & Investment", university:"EM Lyon Business School", country:"France", city:"Lyon", level:"Postgraduate", subject:"Business", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/emlyon.png"},
+  {name:"BSc Finance", university:"EM Lyon Business School", country:"France", city:"Lyon", level:"Undergraduate", subject:"Finance", delivery:"Blended", duration:"3 Years", logo:"assets/universities/emlyon.png"},
+  {name:"MSc Corporate Finance", university:"Toulouse Business School", country:"France", city:"Toulouse", level:"Postgraduate", subject:"Finance", delivery:"Online", duration:"1 Year", logo:"assets/universities/tbs.png"},
+  {name:"BA Marketing", university:"Toulouse Business School", country:"France", city:"Toulouse", level:"Undergraduate", subject:"Marketing", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/tbs.png"},
+  {name:"MSc International Business", university:"IE University", country:"Spain", city:"Madrid", level:"Postgraduate", subject:"Business", delivery:"Online", duration:"1 Year", logo:"assets/universities/ie.png"},
+  {name:"BSc Architecture", university:"IE University", country:"Spain", city:"Madrid", level:"Undergraduate", subject:"Architecture", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/ie.png"},
+  {name:"PhD in Medical Sciences", university:"University of Barcelona", country:"Spain", city:"Barcelona", level:"PhD", subject:"Medicine", delivery:"On-Campus", duration:"3-4 Years", logo:"assets/universities/barcelona.png"},
+  {name:"MBBS Medicine", university:"University of Barcelona", country:"Spain", city:"Barcelona", level:"Undergraduate", subject:"Medicine", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/barcelona.png"},
+  {name:"BSc Economics", university:"ESADE", country:"Spain", city:"Barcelona", level:"Undergraduate", subject:"Economics", delivery:"Blended", duration:"3 Years", logo:"assets/universities/esade.png"},
+  {name:"BA Marketing", university:"ESADE", country:"Spain", city:"Barcelona", level:"Undergraduate", subject:"Business", delivery:"Online", duration:"3 Years", logo:"assets/universities/esade.png"},
+  {name:"MSc Social Sciences", university:"Universidad Complutense Madrid", country:"Spain", city:"Madrid", level:"Postgraduate", subject:"Social Sciences", delivery:"Blended", duration:"1 Year", logo:"assets/universities/complutense.png"},
+  {name:"LLB Law", university:"Universidad Complutense Madrid", country:"Spain", city:"Madrid", level:"Undergraduate", subject:"Law", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/complutense.png"},
+  {name:"MA Sociology", university:"University of Helsinki", country:"Finland", city:"Helsinki", level:"Postgraduate", subject:"Social Sciences", delivery:"Blended", duration:"1 Year", logo:"assets/universities/helsinki.png"},
+  {name:"MSc Public Health", university:"University of Helsinki", country:"Finland", city:"Helsinki", level:"Postgraduate", subject:"Medicine", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/helsinki.png"},
+  {name:"MSc Marketing Management", university:"Aalto University", country:"Finland", city:"Espoo", level:"Postgraduate", subject:"Business", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/aalto.png"},
+  {name:"BA Business Management", university:"Aalto University", country:"Finland", city:"Espoo", level:"Undergraduate", subject:"Business", delivery:"Online", duration:"3 Years", logo:"assets/universities/aalto.png"},
+  {name:"BEng Civil Engineering", university:"LUT University", country:"Finland", city:"Lappeenranta", level:"Undergraduate", subject:"Engineering", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/lut.png"},
+  {name:"MSc Engineering Management", university:"LUT University", country:"Finland", city:"Lappeenranta", level:"Postgraduate", subject:"Engineering", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/lut.png"},
+  {name:"PhD in Engineering", university:"University of Auckland", country:"New Zealand", city:"Auckland", level:"PhD", subject:"Engineering", delivery:"On-Campus", duration:"3-4 Years", logo:"assets/universities/auckland.png"},
+  {name:"PhD in Health Sciences", university:"University of Auckland", country:"New Zealand", city:"Auckland", level:"PhD", subject:"Medical & Health Sciences", delivery:"On-Campus", duration:"3-4 Years", logo:"assets/universities/auckland.png"},
+  {name:"BSc Health Sciences", university:"University of Otago", country:"New Zealand", city:"Dunedin", level:"Undergraduate", subject:"Health Sciences", delivery:"Blended", duration:"3 Years", logo:"assets/universities/otago.png"},
+  {name:"BSc International Business", university:"University of Otago", country:"New Zealand", city:"Dunedin", level:"Undergraduate", subject:"Business", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/otago.png"},
+  {name:"LLM International Law", university:"Victoria University of Wellington", country:"New Zealand", city:"Wellington", level:"Postgraduate", subject:"Law", delivery:"Blended", duration:"1 Year", logo:"assets/universities/vuw.png"},
+  {name:"MA Political Science", university:"Victoria University of Wellington", country:"New Zealand", city:"Wellington", level:"Postgraduate", subject:"Political Science", delivery:"Blended", duration:"1 Year", logo:"assets/universities/vuw.png"},
+  {name:"MSc Veterinary Science", university:"Massey University", country:"New Zealand", city:"Palmerston North", level:"Postgraduate", subject:"Veterinary Science", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/massey.png"},
+  {name:"BA Business Management", university:"Massey University", country:"New Zealand", city:"Palmerston North", level:"Undergraduate", subject:"Business", delivery:"Online", duration:"3 Years", logo:"assets/universities/massey.png"},
+  {name:"PhD in Social Sciences", university:"University of Amsterdam", country:"Netherlands", city:"Amsterdam", level:"PhD", subject:"Social Sciences", delivery:"On-Campus", duration:"3-4 Years", logo:"assets/universities/amsterdam.png"},
+  {name:"BA Marketing", university:"University of Amsterdam", country:"Netherlands", city:"Amsterdam", level:"Undergraduate", subject:"Business", delivery:"Blended", duration:"3 Years", logo:"assets/universities/amsterdam.png"},
+  {name:"PhD in Medical Sciences", university:"Erasmus University Rotterdam", country:"Netherlands", city:"Rotterdam", level:"PhD", subject:"Medicine", delivery:"On-Campus", duration:"3-4 Years", logo:"assets/universities/erasmus.png"},
+  {name:"MBBS Medicine", university:"Erasmus University Rotterdam", country:"Netherlands", city:"Rotterdam", level:"Undergraduate", subject:"Medicine", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/erasmus.png"},
+  {name:"BA Social Sciences", university:"Tilburg University", country:"Netherlands", city:"Tilburg", level:"Undergraduate", subject:"Social Sciences", delivery:"Blended", duration:"3 Years", logo:"assets/universities/tilburg.png"},
+  {name:"PhD in Management", university:"Tilburg University", country:"Netherlands", city:"Tilburg", level:"PhD", subject:"Business", delivery:"Online", duration:"3-4 Years", logo:"assets/universities/tilburg.png"},
+  {name:"LLB Law", university:"Maastricht University", country:"Netherlands", city:"Maastricht", level:"Undergraduate", subject:"Law", delivery:"Blended", duration:"3 Years", logo:"assets/universities/maastricht.png"},
+  {name:"PhD in Law", university:"Maastricht University", country:"Netherlands", city:"Maastricht", level:"PhD", subject:"Law", delivery:"On-Campus", duration:"3-4 Years", logo:"assets/universities/maastricht.png"},
+  {name:"MSc Marketing Management", university:"Sunway University", country:"Malaysia", city:"Petaling Jaya", level:"Postgraduate", subject:"Business", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/sunway.png"},
+  {name:"BEng Mechanical Engineering", university:"Sunway University", country:"Malaysia", city:"Petaling Jaya", level:"Undergraduate", subject:"Engineering", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/sunway.png"},
+  {name:"BA Culinary Arts Management", university:"Taylor's University", country:"Malaysia", city:"Subang Jaya", level:"Undergraduate", subject:"Culinary Arts", delivery:"On-Campus", duration:"3 Years", logo:"assets/universities/taylors.png"},
+  {name:"Foundation in Computing", university:"Taylor's University", country:"Malaysia", city:"Subang Jaya", level:"Foundation", subject:"Computer Science", delivery:"Online", duration:"1 Year", logo:"assets/universities/taylors.png"},
+  {name:"MSc Marketing Management", university:"Monash University Malaysia", country:"Malaysia", city:"Bandar Sunway", level:"Postgraduate", subject:"Business", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/monash.png"},
+  {name:"Foundation in Engineering", university:"Monash University Malaysia", country:"Malaysia", city:"Bandar Sunway", level:"Foundation", subject:"Engineering", delivery:"On-Campus", duration:"1 Year", logo:"assets/universities/monash.png"},
+  {name:"Foundation in Engineering", university:"University of Nottingham Malaysia", country:"Malaysia", city:"Semenyih", level:"Foundation", subject:"Engineering", delivery:"Online", duration:"1 Year", logo:"assets/universities/nottingham_my.png"},
+  {name:"BSc Science", university:"University of Nottingham Malaysia", country:"Malaysia", city:"Semenyih", level:"Undergraduate", subject:"Science", delivery:"Online", duration:"3 Years", logo:"assets/universities/nottingham_my.png"},
+];
+
 const uniCountryOrder = ["UK","USA","Canada","France","Spain","Finland","Netherlands","Malta","New Zealand","Malaysia"];
 const uniAllMonths = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -1831,6 +1971,107 @@ function initUniversityDirectory() {
   updateDependentFilters();
   applyFilters();
 }
+
+function initCourseDirectory() {
+  const list = document.getElementById('courseDirectoryList');
+  if (!list) return;
+
+  const subjectSel = document.getElementById('courseFilterSubject');
+  const levelSel = document.getElementById('courseFilterLevel');
+  const deliverySel = document.getElementById('courseFilterDelivery');
+  const durationSel = document.getElementById('courseFilterDuration');
+  const searchInput = document.getElementById('courseSearchInput');
+  const resultsCount = document.getElementById('courseResultsCount');
+  const emptyState = document.getElementById('courseEmptyState');
+
+  const subjects = [...new Set(courseDirectory.map(c => c.subject))].sort();
+  const levelOrder = ["Foundation","Diploma","Undergraduate","Postgraduate","PhD"];
+  const levels = levelOrder.filter(l => courseDirectory.some(c => c.level === l));
+  const deliveries = [...new Set(courseDirectory.map(c => c.delivery))].sort();
+  const durations = [...new Set(courseDirectory.map(c => c.duration))].sort();
+
+  subjectSel.innerHTML = '<option value="">Select</option>' + subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+  levelSel.innerHTML = '<option value="">Select</option>' + levels.map(l => `<option value="${l}">${l}</option>`).join('');
+  deliverySel.innerHTML = '<option value="">Select</option>' + deliveries.map(d => `<option value="${d}">${d}</option>`).join('');
+  durationSel.innerHTML = '<option value="">Select</option>' + durations.map(d => `<option value="${d}">${d}</option>`).join('');
+
+  const capIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0z" /></svg>';
+  const pinIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd" /></svg>';
+
+  function cardHTML(c) {
+    const logo = c.logo
+      ? `<img src="${c.logo}" alt="${c.university}" class="max-h-full max-w-full object-contain">`
+      : `<span class="font-display font-bold text-bridge-700 text-xs">${uniInitials(c.university)}</span>`;
+    return `
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 bg-white rounded-2xl border border-black/10 shadow-sm p-5">
+        <div class="w-16 h-16 shrink-0 rounded-lg bg-white border border-black/10 flex items-center justify-center overflow-hidden p-2">${logo}</div>
+        <div class="flex-1 min-w-0">
+          <p class="font-display font-bold text-bridge-900 text-base leading-tight">${c.name}</p>
+          <p class="text-sm font-semibold text-sunrise-600 mt-0.5">${c.university}</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="course-badge">${capIcon} ${c.level}</span>
+            <span class="course-badge">${pinIcon} ${c.city}</span>
+          </div>
+        </div>
+        <div class="shrink-0 w-full sm:w-auto">
+          <a onclick="go('home','lead-form')" class="course-detail-btn w-full sm:w-auto nav-link">Program Details</a>
+        </div>
+      </div>`;
+  }
+
+  function applyFilters() {
+    const subject = subjectSel.value;
+    const level = levelSel.value;
+    const delivery = deliverySel.value;
+    const duration = durationSel.value;
+    const search = searchInput.value.trim().toLowerCase();
+
+    const filtered = courseDirectory.filter(c => {
+      if (subject && c.subject !== subject) return false;
+      if (level && c.level !== level) return false;
+      if (delivery && c.delivery !== delivery) return false;
+      if (duration && c.duration !== duration) return false;
+      if (search && !c.name.toLowerCase().includes(search) && !c.university.toLowerCase().includes(search)) return false;
+      return true;
+    });
+
+    list.innerHTML = filtered.map(cardHTML).join('');
+    const anyActive = subject || level || delivery || duration || search;
+    resultsCount.textContent = anyActive
+      ? `Showing ${filtered.length} of ${courseDirectory.length} courses`
+      : `Showing all ${courseDirectory.length} courses`;
+    emptyState.classList.toggle('hidden', filtered.length > 0);
+    list.classList.toggle('hidden', filtered.length === 0);
+  }
+
+  function clearAll() {
+    subjectSel.value = '';
+    levelSel.value = '';
+    deliverySel.value = '';
+    durationSel.value = '';
+    searchInput.value = '';
+    applyFilters();
+  }
+
+  const applyBtn = document.getElementById('courseApplyFilters');
+  if (applyBtn) applyBtn.addEventListener('click', applyFilters);
+  const resetBtn = document.getElementById('courseResetFilters');
+  if (resetBtn) resetBtn.addEventListener('click', clearAll);
+  const emptyClearBtn = document.getElementById('courseEmptyClear');
+  if (emptyClearBtn) emptyClearBtn.addEventListener('click', clearAll);
+
+  const toggleBtn = document.getElementById('courseFilterToggle');
+  const panel = document.getElementById('courseFilterPanel');
+  const toggleIcon = document.getElementById('courseFilterToggleIcon');
+  if (toggleBtn && panel) {
+    toggleBtn.addEventListener('click', () => {
+      panel.classList.toggle('hidden');
+      if (toggleIcon) toggleIcon.style.transform = panel.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+    });
+  }
+
+  applyFilters();
+}
 function go(id, scrollToId) {
   const root = document.getElementById('pageRoot');
   root.innerHTML = pages[id] || pages.home;
@@ -1873,6 +2114,7 @@ function initPageScripts() {
   });
   initUniCarousels();
   initUniversityDirectory();
+  initCourseDirectory();
 
   // FAQ accordion
   document.querySelectorAll('.faq-btn').forEach(btn => {
