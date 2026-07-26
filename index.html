@@ -82,7 +82,13 @@
     </a>
     <nav class="hidden md:flex items-center gap-1 text-base font-medium font-display">
       <a onclick="go('home')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="home">Home</a>
-      <a onclick="go('about')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="about">About</a>
+      <div class="nav-drop">
+        <span class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block" data-page="about">About ▾</span>
+        <div class="nav-drop-panel">
+          <a onclick="go('about')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">About Us</a>
+          <a onclick="go('our-team')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Our Team</a>
+        </div>
+      </div>
       <a onclick="go('university-college')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="university-college">University &amp; College</a>
       <a onclick="go('programs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Course</a>
       <a onclick="go('scholarship')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="scholarship">Scholarship</a>
@@ -108,6 +114,7 @@
   <nav id="mobileMenu" class="hidden md:hidden px-4 pb-4 border-t border-black/5 text-base font-display font-medium">
     <a onclick="go('home')" class="nav-link block py-2 text-bridge-900">Home</a>
     <a onclick="go('about')" class="nav-link block py-2 text-bridge-900">About</a>
+    <a onclick="go('our-team')" class="nav-link block py-2 pl-3 text-bridge-700">Our Team</a>
     <a onclick="go('university-college')" class="nav-link block py-2 text-bridge-900">University &amp; College</a>
     <a onclick="go('programs')" class="nav-link block py-2 text-bridge-900">Course</a>
     <a onclick="go('scholarship')" class="nav-link block py-2 text-bridge-900">Scholarship</a>
@@ -857,6 +864,63 @@ about: `
   <div class="max-w-container mx-auto px-4 md:px-8">
     <h2 class="text-2xl md:text-3xl font-extrabold">Ready to start your journey?</h2>
     <a onclick="go('contact')" class="btn-primary nav-link mt-6 inline-flex">Talk to a Counsellor</a>
+  </div>
+</section>
+`,
+
+'our-team': `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / <a onclick="go('about')">About</a> / Our Team</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Our Team</h1>
+    <p class="mt-4 max-w-xl text-white/75">The counsellors and staff behind every successful application — real people who know your destination country inside out.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl">
+      <h2 class="section-heading">Meet the People You'll Work With</h2>
+      <p class="mt-3 text-ink/60">Every student is matched with a dedicated counsellor from day one.</p>
+    </div>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="rounded-2xl border border-black/10 p-6 text-center shadow-sm">
+        <div class="w-20 h-20 mx-auto rounded-full bg-bridge-100 text-bridge-700 flex items-center justify-center font-display font-bold text-xl">FN</div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Founder &amp; CEO</h3>
+        <p class="mt-1 text-sm text-ink/60">Leads CloudBridge's overall strategy and university partnerships.</p>
+      </div>
+      <div class="rounded-2xl border border-black/10 p-6 text-center shadow-sm">
+        <div class="w-20 h-20 mx-auto rounded-full bg-bridge-100 text-bridge-700 flex items-center justify-center font-display font-bold text-xl">HA</div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Head of UK Admissions</h3>
+        <p class="mt-1 text-sm text-ink/60">Specialises in UK university applications and offer negotiations.</p>
+      </div>
+      <div class="rounded-2xl border border-black/10 p-6 text-center shadow-sm">
+        <div class="w-20 h-20 mx-auto rounded-full bg-bridge-100 text-bridge-700 flex items-center justify-center font-display font-bold text-xl">SV</div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Senior Visa Counsellor</h3>
+        <p class="mt-1 text-sm text-ink/60">Guides students through documentation and visa interview prep.</p>
+      </div>
+      <div class="rounded-2xl border border-black/10 p-6 text-center shadow-sm">
+        <div class="w-20 h-20 mx-auto rounded-full bg-bridge-100 text-bridge-700 flex items-center justify-center font-display font-bold text-xl">MC</div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Malaysia &amp; USA Counsellor</h3>
+        <p class="mt-1 text-sm text-ink/60">Handles admissions and scholarship guidance for Malaysia and the USA.</p>
+      </div>
+      <div class="rounded-2xl border border-black/10 p-6 text-center shadow-sm">
+        <div class="w-20 h-20 mx-auto rounded-full bg-bridge-100 text-bridge-700 flex items-center justify-center font-display font-bold text-xl">SC</div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Sylhet Office Lead</h3>
+        <p class="mt-1 text-sm text-ink/60">Heads day-to-day counselling operations at our Sylhet office.</p>
+      </div>
+      <div class="rounded-2xl border border-black/10 p-6 text-center shadow-sm">
+        <div class="w-20 h-20 mx-auto rounded-full bg-bridge-100 text-bridge-700 flex items-center justify-center font-display font-bold text-xl">PA</div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Post-Arrival Support Lead</h3>
+        <p class="mt-1 text-sm text-ink/60">Helps students settle in after landing — accommodation, banking, and more.</p>
+      </div>
+    </div>
+    <p class="mt-8 text-sm text-ink/40">(placeholder — real team member names, photos, and bios go here)</p>
+  </div>
+</section>
+<section class="py-16 bg-dusk-gradient text-white text-center">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <h2 class="text-2xl md:text-3xl font-extrabold">Want to meet your counsellor?</h2>
+    <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-6 inline-flex">Book Free Consultation</a>
   </div>
 </section>
 `,
