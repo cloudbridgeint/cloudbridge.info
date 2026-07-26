@@ -80,26 +80,14 @@
     </a>
     <nav class="hidden md:flex items-center gap-1 text-base font-medium font-display">
       <a onclick="go('home')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="home">Home</a>
-      <div class="nav-drop">
-        <span class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block">Study Abroad ▾</span>
-        <div class="nav-drop-panel">
-          <a onclick="go('dest-uk')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Study in UK</a>
-          <a onclick="go('dest-usa')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Study in USA</a>
-          <a onclick="go('dest-malaysia')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Study in Malaysia</a>
-        </div>
-      </div>
-      <a onclick="go('programs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Programs</a>
-      <a onclick="go('destinations')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="destinations">Study Destination</a>
-      <a onclick="go('about')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="about">About us</a>
-      <div class="nav-drop">
-        <span class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block">Service ▾</span>
-        <div class="nav-drop-panel">
-          <a onclick="go('student-visa')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Student Visa</a>
-          <a onclick="go('spouse-visa')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Spouse Visa</a>
-        </div>
-      </div>
+      <a onclick="go('about')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="about">About</a>
+      <a onclick="go('university-college')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="university-college">University &amp; College</a>
+      <a onclick="go('programs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Course</a>
+      <a onclick="go('scholarship')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="scholarship">Scholarship</a>
+      <a onclick="go('events')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="events">Events</a>
+      <a onclick="go('home','lead-form')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50">Apply Now</a>
       <a onclick="go('blogs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="blogs">Blogs</a>
-      <a onclick="go('contact')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="contact">Contact Us</a>
+      <a onclick="go('contact')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="contact">Contact</a>
     </nav>
     <div class="hidden md:flex items-center shrink-0">
       <a onclick="go('home','lead-form')" class="btn-primary !px-5 !py-2 text-sm inline-flex items-center gap-1.5 !rounded-lg !bg-[#db1f2a] !text-white hover:!bg-[#c01822]">
@@ -117,16 +105,14 @@
   </div>
   <nav id="mobileMenu" class="hidden md:hidden px-4 pb-4 border-t border-black/5 text-base font-display font-medium">
     <a onclick="go('home')" class="nav-link block py-2 text-bridge-900">Home</a>
-    <a onclick="go('dest-uk')" class="nav-link block py-2 pl-3 text-bridge-700">Study in UK</a>
-    <a onclick="go('dest-usa')" class="nav-link block py-2 pl-3 text-bridge-700">Study in USA</a>
-    <a onclick="go('dest-malaysia')" class="nav-link block py-2 pl-3 text-bridge-700">Study in Malaysia</a>
-    <a onclick="go('programs')" class="nav-link block py-2 text-bridge-900">Programs</a>
-    <a onclick="go('destinations')" class="nav-link block py-2 text-bridge-900">Study Destination</a>
-    <a onclick="go('about')" class="nav-link block py-2 text-bridge-900">About us</a>
-    <a onclick="go('student-visa')" class="nav-link block py-2 pl-3 text-bridge-700">Student Visa</a>
-    <a onclick="go('spouse-visa')" class="nav-link block py-2 pl-3 text-bridge-700">Spouse Visa</a>
+    <a onclick="go('about')" class="nav-link block py-2 text-bridge-900">About</a>
+    <a onclick="go('university-college')" class="nav-link block py-2 text-bridge-900">University &amp; College</a>
+    <a onclick="go('programs')" class="nav-link block py-2 text-bridge-900">Course</a>
+    <a onclick="go('scholarship')" class="nav-link block py-2 text-bridge-900">Scholarship</a>
+    <a onclick="go('events')" class="nav-link block py-2 text-bridge-900">Events</a>
+    <a onclick="go('home','lead-form')" class="nav-link block py-2 text-bridge-900">Apply Now</a>
     <a onclick="go('blogs')" class="nav-link block py-2 text-bridge-900">Blogs</a>
-    <a onclick="go('contact')" class="nav-link block py-2 text-bridge-900">Contact Us</a>
+    <a onclick="go('contact')" class="nav-link block py-2 text-bridge-900">Contact</a>
     <a onclick="go('home','lead-form')" class="btn-primary w-full !py-2 text-sm mt-2 inline-flex items-center justify-center gap-1.5 !rounded-lg !bg-[#db1f2a] !text-white hover:!bg-[#c01822]">
       Free Consultation
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4" aria-hidden="true"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
@@ -835,6 +821,124 @@ programs: `
     <div class="rounded-2xl border border-black/10 p-6"><h3 class="font-display font-bold text-bridge-900">Settling In Together</h3><p class="mt-2 text-sm text-ink/60">Guidance on accommodation, healthcare registration, and work rights for accompanying spouses.</p></div>
   </div>
   <div class="mt-8"><a onclick="go('home','lead-form')" class="btn-primary nav-link">Ask about spouse visas</a></div>
+</section>
+`,
+
+'university-college': `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / University & College</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">University & College</h1>
+    <p class="mt-4 max-w-xl text-white/75">500+ partner universities and colleges across the UK, Malaysia, and the USA — hand-picked for strong outcomes.</p>
+  </div>
+</section>
+<section class="py-12 bg-white border-y border-black/5">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="text-center text-xs font-semibold uppercase tracking-wide text-ink/40 mb-6">Featured Partner Universities</p>
+    <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden sm:flex">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden lg:flex">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden lg:flex">LOGO</div>
+      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden lg:flex">LOGO</div>
+    </div>
+    <p class="text-center text-xs text-ink/30 mt-4">(placeholder — real partner university logos go here)</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl">
+      <h2 class="section-heading">Explore by Country</h2>
+      <p class="mt-3 text-ink/60">Browse partner universities and colleges grouped by study destination.</p>
+    </div>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <a onclick="go('dest-uk')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#2e4a7a,#4d70a8)">
+        <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
+        <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">United Kingdom</h3><p class="mt-1 text-sm text-white/75">150+ partner universities and colleges.</p></div>
+      </a>
+      <a onclick="go('dest-malaysia')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#1e786e,#22a396)">
+        <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
+        <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">Malaysia</h3><p class="mt-1 text-sm text-white/75">English-medium universities and colleges.</p></div>
+      </a>
+      <a onclick="go('dest-usa')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#963c3c,#c25a5a)">
+        <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
+        <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">USA</h3><p class="mt-1 text-sm text-white/75">Research universities and liberal arts colleges.</p></div>
+      </a>
+    </div>
+    <div class="mt-10"><a onclick="go('home','lead-form')" class="btn-primary nav-link inline-flex">Book Free Consultation</a></div>
+  </div>
+</section>
+`,
+
+scholarship: `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / Scholarship</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Scholarships at 500+ Universities</h1>
+    <p class="mt-4 max-w-xl text-white/75">Let our counsellors match you with funding you actually qualify for — most students never even check.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl">
+      <h2 class="section-heading">Types of Funding</h2>
+      <p class="mt-3 text-ink/60">Scholarships and funding come in more forms than most students realise.</p>
+    </div>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
+        <h3 class="font-display font-bold text-bridge-900">Merit-Based Scholarships</h3>
+        <p class="mt-2 text-sm text-ink/60">Awarded for strong academic results — often applied automatically during admission.</p>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
+        <h3 class="font-display font-bold text-bridge-900">Need-Based Funding</h3>
+        <p class="mt-2 text-sm text-ink/60">Partial or full tuition support based on demonstrated financial need.</p>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
+        <h3 class="font-display font-bold text-bridge-900">Country & University Grants</h3>
+        <p class="mt-2 text-sm text-ink/60">Destination-specific and university-specific awards for international students.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="py-16 bg-bridge-50/50 text-center">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <h2 class="section-heading text-center">Find Out What You Qualify For</h2>
+    <p class="mt-3 max-w-xl mx-auto text-ink/60">Tell us your academic background and destination — we'll match you with real funding options, free of charge.</p>
+    <div class="mt-6"><a onclick="go('home','lead-form')" class="btn-primary nav-link inline-flex">Check Scholarship Eligibility</a></div>
+  </div>
+</section>
+`,
+
+events: `
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a onclick="go('home')">Home</a> / Events</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Events</h1>
+    <p class="mt-4 max-w-xl text-white/75">Join our expos, seminars, and info sessions to get expert guidance in person.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+        <div class="h-36" style="background:linear-gradient(160deg,#2e4a7a,#4d70a8)"></div>
+        <div class="p-5"><p class="text-xs text-ink/50">3 May 2026 · 2PM–5PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">UK Open Assessment Day — Dhaka</h3><p class="mt-2 text-sm text-ink/60">Meet UK university representatives and get on-the-spot conditional offers.</p></div>
+      </div>
+      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+        <div class="h-36" style="background:linear-gradient(160deg,#1e786e,#22a396)"></div>
+        <div class="p-5"><p class="text-xs text-ink/50">17 May 2026 · 10AM–6PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">Multi-Destination Education Expo — Dhaka</h3><p class="mt-2 text-sm text-ink/60">Explore UK, Malaysia, and USA options under one roof.</p></div>
+      </div>
+      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+        <div class="h-36" style="background:linear-gradient(160deg,#963c3c,#c25a5a)"></div>
+        <div class="p-5"><p class="text-xs text-ink/50">9 May 2026 · 11AM–5PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">Study Abroad Expo — Sylhet</h3><p class="mt-2 text-sm text-ink/60">One-on-one counselling sessions, no appointment needed.</p></div>
+      </div>
+    </div>
+    <p class="mt-8 text-sm text-ink/50">More events added regularly — check back soon.</p>
+    <div class="mt-8"><a onclick="go('home','lead-form')" class="btn-primary nav-link inline-flex">Reserve Your Seat</a></div>
+  </div>
 </section>
 `,
 
