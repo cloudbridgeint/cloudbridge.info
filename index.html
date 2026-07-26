@@ -61,6 +61,11 @@
   .nav-drop { position:relative; }
   .nav-drop-panel { display:none; position:absolute; left:0; top:100%; min-width:190px; background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:.6rem; box-shadow:0 10px 30px rgba(0,0,0,.08); padding:.4rem 0; }
   .nav-drop:hover .nav-drop-panel { display:block; }
+  .university-card { transition:.2s; }
+  .university-card:hover { transform:translateY(-3px); box-shadow:0 12px 28px rgba(15,28,48,.1); }
+  .uni-filter-check { accent-color:#e12d38; width:1rem; height:1rem; cursor:pointer; }
+  .uni-filter-check-label { display:flex; align-items:center; gap:.5rem; font-size:.8rem; color:#3d4451; cursor:pointer; }
+  .uni-intake-badge { font-size:.65rem; font-weight:600; padding:.2rem .55rem; border-radius:9999px; background:#eef2f9; color:#233f68; }
   .crumb { font-size:.8rem; color:rgba(255,255,255,.6); }
   .crumb a { cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
   #heroSlider .slider-arrow { position:absolute; bottom:1.35rem; width:2.5rem; height:2.5rem; border-radius:9999px; background:rgba(255,255,255,.12); border:none; color:#fff; font-size:1.5rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:20; transition:.15s; }
@@ -1113,49 +1118,79 @@ programs: `
   <div class="max-w-container mx-auto px-4 md:px-8">
     <p class="crumb"><a onclick="go('home')">Home</a> / University & College</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">University & College</h1>
-    <p class="mt-4 max-w-xl text-white/75">500+ partner universities and colleges across the UK, Malaysia, and the USA — hand-picked for strong outcomes.</p>
+    <p class="mt-4 max-w-xl text-white/75">500+ partner universities and colleges across 10 countries. Filter by country, city, tuition budget, and intake to find your fit.</p>
   </div>
 </section>
-<section class="py-12 bg-white border-y border-black/5">
+
+<section class="py-10 md:py-14 bg-white">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="text-center text-xs font-semibold uppercase tracking-wide text-ink/40 mb-6">Featured Partner Universities</p>
-    <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
-      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
-      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
-      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold">LOGO</div>
-      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden sm:flex">LOGO</div>
-      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden lg:flex">LOGO</div>
-      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden lg:flex">LOGO</div>
-      <div class="h-14 rounded-lg bg-bridge-50 flex items-center justify-center text-[11px] text-ink/40 font-semibold hidden lg:flex">LOGO</div>
+
+    <button id="uniFilterToggle" class="lg:hidden w-full mb-4 flex items-center justify-between rounded-xl border border-black/10 px-4 py-3 font-display font-semibold text-bridge-900">
+      <span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M2.5 4.5A1 1 0 013.5 3.5h13a1 1 0 01.8 1.6l-5.3 6.9v4a1 1 0 01-.45.834l-2 1.333A1 1 0 017.5 17V12l-5.3-6.9a1 1 0 01-.2-.6z" clip-rule="evenodd" /></svg>Filters</span>
+      <svg id="uniFilterToggleIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 transition-transform"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+    </button>
+
+    <div class="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8 lg:items-start">
+
+      <aside id="uniFilterPanel" class="hidden lg:block mb-6 lg:mb-0">
+        <div class="lg:sticky lg:top-24 rounded-2xl border border-black/10 shadow-sm p-5 space-y-6 max-h-[calc(100vh-7rem)] overflow-y-auto">
+
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-bold text-bridge-900">Filters</h3>
+            <button id="uniClearFilters" class="text-xs font-semibold text-sunrise-600 hover:underline">Clear all</button>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Search</label>
+            <input id="uniSearchInput" type="text" placeholder="University name..." class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sunrise-400">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Country</label>
+            <div id="uniFilterCountry" class="space-y-1.5 max-h-40 overflow-y-auto pr-1"></div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Tuition Fee (per year, USD)</label>
+            <div class="flex items-center gap-2">
+              <select id="uniFilterFeeMin" class="w-1/2 rounded-lg border border-black/15 px-2 py-2 text-sm"></select>
+              <span class="text-ink/40 text-sm">to</span>
+              <select id="uniFilterFeeMax" class="w-1/2 rounded-lg border border-black/15 px-2 py-2 text-sm"></select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">City</label>
+            <div id="uniFilterCity" class="space-y-1.5 max-h-40 overflow-y-auto pr-1"></div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Intake</label>
+            <div id="uniFilterIntake" class="space-y-1.5"></div>
+          </div>
+
+        </div>
+      </aside>
+
+      <div>
+        <div class="flex items-center justify-between mb-5">
+          <p id="uniResultsCount" class="text-sm text-ink/60">Showing all universities</p>
+        </div>
+
+        <div id="uniDirectoryGrid" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+
+        <div id="uniEmptyState" class="hidden text-center py-16">
+          <p class="font-display font-bold text-bridge-900 text-lg">No universities match your filters</p>
+          <p class="mt-1 text-sm text-ink/60">Try widening your fee range or clearing a filter.</p>
+          <button id="uniEmptyClear" class="btn-outline mt-4">Clear all filters</button>
+        </div>
+      </div>
+
     </div>
-    <p class="text-center text-xs text-ink/30 mt-4">(placeholder — real partner university logos go here)</p>
-  </div>
-</section>
-<section class="py-16">
-  <div class="max-w-container mx-auto px-4 md:px-8">
-    <div class="max-w-xl">
-      <h2 class="section-heading">Explore by Country</h2>
-      <p class="mt-3 text-ink/60">Browse partner universities and colleges grouped by study destination.</p>
-    </div>
-    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <a onclick="go('dest-uk')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#2e4a7a,#4d70a8)">
-        <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
-        <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">United Kingdom</h3><p class="mt-1 text-sm text-white/75">150+ partner universities and colleges.</p></div>
-      </a>
-      <a onclick="go('dest-malaysia')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#1e786e,#22a396)">
-        <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
-        <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">Malaysia</h3><p class="mt-1 text-sm text-white/75">English-medium universities and colleges.</p></div>
-      </a>
-      <a onclick="go('dest-usa')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#963c3c,#c25a5a)">
-        <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
-        <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">USA</h3><p class="mt-1 text-sm text-white/75">Research universities and liberal arts colleges.</p></div>
-      </a>
-    </div>
-    <div class="mt-10"><a onclick="go('home','lead-form')" class="btn-primary nav-link inline-flex">Book Free Consultation</a></div>
   </div>
 </section>
 `,
+
 
 scholarship: `
 <section class="bg-dusk-gradient text-white py-16">
@@ -1384,6 +1419,173 @@ function initUniCarousels() {
   });
 }
 
+/* ============================================================
+   UNIVERSITY & COLLEGE DIRECTORY
+   Left-sidebar filters (country, city, fee range, intake, search)
+   drive a live-filtered grid on the right. All filtering runs
+   client-side against the static dataset below.
+   ============================================================ */
+const universityDirectory = [
+  {name:"Aston University", country:"UK", city:"Birmingham", feeMin:13000, feeMax:17000, intake:["September","January"], logo:"assets/universities/aston.png"},
+  {name:"Arden University", country:"UK", city:"Coventry", feeMin:7000, feeMax:9500, intake:["September","January","May"], logo:"assets/universities/arden.png"},
+  {name:"Birmingham City University", country:"UK", city:"Birmingham", feeMin:12500, feeMax:16000, intake:["September","January"], logo:"assets/universities/bcu.png"},
+  {name:"Bangor University", country:"UK", city:"Bangor", feeMin:11500, feeMax:15500, intake:["September","January"], logo:"assets/universities/bangor.png"},
+  {name:"Abertay University", country:"UK", city:"Dundee", feeMin:11000, feeMax:14500, intake:["September","January"], logo:"assets/universities/abertay.png"},
+  {name:"De Montfort University", country:"UK", city:"Leicester", feeMin:12000, feeMax:15500, intake:["September","January"], logo:"assets/universities/demontfort.png"},
+  {name:"Northeastern University", country:"USA", city:"Boston", feeMin:35000, feeMax:48000, intake:["September","January"]},
+  {name:"Arizona State University", country:"USA", city:"Tempe", feeMin:22000, feeMax:29000, intake:["September","January"]},
+  {name:"University of Illinois Chicago", country:"USA", city:"Chicago", feeMin:24000, feeMax:31000, intake:["September","January"]},
+  {name:"University of Dayton", country:"USA", city:"Dayton", feeMin:20000, feeMax:26000, intake:["September","January"]},
+  {name:"University of Toronto", country:"Canada", city:"Toronto", feeMin:28000, feeMax:42000, intake:["September","January"]},
+  {name:"Simon Fraser University", country:"Canada", city:"Burnaby", feeMin:22000, feeMax:30000, intake:["September","January","May"]},
+  {name:"University of Manitoba", country:"Canada", city:"Winnipeg", feeMin:18000, feeMax:24000, intake:["September","January"]},
+  {name:"Toronto Metropolitan University", country:"Canada", city:"Toronto", feeMin:21000, feeMax:27000, intake:["September","January"]},
+  {name:"University of Malta", country:"Malta", city:"Msida", feeMin:8000, feeMax:12000, intake:["September","February"]},
+  {name:"MCAST", country:"Malta", city:"Paola", feeMin:6000, feeMax:9000, intake:["September","February"]},
+  {name:"American University of Malta", country:"Malta", city:"Bormla", feeMin:9000, feeMax:13000, intake:["September","January"]},
+  {name:"Sorbonne University", country:"France", city:"Paris", feeMin:9000, feeMax:14000, intake:["September"]},
+  {name:"Sciences Po", country:"France", city:"Paris", feeMin:15000, feeMax:22000, intake:["September","January"]},
+  {name:"EM Lyon Business School", country:"France", city:"Lyon", feeMin:16000, feeMax:24000, intake:["September","January"]},
+  {name:"Toulouse Business School", country:"France", city:"Toulouse", feeMin:13000, feeMax:19000, intake:["September"]},
+  {name:"IE University", country:"Spain", city:"Madrid", feeMin:18000, feeMax:26000, intake:["September","January"]},
+  {name:"University of Barcelona", country:"Spain", city:"Barcelona", feeMin:8000, feeMax:12000, intake:["September"]},
+  {name:"ESADE", country:"Spain", city:"Barcelona", feeMin:19000, feeMax:27000, intake:["September"]},
+  {name:"Universidad Complutense Madrid", country:"Spain", city:"Madrid", feeMin:7000, feeMax:11000, intake:["September"]},
+  {name:"University of Helsinki", country:"Finland", city:"Helsinki", feeMin:10000, feeMax:15000, intake:["September"]},
+  {name:"Aalto University", country:"Finland", city:"Espoo", feeMin:12000, feeMax:16000, intake:["September"]},
+  {name:"LUT University", country:"Finland", city:"Lappeenranta", feeMin:9000, feeMax:13000, intake:["September","January"]},
+  {name:"University of Auckland", country:"New Zealand", city:"Auckland", feeMin:24000, feeMax:33000, intake:["February","July"]},
+  {name:"University of Otago", country:"New Zealand", city:"Dunedin", feeMin:22000, feeMax:30000, intake:["February","July"]},
+  {name:"Victoria University of Wellington", country:"New Zealand", city:"Wellington", feeMin:21000, feeMax:28000, intake:["February","July"]},
+  {name:"Massey University", country:"New Zealand", city:"Palmerston North", feeMin:20000, feeMax:27000, intake:["February","July"]},
+  {name:"University of Amsterdam", country:"Netherlands", city:"Amsterdam", feeMin:11000, feeMax:18000, intake:["September","February"]},
+  {name:"Erasmus University Rotterdam", country:"Netherlands", city:"Rotterdam", feeMin:12000, feeMax:19000, intake:["September"]},
+  {name:"Tilburg University", country:"Netherlands", city:"Tilburg", feeMin:9000, feeMax:15000, intake:["September","February"]},
+  {name:"Maastricht University", country:"Netherlands", city:"Maastricht", feeMin:10000, feeMax:16000, intake:["September","February"]},
+  {name:"Sunway University", country:"Malaysia", city:"Petaling Jaya", feeMin:6000, feeMax:9500, intake:["September","January","May"]},
+  {name:"Taylor's University", country:"Malaysia", city:"Subang Jaya", feeMin:6500, feeMax:10000, intake:["September","January","May"]},
+  {name:"Monash University Malaysia", country:"Malaysia", city:"Bandar Sunway", feeMin:8000, feeMax:12500, intake:["September","January","May"]},
+  {name:"University of Nottingham Malaysia", country:"Malaysia", city:"Semenyih", feeMin:8500, feeMax:13000, intake:["September","January"]}
+];
+const uniFeeBrackets = [0,5000,10000,15000,20000,25000,30000,35000,40000,50000];
+function uniInitials(name) {
+  return name.split(' ').filter(w => w[0] === w[0].toUpperCase() && /[A-Za-z]/.test(w[0])).slice(0,2).map(w => w[0]).join('').toUpperCase() || name.slice(0,2).toUpperCase();
+}
+function initUniversityDirectory() {
+  const grid = document.getElementById('uniDirectoryGrid');
+  if (!grid) return;
+
+  const countryBox = document.getElementById('uniFilterCountry');
+  const cityBox = document.getElementById('uniFilterCity');
+  const intakeBox = document.getElementById('uniFilterIntake');
+  const feeMinSel = document.getElementById('uniFilterFeeMin');
+  const feeMaxSel = document.getElementById('uniFilterFeeMax');
+  const searchInput = document.getElementById('uniSearchInput');
+  const resultsCount = document.getElementById('uniResultsCount');
+  const emptyState = document.getElementById('uniEmptyState');
+
+  const countries = [...new Set(universityDirectory.map(u => u.country))].sort();
+  const cities = [...new Set(universityDirectory.map(u => u.city))].sort();
+  const intakes = [...new Set(universityDirectory.flatMap(u => u.intake))].sort();
+
+  countryBox.innerHTML = countries.map(c => `
+    <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="country" value="${c}"> ${c}</label>
+  `).join('');
+  cityBox.innerHTML = cities.map(c => `
+    <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="city" value="${c}"> ${c}</label>
+  `).join('');
+  intakeBox.innerHTML = intakes.map(i => `
+    <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="intake" value="${i}"> ${i}</label>
+  `).join('');
+
+  feeMinSel.innerHTML = uniFeeBrackets.map(v => `<option value="${v}">$${v.toLocaleString()}</option>`).join('');
+  feeMaxSel.innerHTML = uniFeeBrackets.map(v => `<option value="${v}">$${v.toLocaleString()}</option>`).join('') + `<option value="999999">No limit</option>`;
+  feeMinSel.value = "0";
+  feeMaxSel.value = "999999";
+
+  function cardHTML(u) {
+    const logo = u.logo
+      ? `<img src="${u.logo}" alt="${u.name}" class="max-h-10 max-w-10 object-contain">`
+      : `<span class="font-display font-bold text-bridge-700">${uniInitials(u.name)}</span>`;
+    const intakeBadges = u.intake.map(i => `<span class="uni-intake-badge">${i}</span>`).join('');
+    return `
+      <div class="university-card rounded-2xl border border-black/10 shadow-sm p-5 flex flex-col bg-white">
+        <div class="flex items-center gap-3">
+          <div class="w-14 h-14 shrink-0 rounded-lg bg-bridge-50 border border-black/10 flex items-center justify-center overflow-hidden p-1.5">${logo}</div>
+          <div class="min-w-0">
+            <p class="font-display font-bold text-bridge-900 leading-tight text-sm">${u.name}</p>
+            <p class="text-xs text-ink/50 mt-0.5">${u.city}, ${u.country}</p>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center justify-between text-sm border-t border-black/5 pt-3">
+          <span class="text-ink/50 text-xs">Tuition / year</span>
+          <span class="font-semibold text-bridge-900">$${u.feeMin.toLocaleString()} - $${u.feeMax.toLocaleString()}</span>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-1.5">${intakeBadges}</div>
+        <a onclick="go('home','lead-form')" class="btn-outline !text-xs mt-4 w-full text-center nav-link">Get Info</a>
+      </div>`;
+  }
+
+  function getChecked(group) {
+    return [...document.querySelectorAll(`.uni-filter-check[data-group="${group}"]:checked`)].map(el => el.value);
+  }
+
+  function applyFilters() {
+    const checkedCountries = getChecked('country');
+    const checkedCities = getChecked('city');
+    const checkedIntakes = getChecked('intake');
+    const feeMin = parseInt(feeMinSel.value, 10);
+    const feeMax = parseInt(feeMaxSel.value, 10);
+    const search = searchInput.value.trim().toLowerCase();
+
+    const filtered = universityDirectory.filter(u => {
+      if (checkedCountries.length && !checkedCountries.includes(u.country)) return false;
+      if (checkedCities.length && !checkedCities.includes(u.city)) return false;
+      if (checkedIntakes.length && !u.intake.some(i => checkedIntakes.includes(i))) return false;
+      if (u.feeMax < feeMin || u.feeMin > feeMax) return false;
+      if (search && !u.name.toLowerCase().includes(search)) return false;
+      return true;
+    });
+
+    grid.innerHTML = filtered.map(cardHTML).join('');
+    const anyFilterActive = checkedCountries.length || checkedCities.length || checkedIntakes.length || feeMin > 0 || feeMax < 999999 || search;
+    resultsCount.textContent = anyFilterActive
+      ? `Showing ${filtered.length} of ${universityDirectory.length} universities`
+      : `Showing all ${universityDirectory.length} universities`;
+    emptyState.classList.toggle('hidden', filtered.length > 0);
+    grid.classList.toggle('hidden', filtered.length === 0);
+  }
+
+  function clearAll() {
+    document.querySelectorAll('.uni-filter-check').forEach(el => { el.checked = false; });
+    feeMinSel.value = "0";
+    feeMaxSel.value = "999999";
+    searchInput.value = "";
+    applyFilters();
+  }
+
+  document.querySelectorAll('.uni-filter-check').forEach(el => el.addEventListener('change', applyFilters));
+  feeMinSel.addEventListener('change', applyFilters);
+  feeMaxSel.addEventListener('change', applyFilters);
+  searchInput.addEventListener('input', applyFilters);
+  const clearBtn = document.getElementById('uniClearFilters');
+  if (clearBtn) clearBtn.addEventListener('click', clearAll);
+  const emptyClearBtn = document.getElementById('uniEmptyClear');
+  if (emptyClearBtn) emptyClearBtn.addEventListener('click', clearAll);
+
+  const toggleBtn = document.getElementById('uniFilterToggle');
+  const panel = document.getElementById('uniFilterPanel');
+  const toggleIcon = document.getElementById('uniFilterToggleIcon');
+  if (toggleBtn && panel) {
+    toggleBtn.addEventListener('click', () => {
+      panel.classList.toggle('hidden');
+      if (toggleIcon) toggleIcon.style.transform = panel.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+    });
+  }
+
+  applyFilters();
+}
+
 function go(id, scrollToId) {
   const root = document.getElementById('pageRoot');
   root.innerHTML = pages[id] || pages.home;
@@ -1425,6 +1627,7 @@ function initPageScripts() {
     });
   });
   initUniCarousels();
+  initUniversityDirectory();
 
   // FAQ accordion
   document.querySelectorAll('.faq-btn').forEach(btn => {
