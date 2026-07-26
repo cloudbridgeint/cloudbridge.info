@@ -1061,8 +1061,12 @@ about: `
     <h2 class="section-heading text-center mx-auto">Our Team Members</h2>
     <p class="mt-3 text-ink/60 text-center max-w-xl mx-auto">The counsellors and staff behind every successful application.</p>
 
-    <div class="mt-10 max-w-sm mx-auto">
-      <div id="aboutTeamSlider">
+    <div class="mt-10 flex items-center justify-center gap-3 md:gap-8">
+      <button id="aboutTeamPrev" type="button" aria-label="Previous team member" class="shrink-0 w-11 h-11 rounded-full bg-white shadow-md ring-1 ring-black/5 flex items-center justify-center text-sunrise-600 hover:bg-sunrise-50 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.06 10l3.73 3.71a.75.75 0 11-1.06 1.06l-4.25-4.25a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 0z" clip-rule="evenodd" /></svg>
+      </button>
+      <div class="max-w-sm w-full">
+        <div id="aboutTeamSlider">
         <div class="team-slide active flex-col items-center text-center" data-slide="0">
           <img src="assets/team/shahan.jpg" alt="Mohammed Shahan" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Mohammed Shahan</h3>
@@ -1093,8 +1097,12 @@ about: `
           <p class="text-sm text-ink/60">Application Team</p>
           <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
         </div>
+        </div>
+        <div id="aboutTeamDots" class="mt-6 flex items-center justify-center gap-2"></div>
       </div>
-      <div id="aboutTeamDots" class="mt-6 flex items-center justify-center gap-2"></div>
+      <button id="aboutTeamNext" type="button" aria-label="Next team member" class="shrink-0 w-11 h-11 rounded-full bg-white shadow-md ring-1 ring-black/5 flex items-center justify-center text-sunrise-600 hover:bg-sunrise-50 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 010-1.06L10.94 10 7.21 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0z" clip-rule="evenodd" /></svg>
+      </button>
     </div>
     <div class="mt-6 text-center"><a onclick="go('our-team')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">See the full team &rarr;</a></div>
   </div>
@@ -1779,14 +1787,21 @@ function initAboutPage() {
     dotsBox.innerHTML = Array.from(slides).map((_, i) => `<button type="button" class="team-dot${i === 0 ? ' active' : ''}" data-slide="${i}" aria-label="Team member ${i + 1}"></button>`).join('');
     const dots = dotsBox.querySelectorAll('.team-dot');
     let current = 0;
+    function restartTimer() {
+      if (window.aboutTeamTimer) clearInterval(window.aboutTeamTimer);
+      window.aboutTeamTimer = setInterval(() => { showSlide((current + 1) % slides.length); }, 4000);
+    }
     function showSlide(i) {
       slides.forEach(s => s.classList.toggle('active', parseInt(s.dataset.slide, 10) === i));
       dots.forEach(d => d.classList.toggle('active', parseInt(d.dataset.slide, 10) === i));
       current = i;
     }
-    dots.forEach(d => d.addEventListener('click', () => showSlide(parseInt(d.dataset.slide, 10))));
-    if (window.aboutTeamTimer) clearInterval(window.aboutTeamTimer);
-    window.aboutTeamTimer = setInterval(() => { showSlide((current + 1) % slides.length); }, 4000);
+    dots.forEach(d => d.addEventListener('click', () => { showSlide(parseInt(d.dataset.slide, 10)); restartTimer(); }));
+    const prevBtn = document.getElementById('aboutTeamPrev');
+    const nextBtn = document.getElementById('aboutTeamNext');
+    if (prevBtn) prevBtn.addEventListener('click', () => { showSlide((current - 1 + slides.length) % slides.length); restartTimer(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { showSlide((current + 1) % slides.length); restartTimer(); });
+    restartTimer();
   }
 
   const partnerTrack = document.getElementById('partnerLogoTrack');
