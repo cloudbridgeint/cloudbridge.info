@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lato:wght@400;700;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
@@ -17,7 +17,7 @@
       extend: {
         colors: {
           bridge: {50:'#eef2f9',100:'#d7e0ef',200:'#b0c1df',300:'#7f9bc9',400:'#4d70a8',500:'#2f5182',600:'#233f68',700:'#1c3255',800:'#162743',900:'#0f1c30',950:'#0a1220'},
-          sunrise: {50:'#fff8ec',100:'#ffedc7',200:'#ffd888',300:'#ffc04d',400:'#f7a827',500:'#e88f14',600:'#c26f0d',700:'#9a530f'},
+          sunrise: {50:'#fcedee',100:'#f9d2d5',200:'#f2a6aa',300:'#eb7077',400:'#e12d38',500:'#ce1d27',600:'#aa1821',700:'#86131a'},
           harbor: {500:'#1c9c82',600:'#157e69'},
           ink: '#1e2430',
           cloud: '#f7f9fc',
@@ -38,24 +38,25 @@
   html { scroll-behavior: smooth; }
   body { font-family: 'Lato', sans-serif; }
   h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Inter', sans-serif; }
-  .btn-primary { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; background:#f7a827; padding:0.75rem 1.5rem; font-weight:600; color:#0f1c30; transition:.15s; cursor:pointer; border:none; }
-  .btn-primary:hover { background:#ffc04d; }
+  .btn-primary { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; background:#e12d38; padding:0.75rem 1.5rem; font-weight:600; color:#fff; transition:.15s; cursor:pointer; border:none; }
+  .btn-primary:hover { background:#eb7077; }
   .btn-secondary { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; border:1px solid rgba(255,255,255,.3); padding:0.75rem 1.5rem; font-weight:600; color:#fff; transition:.15s; cursor:pointer; background:transparent; }
   .btn-secondary:hover { background:rgba(255,255,255,.1); }
   .btn-outline { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; border:1px solid #0f1c30; padding:0.65rem 1.3rem; font-weight:600; color:#0f1c30; transition:.15s; cursor:pointer; background:transparent; font-size:.875rem; }
   .btn-outline:hover { background:#0f1c30; color:#fff; }
   .footer-btn-red { display:inline-flex; align-items:center; justify-content:center; background:#c0201f; transition:.15s; cursor:pointer; border:none; }
   .footer-btn-red:hover { background:#a11d1d; }
-  .section-heading { font-size:2rem; font-weight:800; letter-spacing:-0.01em; color:#0f1c30; }
+  .section-heading { font-family:'Playfair Display', serif; font-size:2rem; font-weight:800; letter-spacing:-0.01em; background:linear-gradient(90deg, #050a31, #c90f14); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; width:fit-content; max-width:100%; }
+  .section-heading.text-center { margin-left:auto; margin-right:auto; }
   @media (min-width:768px){ .section-heading{ font-size:2.5rem; } }
   .path-line { stroke-dasharray:1000; stroke-dashoffset:1000; animation: draw 2.2s ease-out forwards; }
   @keyframes draw { to { stroke-dashoffset:0; } }
   @keyframes floaty { 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-8px);} }
   .float-slow { animation: floaty 6s ease-in-out infinite; }
   .card-photo { background-size:cover; background-position:center; }
-  :focus-visible { outline: 2px solid #f7a827; outline-offset: 2px; }
+  :focus-visible { outline: 2px solid #e12d38; outline-offset: 2px; }
   .nav-link { cursor:pointer; }
-  .nav-link.active { color:#e88f14 !important; }
+  .nav-link.active { color:#ce1d27 !important; }
   .nav-drop { position:relative; }
   .nav-drop-panel { display:none; position:absolute; left:0; top:100%; min-width:190px; background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:.6rem; box-shadow:0 10px 30px rgba(0,0,0,.08); padding:.4rem 0; }
   .nav-drop:hover .nav-drop-panel { display:block; }
@@ -293,7 +294,7 @@ home: `
         <path d="M 1000 220 L 1150 280 L 1000 340 L 850 280 Z"/>
         <path d="M 1000 340 L 1000 400"/>
       </g>
-      <circle cx="1000" cy="410" r="8" fill="#f7a827"/>
+      <circle cx="1000" cy="410" r="8" fill="#e12d38"/>
     </svg>
     <div class="absolute inset-0 bg-gradient-to-r from-bridge-950 via-bridge-950/75 to-transparent"></div>
     <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
@@ -306,7 +307,7 @@ home: `
     </div>
   </div>
 
-  <div class="hidden lg:flex absolute right-10 top-1/2 -translate-y-1/2 z-20 flex-col items-center justify-center w-52 aspect-square rounded-2xl text-center shadow-2xl px-5" style="background-image:linear-gradient(135deg,#2f5182,#c26f0d)">
+  <div class="hidden lg:flex absolute right-10 top-1/2 -translate-y-1/2 z-20 flex-col items-center justify-center w-52 aspect-square rounded-2xl text-center shadow-2xl px-5" style="background-image:linear-gradient(135deg,#2f5182,#aa1821)">
     <p class="font-display text-5xl font-extrabold leading-none">13<span class="text-sunrise-100 align-top text-2xl">+</span></p>
     <p class="mt-1 text-base font-semibold">years</p>
     <p class="mt-2 text-xs text-white/85 leading-snug">of student service excellence</p>
