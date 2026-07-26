@@ -67,6 +67,10 @@
   .uni-filter-check-label { display:flex; align-items:center; gap:.5rem; font-size:.8rem; color:#3d4451; cursor:pointer; }
   .uni-intake-badge { font-size:.65rem; font-weight:600; padding:.2rem .55rem; border-radius:9999px; background:#eef2f9; color:#233f68; }
   .uni-card-btn { border-radius:0.5rem; }
+  .uni-card-btn:hover { background:#e12d38 !important; border-color:#e12d38 !important; color:#fff !important; }
+  .uni-filter-chip { display:inline-flex; align-items:center; gap:.4rem; background:#0f1c30; color:#fff; font-size:.78rem; font-weight:600; padding:.4rem .5rem .4rem .85rem; border-radius:9999px; }
+  .uni-filter-chip button { display:flex; align-items:center; justify-content:center; width:1.1rem; height:1.1rem; border-radius:9999px; background:rgba(255,255,255,.15); cursor:pointer; border:none; color:#fff; flex-shrink:0; }
+  .uni-filter-chip button:hover { background:rgba(255,255,255,.3); }
   .uni-accordion-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:.8rem 1rem; border:1px solid rgba(0,0,0,.12); border-radius:.75rem; font-family:'Inter',sans-serif; font-weight:600; font-size:.9rem; color:#162743; background:#fff; cursor:pointer; transition:.15s; }
   .uni-accordion-btn:hover { border-color:rgba(0,0,0,.28); }
   .uni-accordion-chevron { transition:transform .2s; width:1rem; height:1rem; color:#162743; flex-shrink:0; }
@@ -1132,7 +1136,8 @@ programs: `
 <section class="py-10 md:py-14 bg-white">
   <div class="max-w-container mx-auto px-4 md:px-8">
 
-    <h2 class="section-heading text-center mx-auto mb-8">Select Your Preferred University and Apply Today</h2>
+    <h2 class="section-heading text-center mx-auto mb-2">Select Your Preferred University and Apply Today</h2>
+    <p id="uniResultsCount" class="text-sm text-ink/60 mb-8">Showing all universities</p>
 
     <button id="uniFilterToggle" class="lg:hidden w-full mb-4 flex items-center justify-between rounded-xl border border-black/10 px-4 py-3 font-display font-semibold text-bridge-900">
       <span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M2.5 4.5A1 1 0 013.5 3.5h13a1 1 0 01.8 1.6l-5.3 6.9v4a1 1 0 01-.45.834l-2 1.333A1 1 0 017.5 17V12l-5.3-6.9a1 1 0 01-.2-.6z" clip-rule="evenodd" /></svg>Filters</span>
@@ -1148,6 +1153,8 @@ programs: `
             <h3 class="font-display font-bold text-bridge-900 text-lg">Filters</h3>
             <button id="uniClearFilters" class="text-sm font-semibold text-sunrise-600 hover:underline">Reset</button>
           </div>
+
+          <div id="uniActiveChips" class="flex flex-wrap gap-2 hidden"></div>
 
           <div class="space-y-3">
 
@@ -1167,7 +1174,8 @@ programs: `
                 <svg class="uni-accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
               </button>
               <div class="uni-accordion-panel hidden">
-                <input id="uniSearchInput" type="text" placeholder="Search by name..." class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sunrise-400">
+                <input id="uniSearchInput" type="text" placeholder="Search University" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sunrise-400 mb-2">
+                <div id="uniFilterUniversity" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
               </div>
             </div>
 
@@ -1259,10 +1267,6 @@ programs: `
       </aside>
 
       <div>
-        <div class="flex items-center justify-between mb-5">
-          <p id="uniResultsCount" class="text-sm text-ink/60">Showing all universities</p>
-        </div>
-
         <div id="uniDirectoryGrid" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
 
         <div id="uniEmptyState" class="hidden text-center py-16">
@@ -1566,6 +1570,9 @@ const uniFeeBrackets = [0,5000,10000,15000,20000,25000,30000,35000,40000,50000];
 function uniInitials(name) {
   return name.split(' ').filter(w => w[0] === w[0].toUpperCase() && /[A-Za-z]/.test(w[0])).slice(0,2).map(w => w[0]).join('').toUpperCase() || name.slice(0,2).toUpperCase();
 }
+const uniCountryOrder = ["UK","USA","Canada","France","Spain","Finland","Netherlands","Malta","New Zealand","Malaysia"];
+const uniAllMonths = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
 function initUniversityDirectory() {
   const grid = document.getElementById('uniDirectoryGrid');
   if (!grid) return;
@@ -1576,18 +1583,21 @@ function initUniversityDirectory() {
   const intakeYearBox = document.getElementById('uniFilterIntakeYear');
   const facultyBox = document.getElementById('uniFilterFaculty');
   const studyLevelBox = document.getElementById('uniFilterStudyLevel');
+  const universityBox = document.getElementById('uniFilterUniversity');
   const rankingSel = document.getElementById('uniFilterRanking');
   const feeMinSel = document.getElementById('uniFilterFeeMin');
   const feeMaxSel = document.getElementById('uniFilterFeeMax');
   const searchInput = document.getElementById('uniSearchInput');
   const resultsCount = document.getElementById('uniResultsCount');
   const emptyState = document.getElementById('uniEmptyState');
+  const activeChips = document.getElementById('uniActiveChips');
 
-  const countries = [...new Set(universityDirectory.map(u => u.country))].sort();
+  const countries = uniCountryOrder.filter(c => universityDirectory.some(u => u.country === c));
   const faculties = [...new Set(universityDirectory.flatMap(u => u.faculty))].sort();
   const studyLevelOrder = ["Foundation","Diploma","Undergraduate","Postgraduate","PhD"];
   const studyLevels = studyLevelOrder.filter(s => universityDirectory.some(u => u.studyLevel.includes(s)));
   const intakeYears = [...new Set(universityDirectory.flatMap(u => u.intakeYear))].sort();
+  const universityNames = universityDirectory.map(u => u.name).sort();
 
   countryBox.innerHTML = countries.map(c => `
     <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="country" value="${c}"> ${c}</label>
@@ -1600,6 +1610,12 @@ function initUniversityDirectory() {
   `).join('');
   intakeYearBox.innerHTML = intakeYears.map(y => `
     <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="intakeyear" value="${y}"> ${y}</label>
+  `).join('');
+  intakeBox.innerHTML = uniAllMonths.map(m => `
+    <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="intake" value="${m}"> ${m}</label>
+  `).join('');
+  universityBox.innerHTML = universityNames.map(n => `
+    <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="university" value="${n}"> ${n}</label>
   `).join('');
 
   feeMinSel.innerHTML = uniFeeBrackets.map(v => `<option value="${v}">$${v.toLocaleString()}</option>`).join('');
@@ -1614,36 +1630,74 @@ function initUniversityDirectory() {
   function updateDependentFilters() {
     const checkedCountries = getChecked('country');
     const prevCheckedCities = getChecked('city');
-    const prevCheckedIntakes = getChecked('intake');
 
     const relevant = checkedCountries.length
       ? universityDirectory.filter(u => checkedCountries.includes(u.country))
       : universityDirectory;
 
     const availableCities = [...new Set(relevant.map(u => u.city))].sort();
-    const availableIntakes = [...new Set(relevant.flatMap(u => u.intake))].sort();
 
     cityBox.innerHTML = availableCities.map(c => `
       <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="city" value="${c}" ${prevCheckedCities.includes(c) ? 'checked' : ''}> ${c}</label>
     `).join('');
-    intakeBox.innerHTML = availableIntakes.map(i => `
-      <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="intake" value="${i}" ${prevCheckedIntakes.includes(i) ? 'checked' : ''}> ${i}</label>
-    `).join('');
 
-    updateAccordionCounts();
+    cityBox.querySelectorAll('.uni-filter-check').forEach(el => el.addEventListener('change', renderChips));
+    renderChips();
   }
 
-  function updateAccordionCounts() {
-    const map = {
-      Country: 'country', Faculty: 'faculty', StudyLevel: 'studylevel',
-      Intake: 'intake', IntakeYear: 'intakeyear', City: 'city'
-    };
-    Object.entries(map).forEach(([badgeKey, group]) => {
-      const n = getChecked(group).length;
-      const badge = document.getElementById('uniCount' + badgeKey);
-      if (!badge) return;
-      badge.textContent = n;
-      badge.classList.toggle('hidden', n === 0);
+  function filterUniversityCheckboxList() {
+    const q = searchInput.value.trim().toLowerCase();
+    universityBox.querySelectorAll('label').forEach(label => {
+      const text = label.textContent.trim().toLowerCase();
+      label.style.display = (!q || text.includes(q)) ? 'flex' : 'none';
+    });
+  }
+
+  const chipGroupLabels = {
+    country: 'Country', city: 'Location', intake: 'Intake', intakeyear: 'Intake Year',
+    faculty: 'Faculty', studylevel: 'Study Level', university: 'University'
+  };
+
+  function renderChips() {
+    const chips = [];
+    Object.keys(chipGroupLabels).forEach(group => {
+      getChecked(group).forEach(value => {
+        chips.push({ group: group, value: value });
+      });
+    });
+    if (rankingSel.value !== 'any') chips.push({ group: 'ranking', value: 'Top ' + rankingSel.value });
+    if (parseInt(feeMinSel.value,10) > 0 || parseInt(feeMaxSel.value,10) < 999999) {
+      const maxLabel = feeMaxSel.value === '999999' ? 'Any' : parseInt(feeMaxSel.value,10).toLocaleString();
+      chips.push({ group: 'fee', value: '$' + parseInt(feeMinSel.value,10).toLocaleString() + ' - $' + maxLabel });
+    }
+
+    if (!chips.length) {
+      activeChips.classList.add('hidden');
+      activeChips.innerHTML = '';
+      return;
+    }
+    activeChips.classList.remove('hidden');
+    activeChips.innerHTML = chips.map((c, idx) => `
+      <span class="uni-filter-chip">${c.value}<button type="button" data-chip-remove="${idx}" aria-label="Remove">&times;</button></span>
+    `).join('');
+
+    activeChips.querySelectorAll('[data-chip-remove]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-chip-remove'), 10);
+        const chip = chips[idx];
+        if (chip.group === 'ranking') {
+          rankingSel.value = 'any';
+        } else if (chip.group === 'fee') {
+          feeMinSel.value = '0';
+          feeMaxSel.value = '999999';
+        } else {
+          const match = [...document.querySelectorAll(`.uni-filter-check[data-group="${chip.group}"]`)].find(e => e.value === chip.value);
+          if (match) match.checked = false;
+          if (chip.group === 'country') updateDependentFilters();
+        }
+        renderChips();
+        applyFilters();
+      });
     });
   }
 
@@ -1654,7 +1708,7 @@ function initUniversityDirectory() {
     const intakeBadges = u.intake.map(i => `<span class="uni-intake-badge">${i}</span>`).join('');
     const scholarshipText = u.scholarship
       ? `<span class="font-semibold text-harbor-600">Available</span>`
-      : `<span class="font-semibold text-ink/40">Not Available</span>`;
+      : `<span class="font-semibold text-ink/60">Not Available</span>`;
     return `
       <div class="university-card rounded-2xl border border-black/10 shadow-sm p-5 flex flex-col bg-white">
         <div class="flex items-center gap-3">
@@ -1664,21 +1718,21 @@ function initUniversityDirectory() {
             <p class="text-xs text-ink/50 mt-0.5">${u.city}, ${u.country}</p>
           </div>
         </div>
-        <div class="mt-4 space-y-2 text-xs border-t border-black/5 pt-3">
+        <div class="mt-4 space-y-2.5 text-sm border-t border-black/5 pt-3">
           <div class="flex items-center justify-between">
-            <span class="text-ink/50">Tuition / year</span>
+            <span class="text-ink font-medium">Tuition / year</span>
             <span class="font-semibold text-bridge-900">$${u.feeMin.toLocaleString()} - $${u.feeMax.toLocaleString()}</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-ink/50">Scholarships</span>
+            <span class="text-ink font-medium">Scholarships</span>
             ${scholarshipText}
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-ink/50">About the university</span>
+            <span class="text-ink font-medium">About the university</span>
             <a onclick="go('home','lead-form')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View Profile</a>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-ink/50">Find Courses</span>
+            <span class="text-ink font-medium">Find Courses</span>
             <a onclick="go('programs')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View All</a>
           </div>
         </div>
@@ -1694,10 +1748,10 @@ function initUniversityDirectory() {
     const checkedFaculties = getChecked('faculty');
     const checkedStudyLevels = getChecked('studylevel');
     const checkedIntakeYears = getChecked('intakeyear');
+    const checkedUniversities = getChecked('university');
     const feeMin = parseInt(feeMinSel.value, 10);
     const feeMax = parseInt(feeMaxSel.value, 10);
     const rankingMax = rankingSel.value;
-    const search = searchInput.value.trim().toLowerCase();
 
     const filtered = universityDirectory.filter(u => {
       if (checkedCountries.length && !checkedCountries.includes(u.country)) return false;
@@ -1706,19 +1760,19 @@ function initUniversityDirectory() {
       if (checkedFaculties.length && !u.faculty.some(f => checkedFaculties.includes(f))) return false;
       if (checkedStudyLevels.length && !u.studyLevel.some(s => checkedStudyLevels.includes(s))) return false;
       if (checkedIntakeYears.length && !u.intakeYear.some(y => checkedIntakeYears.includes(y))) return false;
+      if (checkedUniversities.length && !checkedUniversities.includes(u.name)) return false;
       if (u.feeMax < feeMin || u.feeMin > feeMax) return false;
       if (rankingMax !== 'any') {
         const rankNum = parseInt(u.ranking, 10);
         if (isNaN(rankNum) || rankNum > parseInt(rankingMax, 10)) return false;
       }
-      if (search && !u.name.toLowerCase().includes(search)) return false;
       return true;
     });
 
     grid.innerHTML = filtered.map(cardHTML).join('');
     const anyFilterActive = checkedCountries.length || checkedCities.length || checkedIntakes.length ||
-      checkedFaculties.length || checkedStudyLevels.length || checkedIntakeYears.length ||
-      feeMin > 0 || feeMax < 999999 || rankingMax !== 'any' || search;
+      checkedFaculties.length || checkedStudyLevels.length || checkedIntakeYears.length || checkedUniversities.length ||
+      feeMin > 0 || feeMax < 999999 || rankingMax !== 'any';
     resultsCount.textContent = anyFilterActive
       ? `Showing ${filtered.length} of ${universityDirectory.length} universities`
       : `Showing all ${universityDirectory.length} universities`;
@@ -1732,14 +1786,20 @@ function initUniversityDirectory() {
     feeMaxSel.value = "999999";
     rankingSel.value = "any";
     searchInput.value = "";
+    filterUniversityCheckboxList();
     updateDependentFilters();
+    renderChips();
     applyFilters();
   }
 
-  countryBox.querySelectorAll('.uni-filter-check').forEach(el => el.addEventListener('change', updateDependentFilters));
-  document.querySelectorAll('.uni-filter-check[data-group="faculty"], .uni-filter-check[data-group="studylevel"], .uni-filter-check[data-group="intakeyear"]').forEach(el => {
-    el.addEventListener('change', updateAccordionCounts);
+  countryBox.querySelectorAll('.uni-filter-check').forEach(el => el.addEventListener('change', () => { updateDependentFilters(); renderChips(); }));
+  document.querySelectorAll('.uni-filter-check[data-group="faculty"], .uni-filter-check[data-group="studylevel"], .uni-filter-check[data-group="intakeyear"], .uni-filter-check[data-group="intake"], .uni-filter-check[data-group="university"]').forEach(el => {
+    el.addEventListener('change', renderChips);
   });
+  rankingSel.addEventListener('change', renderChips);
+  feeMinSel.addEventListener('change', renderChips);
+  feeMaxSel.addEventListener('change', renderChips);
+  searchInput.addEventListener('input', filterUniversityCheckboxList);
 
   const applyBtn = document.getElementById('uniApplyFilters');
   if (applyBtn) applyBtn.addEventListener('click', applyFilters);
