@@ -108,6 +108,20 @@
   .crumb a { cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
   .form-input { transition:border-color .15s, box-shadow .15s; }
   .form-input:focus { outline:none; border-color:#2f5182; box-shadow:0 0 0 3px rgba(47,81,130,.15); }
+  .apply-dot { width:2rem; height:2rem; border-radius:9999px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.8rem; background:#d1d5db; color:#fff; transition:background .2s; }
+  .apply-dot.active { background:#1c3255; }
+  .apply-dot.completed { background:#e12d38; }
+  .apply-label { font-size:.65rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9ca3af; }
+  .apply-label.active { color:#1c3255; }
+  .apply-label.completed { color:#e12d38; }
+  .apply-label-field { display:block; font-size:.7rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#374151; margin-bottom:.4rem; }
+  .apply-input { width:100%; border-radius:.75rem; border:1px solid rgba(0,0,0,.12); padding:.7rem 1rem; font-size:.875rem; transition:border-color .15s, box-shadow .15s; }
+  .apply-input:focus { outline:none; border-color:#2f5182; box-shadow:0 0 0 3px rgba(47,81,130,.15); }
+  .apply-file { position:relative; display:flex; align-items:center; justify-content:space-between; gap:.75rem; border:1.5px dashed rgba(0,0,0,.15); border-radius:.75rem; padding:.75rem 1rem; background:#fafbff; }
+  .apply-file-input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .apply-file-label { display:flex; align-items:center; gap:.5rem; font-size:.8rem; font-weight:600; color:#2f5182; }
+  .apply-file-badge { font-size:.65rem; font-weight:700; text-transform:uppercase; color:#9ca3af; background:#f1f2f6; padding:.2rem .6rem; border-radius:9999px; white-space:nowrap; }
+  .apply-file-badge.required { color:#7a1c22; background:#fbe4e4; }
   #heroSlider .slider-arrow { position:absolute; bottom:1.35rem; width:2.5rem; height:2.5rem; border-radius:9999px; background:rgba(255,255,255,.12); border:none; color:#fff; font-size:1.5rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:20; transition:.15s; }
   #heroSlider .slider-arrow:hover { background:rgba(255,255,255,.22); }
   .slider-dot { transition:.2s; cursor:pointer; border:none; }
@@ -140,7 +154,7 @@
       <a href="/programs" onclick="return spaNav(event,'programs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Course</a>
       <a href="/scholarship" onclick="return spaNav(event,'scholarship')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="scholarship">Scholarship</a>
       <a href="/events" onclick="return spaNav(event,'events')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="events">Events</a>
-      <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50">Apply Now</a>
+      <a href="/apply-now" onclick="return spaNav(event,'apply-now')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50">Apply Now</a>
       <a href="/blogs" onclick="return spaNav(event,'blogs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="blogs">Blogs</a>
       <a href="/contact" onclick="return spaNav(event,'contact')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="contact">Contact</a>
     </nav>
@@ -166,7 +180,7 @@
     <a href="/programs" onclick="return spaNav(event,'programs')" class="nav-link block py-2 text-bridge-900">Course</a>
     <a href="/scholarship" onclick="return spaNav(event,'scholarship')" class="nav-link block py-2 text-bridge-900">Scholarship</a>
     <a href="/events" onclick="return spaNav(event,'events')" class="nav-link block py-2 text-bridge-900">Events</a>
-    <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="nav-link block py-2 text-bridge-900">Apply Now</a>
+    <a href="/apply-now" onclick="return spaNav(event,'apply-now')" class="nav-link block py-2 text-bridge-900">Apply Now</a>
     <a href="/blogs" onclick="return spaNav(event,'blogs')" class="nav-link block py-2 text-bridge-900">Blogs</a>
     <a href="/contact" onclick="return spaNav(event,'contact')" class="nav-link block py-2 text-bridge-900">Contact</a>
     <a href="/free-consultation" onclick="return spaNav(event,'free-consultation')" class="btn-primary w-full !py-2 text-sm mt-2 inline-flex items-center justify-center gap-1.5 !rounded-lg !bg-[#db1f2a] !text-white hover:!bg-[#c01822]">
@@ -1510,6 +1524,116 @@ destinations: `
         <li>• Biomedical & Electrical Engineering</li>
         <li>• Public Policy & International Relations</li>
       </ul>
+    </div>
+  </div>
+</section>
+`,
+
+'apply-now': `
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 max-w-3xl">
+
+    <div class="rounded-t-2xl py-8 px-6 text-center text-white" style="background-image:linear-gradient(90deg,#e12d38 0%,#1c3255 100%)">
+      <h1 class="text-2xl md:text-3xl font-extrabold">Complete all steps to submit your application</h1>
+    </div>
+
+    <div class="bg-white rounded-b-2xl shadow-sm ring-1 ring-black/5 p-6 md:p-10">
+
+      <div class="relative mb-10">
+        <div class="absolute top-4 h-0.5 bg-black/10" style="left:12.5%;right:12.5%"></div>
+        <div id="applyLine1" class="absolute top-4 h-0.5 bg-sunrise-600" style="left:12.5%;width:25%;transform:scaleX(0);transform-origin:left;transition:transform .35s ease"></div>
+        <div id="applyLine2" class="absolute top-4 h-0.5 bg-sunrise-600" style="left:37.5%;width:25%;transform:scaleX(0);transform-origin:left;transition:transform .35s ease"></div>
+        <div id="applyLine3" class="absolute top-4 h-0.5 bg-sunrise-600" style="left:62.5%;width:25%;transform:scaleX(0);transform-origin:left;transition:transform .35s ease"></div>
+        <div class="relative grid grid-cols-4">
+          <div class="flex flex-col items-center gap-2"><div id="applyDot1" class="apply-dot active">1</div><p id="applyLabel1" class="apply-label active">PERSONAL</p></div>
+          <div class="flex flex-col items-center gap-2"><div id="applyDot2" class="apply-dot">2</div><p id="applyLabel2" class="apply-label">EDUCATION</p></div>
+          <div class="flex flex-col items-center gap-2"><div id="applyDot3" class="apply-dot">3</div><p id="applyLabel3" class="apply-label">COURSE</p></div>
+          <div class="flex flex-col items-center gap-2"><div id="applyDot4" class="apply-dot">4</div><p id="applyLabel4" class="apply-label">DOCUMENTS</p></div>
+        </div>
+      </div>
+
+      <div id="applyFormBody">
+
+        <div id="applyStep1" class="apply-step">
+          <h2 class="flex items-center gap-2 font-display font-bold text-bridge-900 text-lg pb-3 border-b border-black/10">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Personal Information
+          </h2>
+          <div class="mt-6 grid sm:grid-cols-2 gap-5">
+            <div><label class="apply-label-field">First Name <span class="text-sunrise-600">*</span></label><input required placeholder="e.g. Rahim" class="apply-input"></div>
+            <div><label class="apply-label-field">Last Name <span class="text-sunrise-600">*</span></label><input required placeholder="e.g. Uddin" class="apply-input"></div>
+            <div><label class="apply-label-field">Phone Number <span class="text-sunrise-600">*</span></label><input required placeholder="+880 1XXXXXXXXX" class="apply-input"></div>
+            <div><label class="apply-label-field">Email Address <span class="text-sunrise-600">*</span></label><input required type="email" placeholder="name@email.com" class="apply-input"></div>
+            <div><label class="apply-label-field">Date of Birth <span class="text-sunrise-600">*</span></label><input required type="date" class="apply-input"></div>
+            <div><label class="apply-label-field">Gender <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+            <div><label class="apply-label-field">Nationality <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>Bangladeshi</option><option>Indian</option><option>Other</option></select></div>
+            <div><label class="apply-label-field">Country of Residence <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>Bangladesh</option><option>India</option><option>UAE</option><option>Saudi Arabia</option><option>Other</option></select></div>
+            <div class="sm:col-span-2"><label class="apply-label-field">Full Address <span class="text-sunrise-600">*</span></label><input required placeholder="House, Road, Area, City" class="apply-input"></div>
+          </div>
+        </div>
+
+        <div id="applyStep2" class="apply-step hidden">
+          <h2 class="flex items-center gap-2 font-display font-bold text-bridge-900 text-lg pb-3 border-b border-black/10">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4 3 8.5 12 13l9-4.5L12 4Z"/><path d="M6.5 10.6V15c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3v-4.4"/></svg>
+            Education Background
+          </h2>
+          <div class="mt-6 grid sm:grid-cols-2 gap-5">
+            <div class="sm:col-span-2"><label class="apply-label-field">Highest Qualification <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>SSC / O Levels</option><option>HSC / A Levels</option><option>Diploma</option><option>Bachelor's</option><option>Master's</option></select></div>
+            <div class="sm:col-span-2"><label class="apply-label-field">Name of Institute <span class="text-sunrise-600">*</span></label><input required placeholder="University / College name" class="apply-input"></div>
+            <div class="sm:col-span-2"><label class="apply-label-field">Course / Subject Studied <span class="text-sunrise-600">*</span></label><input required placeholder="e.g. Computer Science" class="apply-input"></div>
+            <div><label class="apply-label-field">Graduation / Passing Year <span class="text-sunrise-600">*</span></label><input required type="date" class="apply-input"></div>
+            <div><label class="apply-label-field">English Proficiency Test <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>IELTS</option><option>TOEFL</option><option>PTE Academic</option><option>Duolingo English Test</option><option>MOI Certificate</option><option>Not yet taken</option></select></div>
+          </div>
+        </div>
+
+        <div id="applyStep3" class="apply-step hidden">
+          <h2 class="flex items-center gap-2 font-display font-bold text-bridge-900 text-lg pb-3 border-b border-black/10">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.8L12 3Z"/></svg>
+            Course Preference
+          </h2>
+          <div class="mt-6 grid sm:grid-cols-2 gap-5">
+            <div><label class="apply-label-field">Preferred Study Level <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>Foundation</option><option>Undergraduate</option><option>Postgraduate</option><option>PHD</option></select></div>
+            <div><label class="apply-label-field">Preferred Subject <span class="text-sunrise-600">*</span></label><select required id="applySubjectSelect" class="apply-input"><option value="">— Select —</option></select></div>
+            <div><label class="apply-label-field">Intake Month <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select></div>
+            <div><label class="apply-label-field">Intake Year <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>2026</option><option>2027</option><option>2028</option></select></div>
+          </div>
+        </div>
+
+        <div id="applyStep4" class="apply-step hidden">
+          <h2 class="flex items-center gap-2 font-display font-bold text-bridge-900 text-lg pb-3 border-b border-black/10">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v4h4"/></svg>
+            Upload Documents
+          </h2>
+          <div class="mt-6 space-y-5">
+            <div><label class="apply-label-field">Academic Certificate <span class="text-sunrise-600">*</span></label><div class="apply-file"><input required type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-badge required">Required</span></div></div>
+            <div><label class="apply-label-field">Mark Sheet / Transcript <span class="text-sunrise-600">*</span></label><div class="apply-file"><input required type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-badge required">Required</span></div></div>
+            <div><label class="apply-label-field">English Test Certificate</label><div class="apply-file"><input type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-badge">Optional</span></div></div>
+            <div><label class="apply-label-field">CV / Resume</label><div class="apply-file"><input type="file" accept=".pdf,.doc,.docx" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/DOC)</span><span class="apply-file-badge">Optional</span></div></div>
+            <div><label class="apply-label-field">Personal Statement</label><div class="apply-file"><input type="file" accept=".pdf,.doc,.docx" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/DOC)</span><span class="apply-file-badge">Optional</span></div></div>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-black/10 flex justify-between">
+          <button type="button" id="applyBackBtn" onclick="applyBack()" class="hidden rounded-xl px-6 py-3 font-display font-semibold text-bridge-900 bg-bridge-50 hover:bg-bridge-100 transition inline-flex items-center gap-1.5">
+            <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.06 10l3.73 3.71a.75.75 0 11-1.06 1.06l-4.25-4.25a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 0z" clip-rule="evenodd"/></svg>
+            Back
+          </button>
+          <span></span>
+          <button type="button" id="applyNextBtn" onclick="applyNext()" class="rounded-xl px-6 py-3 font-display font-semibold text-white shadow-sm transition hover:brightness-110 inline-flex items-center gap-1.5" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%)">
+            Next Step
+            <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 010-1.06L10.94 10 7.21 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0z" clip-rule="evenodd"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="applyThanks" class="hidden text-center py-10">
+        <div class="w-16 h-16 mx-auto rounded-full bg-harbor-500/10 flex items-center justify-center text-harbor-600">
+          <svg viewBox="0 0 24 24" class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h2 class="mt-4 font-display font-bold text-xl text-bridge-900">Application Submitted!</h2>
+        <p class="mt-2 text-ink/60 max-w-sm mx-auto">Thanks — a CloudBridge counsellor will review your application and get back to you shortly. <span class="block text-xs text-ink/40 mt-1">(demo only — nothing was actually sent)</span></p>
+      </div>
+
     </div>
   </div>
 </section>
@@ -3005,6 +3129,82 @@ window.selectSubject = selectSubject;
 window.toggleOtherDestination = toggleOtherDestination;
 
 /* ============================================================
+   APPLY NOW — 4-step application wizard. Next/Back swap the
+   visible step, validate required fields in the current step
+   before advancing, and update the dot/line progress indicator.
+   ============================================================ */
+let applyStep = 1;
+function applyPopulateSubjects() {
+  const sel = document.getElementById('applySubjectSelect');
+  if (!sel || sel.options.length > 1) return;
+  (typeof SUBJECTS !== 'undefined' ? SUBJECTS : []).forEach(s => {
+    const opt = document.createElement('option');
+    opt.textContent = s;
+    sel.appendChild(opt);
+  });
+}
+function applyUpdateIndicator() {
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('applyDot' + i);
+    const label = document.getElementById('applyLabel' + i);
+    if (!dot) continue;
+    if (i < applyStep) {
+      dot.className = 'apply-dot completed';
+      dot.innerHTML = '&#10003;';
+      label.className = 'apply-label completed';
+    } else if (i === applyStep) {
+      dot.className = 'apply-dot active';
+      dot.textContent = i;
+      label.className = 'apply-label active';
+    } else {
+      dot.className = 'apply-dot';
+      dot.textContent = i;
+      label.className = 'apply-label';
+    }
+  }
+  for (let i = 1; i <= 3; i++) {
+    const line = document.getElementById('applyLine' + i);
+    if (line) line.style.transform = i < applyStep ? 'scaleX(1)' : 'scaleX(0)';
+  }
+}
+function applyShowStep(step) {
+  for (let i = 1; i <= 4; i++) {
+    const panel = document.getElementById('applyStep' + i);
+    if (panel) panel.classList.toggle('hidden', i !== step);
+  }
+  applyStep = step;
+  applyUpdateIndicator();
+  const backBtn = document.getElementById('applyBackBtn');
+  const nextBtn = document.getElementById('applyNextBtn');
+  if (backBtn) backBtn.classList.toggle('hidden', step === 1);
+  if (nextBtn) nextBtn.innerHTML = step === 4
+    ? 'Submit Application'
+    : 'Next Step <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 010-1.06L10.94 10 7.21 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0z" clip-rule="evenodd"/></svg>';
+}
+function applyNext() {
+  const panel = document.getElementById('applyStep' + applyStep);
+  if (panel) {
+    const fields = panel.querySelectorAll('[required]');
+    for (const field of fields) {
+      if (!field.checkValidity()) { field.reportValidity(); return; }
+    }
+  }
+  if (applyStep < 4) { applyShowStep(applyStep + 1); }
+  else { applySubmitForm(); }
+}
+function applyBack() {
+  if (applyStep > 1) applyShowStep(applyStep - 1);
+}
+function applySubmitForm() {
+  const body = document.getElementById('applyFormBody');
+  const thanks = document.getElementById('applyThanks');
+  if (body) body.classList.add('hidden');
+  if (thanks) thanks.classList.remove('hidden');
+}
+window.applyNext = applyNext;
+window.applyBack = applyBack;
+
+/* ============================================================
    FEATURED UNIVERSITIES LOGO CAROUSEL
    Shows 6 logos at a time (4 on small screens, 3 on mobile),
    auto-slides right-to-left every 2s, loops seamlessly.
@@ -3648,6 +3848,7 @@ const PAGE_META = {
   'find-scholarships': { title: 'How to Find Scholarships You Actually Qualify For | CloudBridge', description: 'Where scholarship money really is, whether you need top grades, and when to apply — a practical guide to funding your studies abroad.' },
   'first-month-abroad': { title: 'Your First Month Abroad: A Practical Checklist | CloudBridge', description: 'What to do in your first week abroad, opening a bank account, coping with homesickness, and budgeting for your first month.' },
   'contact': { title: 'Contact Us | CloudBridge Study Abroad Consultancy', description: 'Get in touch with CloudBridge for a free consultation on studying in the UK, Malaysia, or the USA.' },
+  'apply-now': { title: 'Apply Now | CloudBridge Study Abroad', description: 'Submit your study abroad application to CloudBridge in four simple steps — personal details, education, course preference, and documents.' },
   'free-consultation': { title: 'Book Your Free Consultation | CloudBridge Study Abroad', description: 'Get personalised guidance on courses, universities, and scholarships — book a free consultation with a CloudBridge counsellor.' },
 };
 
@@ -3726,6 +3927,12 @@ function initPageScripts() {
   testiIndex = 0;
   testiRender();
   resetTestiTimer();
+
+  // Apply Now wizard (Apply Now page only)
+  if (document.getElementById('applyStep1')) {
+    applyPopulateSubjects();
+    applyShowStep(1);
+  }
 
   // Course tabs (home page only)
   document.querySelectorAll('.course-tab-btn').forEach(btn => {
