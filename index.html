@@ -131,6 +131,12 @@
   .uni-tab-btn.active { background:#db1f2a; color:#fff; border-color:#db1f2a; }
   .uni-tab-btn { border-radius:0.5rem; }
   @media (max-width:767px){ #heroSlider .slider-arrow { display:none; } }
+  .hero-img-1 { object-position: 68% center; }
+  .hero-img-3 { object-position: 70% center; }
+  @media (min-width:768px){
+    .hero-img-1 { object-position: 68% 20%; }
+    .hero-img-3 { object-position: 70% 15%; }
+  }
 </style>
 </head>
 <body class="bg-cloud text-ink antialiased">
@@ -298,7 +304,7 @@ home: `
 <section class="relative overflow-hidden bg-bridge-950 text-white" id="heroSlider">
 
   <div class="slider-slide relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="0">
-    <img src="assets/hero/slide1.jpg" alt="A student ready to study abroad, with landmarks from partner destination countries in the background" class="absolute inset-0 w-full h-full object-cover" style="object-position:68% center">
+    <img src="assets/hero/slide1.jpg" alt="A student ready to study abroad, with landmarks from partner destination countries in the background" class="absolute inset-0 w-full h-full object-cover hero-img-1">
     <div class="absolute inset-0 bg-gradient-to-r from-cloud/50 via-cloud/25 to-transparent"></div>
     <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
       <div class="max-w-xl">
@@ -324,7 +330,7 @@ home: `
   </div>
 
   <div class="slider-slide hidden relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="2">
-    <img src="assets/hero/slide3.jpg" alt="A student ready to study abroad, with a university campus in the background" class="absolute inset-0 w-full h-full object-cover" style="object-position:70% center">
+    <img src="assets/hero/slide3.jpg" alt="A student ready to study abroad, with a university campus in the background" class="absolute inset-0 w-full h-full object-cover hero-img-3">
     <div class="absolute inset-0 bg-gradient-to-r from-cloud/50 via-cloud/25 to-transparent"></div>
     <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
       <div class="max-w-xl">
