@@ -106,6 +106,8 @@
   .uni-accordion-count { display:inline-flex; align-items:center; justify-content:center; min-width:1.1rem; height:1.1rem; padding:0 .3rem; border-radius:9999px; background:#e12d38; color:#fff; font-size:.65rem; font-weight:700; margin-left:.4rem; }
   .crumb { font-size:.8rem; color:rgba(255,255,255,.6); }
   .crumb a { cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
+  .form-input { transition:border-color .15s, box-shadow .15s; }
+  .form-input:focus { outline:none; border-color:#2f5182; box-shadow:0 0 0 3px rgba(47,81,130,.15); }
   #heroSlider .slider-arrow { position:absolute; bottom:1.35rem; width:2.5rem; height:2.5rem; border-radius:9999px; background:rgba(255,255,255,.12); border:none; color:#fff; font-size:1.5rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:20; transition:.15s; }
   #heroSlider .slider-arrow:hover { background:rgba(255,255,255,.22); }
   .slider-dot { transition:.2s; cursor:pointer; border:none; }
@@ -2585,26 +2587,60 @@ contact: `
 </section>
 
 <section class="py-16">
-  <div class="max-w-container mx-auto px-4 md:px-8 max-w-2xl text-center">
+  <div class="max-w-container mx-auto px-4 md:px-8 max-w-4xl text-center">
     <h2 class="section-heading text-center">Planning to Study Abroad?</h2>
     <p class="mt-3 text-ink/60">Get personalised guidance on courses, universities, and available scholarships. Our team ensures a smooth application process, making your admission journey hassle-free.</p>
     <p class="mt-4 font-display font-bold text-sunrise-600">Book your FREE consultation today!</p>
 
-    <form class="demo-form mt-8 grid sm:grid-cols-2 gap-4 bg-white rounded-2xl p-6 md:p-8 shadow-sm ring-1 ring-black/5 text-left">
-      <input required placeholder="First name" class="rounded-lg border border-black/10 px-4 py-3 text-sm">
-      <input required placeholder="Last name" class="rounded-lg border border-black/10 px-4 py-3 text-sm">
-      <input required placeholder="Phone number (WhatsApp)" class="rounded-lg border border-black/10 px-4 py-3 text-sm">
-      <input type="email" required placeholder="Email address" class="rounded-lg border border-black/10 px-4 py-3 text-sm">
-      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Country of residence</option><option>Bangladesh</option><option>India</option><option>UAE</option><option>Saudi Arabia</option><option>Other</option></select>
-      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Preferred destination</option><option>United Kingdom</option><option>Malaysia</option><option>USA</option></select>
-      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Most recently completed degree</option><option>SSC / O Levels</option><option>HSC / A Levels</option><option>Bachelor's</option><option>Master's</option></select>
-      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Subject interested</option><option>Business &amp; Management</option><option>Engineering</option><option>Computer Science</option><option>Health &amp; Life Sciences</option><option>Arts &amp; Humanities</option><option>Other</option></select>
-      <input placeholder="English proficiency test &amp; result" class="rounded-lg border border-black/10 px-4 py-3 text-sm sm:col-span-2">
+    <form class="demo-form mt-8 grid sm:grid-cols-2 gap-5 bg-white rounded-2xl p-6 md:p-10 shadow-sm ring-1 ring-black/5 text-left">
+      <input required placeholder="First name" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm">
+      <input required placeholder="Last name" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm">
+      <input required placeholder="Phone number (WhatsApp)" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm">
+      <input type="email" required placeholder="Email address" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm">
+      <select class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm text-ink/70"><option value="">Country of residence</option><option>Bangladesh</option><option>India</option><option>UAE</option><option>Saudi Arabia</option><option>Other</option></select>
+      <div>
+        <select id="destinationSelect" onchange="toggleOtherDestination()" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm text-ink/70 w-full">
+          <option value="">Preferred destination</option>
+          <option>United Kingdom</option>
+          <option>USA</option>
+          <option>Canada</option>
+          <option>Malta</option>
+          <option>France</option>
+          <option>Spain</option>
+          <option>Finland</option>
+          <option>New Zealand</option>
+          <option>Netherlands</option>
+          <option>Malaysia</option>
+          <option value="Other">Other</option>
+        </select>
+        <input type="text" id="otherDestinationInput" placeholder="Please specify your preferred country" class="form-input hidden mt-3 rounded-xl border border-black/10 px-4 py-3.5 text-sm w-full">
+      </div>
+      <select class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm text-ink/70"><option value="">Most recently completed degree</option><option>SSC / O Levels</option><option>HSC / A Levels</option><option>Diploma</option><option>Bachelor's</option><option>Master's</option></select>
+      <div class="relative" id="subjectCombo">
+        <input type="text" readonly id="subjectDisplay" placeholder="Subject interested" onclick="toggleSubjectDropdown()" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm w-full cursor-pointer bg-white">
+        <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 pointer-events-none"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        <div id="subjectPanel" class="hidden absolute z-20 mt-2 w-full bg-white rounded-xl shadow-lg border border-black/10 overflow-hidden flex flex-col">
+          <input type="text" id="subjectSearch" placeholder="Search subjects..." oninput="filterSubjects()" class="border-b border-black/10 px-4 py-2.5 text-sm outline-none">
+          <div id="subjectList" class="max-h-56 overflow-y-auto"></div>
+        </div>
+      </div>
+      <div class="sm:col-span-2">
+        <p class="text-sm text-ink/70 mb-2">English proficiency test <span class="text-ink/40 font-normal">(select all that apply)</span></p>
+        <div class="flex flex-wrap gap-x-4 gap-y-2 rounded-xl border border-black/10 px-4 py-3.5">
+          <label class="flex items-center gap-1.5 text-sm text-ink/70"><input type="checkbox" class="uni-filter-check" name="engTest" value="IELTS"> IELTS</label>
+          <label class="flex items-center gap-1.5 text-sm text-ink/70"><input type="checkbox" class="uni-filter-check" name="engTest" value="TOEFL"> TOEFL</label>
+          <label class="flex items-center gap-1.5 text-sm text-ink/70"><input type="checkbox" class="uni-filter-check" name="engTest" value="PTE Academic"> PTE Academic</label>
+          <label class="flex items-center gap-1.5 text-sm text-ink/70"><input type="checkbox" class="uni-filter-check" name="engTest" value="Duolingo"> Duolingo English Test</label>
+          <label class="flex items-center gap-1.5 text-sm text-ink/70"><input type="checkbox" class="uni-filter-check" name="engTest" value="MOI"> MOI Certificate</label>
+          <label class="flex items-center gap-1.5 text-sm text-ink/70"><input type="checkbox" class="uni-filter-check" name="engTest" value="Not yet taken"> Not yet taken</label>
+        </div>
+      </div>
+      <input placeholder="Test result(s) — e.g. IELTS 6.5, Duolingo 115" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm sm:col-span-2">
       <label class="sm:col-span-2 flex items-start gap-2 text-xs text-ink/50">
         <input type="checkbox" required class="mt-0.5 uni-filter-check">
         <span>We will not share your details with anyone without your permission. I agree to CloudBridge's terms and privacy policy.</span>
       </label>
-      <button type="submit" class="sm:col-span-2 rounded-2xl py-3 font-display font-semibold text-white shadow-sm transition hover:brightness-110" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%)">Apply Now</button>
+      <button type="submit" class="sm:col-span-2 rounded-2xl py-3.5 font-display font-semibold text-white shadow-sm transition hover:brightness-110" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%)">Submit</button>
     </form>
     <div class="demo-form-thanks hidden mt-6 rounded-2xl bg-harbor-500/10 p-6 text-center text-harbor-600 font-display font-semibold">
       Thanks! One of our counsellors will call you shortly. <span class="block text-xs font-normal text-ink/40 mt-1">(demo only — nothing was actually sent)</span>
@@ -2717,6 +2753,65 @@ function resetTestiTimer() {
 }
 window.testiMove = testiMove;
 window.testiGoTo = testiGoTo;
+
+/* ============================================================
+   CONTACT FORM WIDGETS — searchable subject combobox and the
+   conditional "Other" preferred-destination field.
+   ============================================================ */
+const SUBJECTS = [
+  'Business & Management', 'Accounting & Finance', 'Marketing', 'Economics', 'Hospitality & Tourism Management',
+  'Computer Science', 'Data Science & Analytics', 'Artificial Intelligence', 'Cybersecurity', 'Information Technology',
+  'Civil Engineering', 'Mechanical Engineering', 'Electrical & Electronic Engineering', 'Chemical Engineering', 'Engineering (General)',
+  'Nursing', 'Public Health', 'Pharmacy', 'Medicine', 'Health & Life Sciences',
+  'Law', 'Psychology', 'Social Sciences', 'International Relations', 'Education',
+  'Architecture', 'Fine Arts & Design', 'Media & Communication', 'Fashion Design', 'Music',
+  'Agriculture & Food Science', 'Environmental Science', 'Biotechnology', 'Mathematics', 'Physics',
+];
+function toggleSubjectDropdown() {
+  const panel = document.getElementById('subjectPanel');
+  if (!panel) return;
+  const willOpen = panel.classList.contains('hidden');
+  panel.classList.toggle('hidden');
+  if (willOpen) {
+    const search = document.getElementById('subjectSearch');
+    renderSubjectList('');
+    if (search) { search.value = ''; setTimeout(() => search.focus(), 0); }
+  }
+}
+function renderSubjectList(query) {
+  const list = document.getElementById('subjectList');
+  if (!list) return;
+  const q = query.toLowerCase();
+  const filtered = SUBJECTS.filter(s => s.toLowerCase().includes(q));
+  list.innerHTML = filtered.length
+    ? filtered.map(s => `<button type="button" onclick="selectSubject(this.textContent)" class="w-full text-left px-4 py-2.5 text-sm text-ink/70 hover:bg-bridge-50">${s}</button>`).join('')
+    : '<p class="px-4 py-3 text-sm text-ink/40">No matching subjects</p>';
+}
+function filterSubjects() {
+  const search = document.getElementById('subjectSearch');
+  renderSubjectList(search ? search.value : '');
+}
+function selectSubject(s) {
+  const display = document.getElementById('subjectDisplay');
+  if (display) display.value = s;
+  const panel = document.getElementById('subjectPanel');
+  if (panel) panel.classList.add('hidden');
+}
+document.addEventListener('click', (e) => {
+  const combo = document.getElementById('subjectCombo');
+  const panel = document.getElementById('subjectPanel');
+  if (combo && panel && !combo.contains(e.target)) panel.classList.add('hidden');
+});
+function toggleOtherDestination() {
+  const select = document.getElementById('destinationSelect');
+  const input = document.getElementById('otherDestinationInput');
+  if (!select || !input) return;
+  input.classList.toggle('hidden', select.value !== 'Other');
+}
+window.toggleSubjectDropdown = toggleSubjectDropdown;
+window.filterSubjects = filterSubjects;
+window.selectSubject = selectSubject;
+window.toggleOtherDestination = toggleOtherDestination;
 
 /* ============================================================
    FEATURED UNIVERSITIES LOGO CAROUSEL
