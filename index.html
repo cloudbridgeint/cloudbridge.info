@@ -131,6 +131,12 @@
   .uni-tab-btn.active { background:#db1f2a; color:#fff; border-color:#db1f2a; }
   .uni-tab-btn { border-radius:0.5rem; }
   @media (max-width:767px){ #heroSlider .slider-arrow { display:none; } }
+  .mobile-menu-item { display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.9rem 1.1rem; border-radius:.85rem; background:#f4f5f9; color:#0f1c30; font-weight:600; font-size:.95rem; }
+  .mobile-menu-item.mobile-menu-apply { color:#e12d38; }
+  .mobile-accordion-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:.9rem 1.1rem; border-radius:.85rem; background:#f4f5f9; color:#0f1c30; font-weight:600; font-size:.95rem; border:none; cursor:pointer; text-align:left; }
+  .mobile-accordion-icon { font-size:1.15rem; line-height:1; transition:transform .2s; }
+  .mobile-accordion-panel { padding:.5rem .25rem .25rem 1.35rem; }
+  .mobile-accordion-panel a { display:block; padding:.65rem .75rem; color:#2f5182; font-weight:500; font-size:.9rem; }
   .hero-img-1 { object-position: 68% center; }
   .hero-img-3 { object-position: 70% center; }
   @media (min-width:768px){
@@ -178,21 +184,31 @@
       </div>
     </button>
   </div>
-  <nav id="mobileMenu" class="hidden md:hidden px-4 pb-4 border-t border-black/5 text-base font-display font-medium">
-    <a href="/" onclick="return spaNav(event,'home')" class="nav-link block py-2 text-bridge-900">Home</a>
-    <a href="/about" onclick="return spaNav(event,'about')" class="nav-link block py-2 text-bridge-900">About</a>
-    <a href="/our-team" onclick="return spaNav(event,'our-team')" class="nav-link block py-2 pl-3 text-bridge-700">Our Team</a>
-    <a href="/university-college" onclick="return spaNav(event,'university-college')" class="nav-link block py-2 text-bridge-900">University &amp; College</a>
-    <a href="/programs" onclick="return spaNav(event,'programs')" class="nav-link block py-2 text-bridge-900">Course</a>
-    <a href="/scholarship" onclick="return spaNav(event,'scholarship')" class="nav-link block py-2 text-bridge-900">Scholarship</a>
-    <a href="/events" onclick="return spaNav(event,'events')" class="nav-link block py-2 text-bridge-900">Events</a>
-    <a href="/apply-now" onclick="return spaNav(event,'apply-now')" class="nav-link block py-2 text-bridge-900">Apply Now</a>
-    <a href="/blogs" onclick="return spaNav(event,'blogs')" class="nav-link block py-2 text-bridge-900">Blogs</a>
-    <a href="/contact" onclick="return spaNav(event,'contact')" class="nav-link block py-2 text-bridge-900">Contact</a>
-    <a href="/free-consultation" onclick="return spaNav(event,'free-consultation')" class="btn-primary w-full !py-2 text-sm mt-2 inline-flex items-center justify-center gap-1.5 !rounded-lg !bg-[#db1f2a] !text-white hover:!bg-[#c01822]">
-      Free Consultation
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4" aria-hidden="true"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
-    </a>
+  <nav id="mobileMenu" class="hidden md:hidden border-t border-black/5">
+    <div class="px-4 py-4 space-y-2.5">
+      <a href="/" onclick="return spaNav(event,'home')" class="mobile-menu-item nav-link">Home</a>
+      <div>
+        <button type="button" class="mobile-accordion-btn" onclick="toggleMobileAccordion(this)">
+          <span>About</span>
+          <span class="mobile-accordion-icon">+</span>
+        </button>
+        <div class="mobile-accordion-panel hidden">
+          <a href="/about" onclick="return spaNav(event,'about')" class="nav-link">About Us</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="nav-link">Our Team</a>
+        </div>
+      </div>
+      <a href="/university-college" onclick="return spaNav(event,'university-college')" class="mobile-menu-item nav-link">University &amp; College</a>
+      <a href="/programs" onclick="return spaNav(event,'programs')" class="mobile-menu-item nav-link">Course</a>
+      <a href="/scholarship" onclick="return spaNav(event,'scholarship')" class="mobile-menu-item nav-link">Scholarship</a>
+      <a href="/events" onclick="return spaNav(event,'events')" class="mobile-menu-item nav-link">Events</a>
+      <a href="/blogs" onclick="return spaNav(event,'blogs')" class="mobile-menu-item nav-link">Blogs</a>
+      <a href="/contact" onclick="return spaNav(event,'contact')" class="mobile-menu-item nav-link">Contact</a>
+      <a href="/apply-now" onclick="return spaNav(event,'apply-now')" class="mobile-menu-item mobile-menu-apply nav-link">
+        Apply Now
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 010-1.06L10.94 10 7.21 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0z" clip-rule="evenodd" /></svg>
+      </a>
+    </div>
+    <a href="/free-consultation" onclick="return spaNav(event,'free-consultation')" class="nav-link block w-full text-center py-4 text-white font-display font-bold text-base" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%)">Free Consultation</a>
   </nav>
 </header>
 
@@ -4140,6 +4156,16 @@ function initPageScripts() {
 document.getElementById('mobileToggle').addEventListener('click', () => {
   document.getElementById('mobileMenu').classList.toggle('hidden');
 });
+
+// Mobile menu accordion (e.g. "About" expanding to About Us / Our Team)
+function toggleMobileAccordion(btn) {
+  const panel = btn.nextElementSibling;
+  const icon = btn.querySelector('.mobile-accordion-icon');
+  const isOpen = !panel.classList.contains('hidden');
+  panel.classList.toggle('hidden');
+  if (icon) icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(45deg)';
+}
+window.toggleMobileAccordion = toggleMobileAccordion;
 
 // Boot: restore page from the real URL path on load, and transparently
 // migrate any old-style hash link (e.g. /#university-college, /#home from
