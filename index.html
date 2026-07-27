@@ -719,11 +719,59 @@ home: `
       <button class="course-tab-btn btn-outline !text-xs" data-tab="postgrad">Postgraduate</button>
       <button class="course-tab-btn btn-outline !text-xs" data-tab="phd">PHD</button>
     </div>
-    <div class="mt-8 max-w-2xl mx-auto text-center bg-white rounded-2xl p-8 ring-1 ring-black/5">
-      <div class="course-tab-panel" data-panel="foundation"><h3 class="font-display font-bold text-bridge-900">Foundation Programs</h3><p class="mt-2 text-sm text-ink/60">A one-year bridge program preparing HSC graduates for direct entry into undergraduate degrees abroad.</p></div>
-      <div class="course-tab-panel hidden" data-panel="undergrad"><h3 class="font-display font-bold text-bridge-900">Undergraduate Programs</h3><p class="mt-2 text-sm text-ink/60">3-4 year Bachelor's degrees across Business, Engineering, Computing, and more — our most popular pathway.</p></div>
-      <div class="course-tab-panel hidden" data-panel="postgrad"><h3 class="font-display font-bold text-bridge-900">Postgraduate Programs</h3><p class="mt-2 text-sm text-ink/60">1-2 year Master's degrees, including MBA and MSc routes, at 500+ partner universities.</p></div>
-      <div class="course-tab-panel hidden" data-panel="phd"><h3 class="font-display font-bold text-bridge-900">Ph.D. Programs</h3><p class="mt-2 text-sm text-ink/60">Funded and self-funded research degrees — the highest globally recognised postgraduate qualification.</p></div>
+    <div class="mt-8 max-w-2xl mx-auto bg-white rounded-2xl p-8 ring-1 ring-black/5">
+      <div class="course-tab-panel" data-panel="foundation">
+        <h3 class="font-display text-xl font-bold text-bridge-900">Foundation Programs</h3>
+        <p class="mt-2 text-sm text-ink/60">A one-year bridge program preparing HSC graduates for direct entry into undergraduate degrees abroad.</p>
+        <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">1 Year</p><p class="mt-0.5 text-xs text-ink/50">Duration</p></div>
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">HSC Grads</p><p class="mt-0.5 text-xs text-ink/50">Best For</p></div>
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">IELTS 5.0+</p><p class="mt-0.5 text-xs text-ink/50">Typical Entry</p></div>
+        </div>
+        <p class="mt-6 text-xs font-semibold uppercase tracking-wide text-ink/40">Popular tracks</p>
+        <div class="mt-2 flex flex-wrap gap-2"><span class="course-badge">Business</span><span class="course-badge">Engineering</span><span class="course-badge">Computing</span><span class="course-badge">Health Sciences</span></div>
+        <p class="mt-5 text-sm text-ink/60"><strong class="text-bridge-900">What's next:</strong> direct entry into Year 1 of a related Bachelor's degree, usually at the same university.</p>
+        <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-6 inline-flex !text-sm">Check My Eligibility</a>
+      </div>
+      <div class="course-tab-panel hidden" data-panel="undergrad">
+        <h3 class="font-display text-xl font-bold text-bridge-900">Undergraduate Programs</h3>
+        <p class="mt-2 text-sm text-ink/60">3-4 year Bachelor's degrees across Business, Engineering, Computing, and more — our most popular pathway.</p>
+        <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">3-4 Years</p><p class="mt-0.5 text-xs text-ink/50">Duration</p></div>
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">HSC / A-Level</p><p class="mt-0.5 text-xs text-ink/50">Best For</p></div>
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">IELTS 6.0+</p><p class="mt-0.5 text-xs text-ink/50">Typical Entry</p></div>
+        </div>
+        <p class="mt-6 text-xs font-semibold uppercase tracking-wide text-ink/40">Popular subjects</p>
+        <div class="mt-2 flex flex-wrap gap-2"><span class="course-badge">Business &amp; Management</span><span class="course-badge">Computer Science</span><span class="course-badge">Engineering</span><span class="course-badge">Health &amp; Life Sciences</span></div>
+        <p class="mt-5 text-sm text-ink/60"><strong class="text-bridge-900">What's next:</strong> straight into employment, or on to a Master's degree for further specialisation.</p>
+        <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-6 inline-flex !text-sm">Check My Eligibility</a>
+      </div>
+      <div class="course-tab-panel hidden" data-panel="postgrad">
+        <h3 class="font-display text-xl font-bold text-bridge-900">Postgraduate Programs</h3>
+        <p class="mt-2 text-sm text-ink/60">1-2 year Master's degrees, including MBA and MSc routes, at 500+ partner universities.</p>
+        <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">1-2 Years</p><p class="mt-0.5 text-xs text-ink/50">Duration</p></div>
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">Bachelor's Grads</p><p class="mt-0.5 text-xs text-ink/50">Best For</p></div>
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">IELTS 6.5+</p><p class="mt-0.5 text-xs text-ink/50">Typical Entry</p></div>
+        </div>
+        <p class="mt-6 text-xs font-semibold uppercase tracking-wide text-ink/40">Popular subjects</p>
+        <div class="mt-2 flex flex-wrap gap-2"><span class="course-badge">MBA</span><span class="course-badge">Data Science</span><span class="course-badge">Engineering Management</span><span class="course-badge">Public Health</span></div>
+        <p class="mt-5 text-sm text-ink/60"><strong class="text-bridge-900">What's next:</strong> career advancement, a PhD, or a post-study work visa in your destination country. Some MBA programs also ask for GMAT/GRE or prior work experience.</p>
+        <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-6 inline-flex !text-sm">Check My Eligibility</a>
+      </div>
+      <div class="course-tab-panel hidden" data-panel="phd">
+        <h3 class="font-display text-xl font-bold text-bridge-900">Ph.D. Programs</h3>
+        <p class="mt-2 text-sm text-ink/60">Funded and self-funded research degrees — the highest globally recognised postgraduate qualification.</p>
+        <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">3-4 Years</p><p class="mt-0.5 text-xs text-ink/50">Duration</p></div>
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">Master's Grads</p><p class="mt-0.5 text-xs text-ink/50">Best For</p></div>
+          <div class="rounded-xl bg-bridge-50 py-3 px-2"><p class="font-display font-bold text-bridge-900 text-sm">Research Proposal</p><p class="mt-0.5 text-xs text-ink/50">Typical Entry</p></div>
+        </div>
+        <p class="mt-6 text-xs font-semibold uppercase tracking-wide text-ink/40">Popular fields</p>
+        <div class="mt-2 flex flex-wrap gap-2"><span class="course-badge">Engineering</span><span class="course-badge">Life Sciences</span><span class="course-badge">Social Sciences</span><span class="course-badge">Computer Science</span></div>
+        <p class="mt-5 text-sm text-ink/60"><strong class="text-bridge-900">What's next:</strong> academic or research careers — many universities offer funded studentships, so we help you check what's available before you apply.</p>
+        <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-6 inline-flex !text-sm">Check My Eligibility</a>
+      </div>
     </div>
   </div>
 </section>
