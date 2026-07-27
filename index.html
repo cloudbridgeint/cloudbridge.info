@@ -648,20 +648,54 @@ home: `
 </section>
 
 <section class="py-16 bg-bridge-50/50">
-  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10">
-    <div>
-      <h2 class="section-heading">Get Your Entry Requirements</h2>
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl mx-auto text-center">
+      <h2 class="section-heading text-center">Get Your Entry Requirements</h2>
       <p class="mt-3 text-ink/60">Fill up the form and we'll send you the exact entry requirements for your destination, university, and program of choice.</p>
     </div>
-    <form class="demo-form grid sm:grid-cols-2 gap-4 bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5 h-fit">
-      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70 sm:col-span-2"><option value="">Preferred office</option><option>Dhaka Office</option><option>Sylhet Office</option></select>
-      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Preferred destination</option><option>United Kingdom</option><option>Malaysia</option><option>USA</option></select>
-      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Most recently completed</option><option>SSC / O Levels</option><option>HSC / A Levels</option><option>Bachelor</option><option>Masters</option></select>
-      <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70 sm:col-span-2"><option value="">Interested program</option><option>Foundation</option><option>Diploma</option><option>Bachelor</option><option>Masters</option><option>Ph.D.</option></select>
-      <button type="submit" class="btn-primary sm:col-span-2">Get Entry Requirements</button>
-    </form>
-    <div class="demo-form-thanks hidden sm:col-start-2 mt-2 rounded-2xl bg-harbor-500/10 p-6 text-center text-harbor-600 font-display font-semibold">
-      Thanks! We'll email your entry requirements shortly. <span class="block text-xs font-normal text-ink/40 mt-1">(demo only)</span>
+    <div class="mt-10 grid md:grid-cols-2 gap-8 items-stretch">
+      <div class="relative rounded-[2rem] overflow-hidden min-h-[320px] md:min-h-[480px]" style="background-image:linear-gradient(160deg,#1c3255 0%,#2f5182 60%,#4d70a8 100%)">
+        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="420" cy="80" r="140" fill="#ffffff" opacity="0.05"/>
+          <circle cx="60" cy="440" r="110" fill="#ffffff" opacity="0.06"/>
+          <g transform="translate(250,235)">
+            <ellipse cx="0" cy="150" rx="120" ry="16" fill="#0a1220" opacity="0.25"/>
+            <path d="M-95 -18 L0 -60 L95 -18 L0 24 Z" fill="#f7a827"/>
+            <path d="M-95 -18 L0 24 L95 -18" fill="none" stroke="#0f1c30" stroke-width="4" stroke-linejoin="round"/>
+            <rect x="-14" y="24" width="28" height="70" rx="6" fill="#eef2f9"/>
+            <path d="M60 -6 L60 46 C60 60 30 68 0 68 C-30 68 -60 60 -60 46 L-60 -6" fill="none" stroke="#f7a827" stroke-width="6" stroke-linecap="round"/>
+            <line x1="95" y1="-18" x2="95" y2="55" stroke="#f7a827" stroke-width="4"/>
+            <circle cx="95" cy="62" r="7" fill="#f7a827"/>
+          </g>
+          <rect x="150" y="360" width="200" height="14" rx="7" fill="#ffffff" opacity="0.15"/>
+        </svg>
+        <div class="absolute left-6 right-6 bottom-6 md:left-8 md:right-8 md:bottom-8">
+          <p class="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-sunrise-200 text-xs font-semibold">500+ Partner Universities</p>
+          <h3 class="mt-3 text-white text-xl md:text-2xl font-display font-bold leading-snug">Your Future Starts With the Right Requirements</h3>
+        </div>
+      </div>
+      <div>
+        <form class="demo-form grid sm:grid-cols-2 gap-4 bg-white rounded-[2rem] rounded-tr-[4rem] p-6 md:p-8 shadow-sm ring-1 ring-black/5">
+          <h3 class="section-heading !text-2xl text-center sm:col-span-2 mb-1">Start Your Journey Now</h3>
+          <input required placeholder="First name" class="rounded-lg border border-black/10 px-4 py-3 text-sm">
+          <input required placeholder="Last name" class="rounded-lg border border-black/10 px-4 py-3 text-sm">
+          <input required placeholder="Mobile number" class="rounded-lg border border-black/10 px-4 py-3 text-sm">
+          <input type="email" placeholder="Email address" class="rounded-lg border border-black/10 px-4 py-3 text-sm">
+          <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Preferred office</option><option>Dhaka Office</option><option>Sylhet Office</option></select>
+          <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Preferred destination</option><option>United Kingdom</option><option>Malaysia</option><option>USA</option></select>
+          <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Most recently completed</option><option>SSC / O Levels</option><option>HSC / A Levels</option><option>Bachelor</option><option>Masters</option></select>
+          <select class="rounded-lg border border-black/10 px-4 py-3 text-sm text-ink/70"><option value="">Interested program</option><option>Foundation</option><option>Diploma</option><option>Bachelor</option><option>Masters</option><option>Ph.D.</option></select>
+          <input placeholder="English proficiency test &amp; result" class="rounded-lg border border-black/10 px-4 py-3 text-sm sm:col-span-2">
+          <label class="sm:col-span-2 flex items-start gap-2 text-xs text-ink/50">
+            <input type="checkbox" required class="mt-0.5 uni-filter-check">
+            <span>We will not share your details with anyone without your permission. I agree to CloudBridge's terms and privacy policy.</span>
+          </label>
+          <button type="submit" class="sm:col-span-2 rounded-full py-3 font-display font-semibold text-white shadow-sm" style="background-image:linear-gradient(90deg,#e12d38,#1c3255)">Get Entry Requirements</button>
+        </form>
+        <div class="demo-form-thanks hidden mt-4 rounded-2xl bg-harbor-500/10 p-6 text-center text-harbor-600 font-display font-semibold">
+          Thanks! We'll email your entry requirements shortly. <span class="block text-xs font-normal text-ink/40 mt-1">(demo only)</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
