@@ -2731,16 +2731,14 @@ function testiInitials(name) {
   const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
   return (first + last).toUpperCase();
 }
-function testiRender() {
-  const track = document.getElementById('testiTrack');
-  if (!track) return;
+function testiCardsHTML() {
   const n = TESTIMONIALS.length;
   const visible = [0, 1, 2].map(o => TESTIMONIALS[(testiIndex + o) % n]);
-  track.innerHTML = visible.map(t => `
+  return visible.map(t => `
     <div class="bg-white rounded-2xl p-6 ring-1 ring-black/5 flex flex-col">
       <p class="text-sm text-ink/70 leading-relaxed flex-1">&ldquo;${t.quote}&rdquo;</p>
-      <div class="mt-5 pt-4 border-t border-black/5 flex items-center gap-3">
-        <div class="w-14 h-14 shrink-0 rounded-full flex items-center justify-center text-white font-display font-bold text-lg" style="background-image:${t.color}">${testiInitials(t.name)}</div>
+      <div class="mt-5 pt-4 border-t border-black/5 flex items-center gap-4">
+        <div class="w-28 h-28 shrink-0 rounded-2xl flex items-center justify-center text-white font-display font-bold text-4xl" style="background-image:${t.color}">${testiInitials(t.name)}</div>
         <div>
           <p class="font-display font-bold text-bridge-900 text-sm">${t.name}</p>
           <p class="text-xs text-ink/50">${t.meta}</p>
@@ -2748,17 +2746,48 @@ function testiRender() {
       </div>
     </div>
   `).join('');
-  const dots = document.getElementById('testiDots');
-  if (dots) {
-    dots.innerHTML = TESTIMONIALS.map((_, i) => `<button onclick="testiGoTo(${i})" class="slider-dot w-2.5 h-2.5 rounded-full ${i === testiIndex ? 'bg-sunrise-400' : 'bg-bridge-900/15'}" aria-label="Testimonial set ${i + 1}"></button>`).join('');
-  }
 }
-function testiMove(delta) { testiIndex = (testiIndex + delta + TESTIMONIALS.length) % TESTIMONIALS.length; testiRender(); resetTestiTimer(); }
-function testiGoTo(i) { testiIndex = i; testiRender(); resetTestiTimer(); }
+function testiRenderDots() {
+  const dots = document.getElementById('testiDots');
+  if (!dots) return;
+  dots.innerHTML = TESTIMONIALS.map((_, i) => `<button onclick="testiGoTo(${i})" class="slider-dot w-2.5 h-2.5 rounded-full ${i === testiIndex ? 'bg-sunrise-400' : 'bg-bridge-900/15'}" aria-label="Testimonial set ${i + 1}"></button>`).join('');
+}
+function testiRender() {
+  const track = document.getElementById('testiTrack');
+  if (!track) return;
+  track.innerHTML = testiCardsHTML();
+  testiRenderDots();
+}
+function testiAdvance(direction) {
+  const track = document.getElementById('testiTrack');
+  if (!track) { testiRender(); return; }
+  const exitX = direction < 0 ? '24px' : '-24px';
+  const enterX = direction < 0 ? '-24px' : '24px';
+  track.style.transition = 'opacity .22s ease, transform .22s ease';
+  track.style.opacity = '0';
+  track.style.transform = 'translateX(' + exitX + ')';
+  setTimeout(() => {
+    track.innerHTML = testiCardsHTML();
+    testiRenderDots();
+    track.style.transition = 'none';
+    track.style.transform = 'translateX(' + enterX + ')';
+    void track.offsetWidth;
+    track.style.transition = 'opacity .22s ease, transform .22s ease';
+    track.style.opacity = '1';
+    track.style.transform = 'translateX(0)';
+  }, 220);
+}
+function testiMove(delta) { testiIndex = (testiIndex + delta + TESTIMONIALS.length) % TESTIMONIALS.length; testiAdvance(delta); resetTestiTimer(); }
+function testiGoTo(i) {
+  const delta = i > testiIndex ? 1 : (i < testiIndex ? -1 : 0);
+  testiIndex = i;
+  testiAdvance(delta || 1);
+  resetTestiTimer();
+}
 function resetTestiTimer() {
   if (testiTimer) clearInterval(testiTimer);
   if (!document.getElementById('testiTrack')) return;
-  testiTimer = setInterval(() => { testiIndex = (testiIndex + 1) % TESTIMONIALS.length; testiRender(); }, 3000);
+  testiTimer = setInterval(() => { testiIndex = (testiIndex + 1) % TESTIMONIALS.length; testiAdvance(1); }, 3000);
 }
 window.testiMove = testiMove;
 window.testiGoTo = testiGoTo;
