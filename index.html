@@ -3,7 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CloudBridge — Study Abroad Consultancy (Design Preview)</title>
+<title>CloudBridge — Study Abroad Consultancy | UK, Malaysia &amp; USA</title>
+<meta name="description" content="CloudBridge guides students across Bangladesh into top universities in the UK, Malaysia, and the USA — free counselling, university selection, and visa support.">
+<link rel="canonical" href="https://cloudbridge.info/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CloudBridge">
+<meta property="og:title" content="CloudBridge — Study Abroad Consultancy | UK, Malaysia &amp; USA">
+<meta property="og:description" content="CloudBridge guides students across Bangladesh into top universities in the UK, Malaysia, and the USA — free counselling, university selection, and visa support.">
+<meta property="og:url" content="https://cloudbridge.info/">
+<meta property="og:image" content="https://cloudbridge.info/assets/logo.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CloudBridge — Study Abroad Consultancy | UK, Malaysia &amp; USA">
+<meta name="twitter:description" content="CloudBridge guides students across Bangladesh into top universities in the UK, Malaysia, and the USA — free counselling, university selection, and visa support.">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <link rel="shortcut icon" type="image/png" href="assets/logo.png">
 <link rel="apple-touch-icon" href="assets/logo.png">
@@ -109,28 +120,28 @@
 <!-- Header (static across all pages) -->
 <header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-black/5">
   <div class="w-full px-4 md:px-8 lg:px-[198px] py-3 flex items-center justify-between gap-4">
-    <a onclick="go('home')" class="flex items-center nav-link shrink-0">
+    <a href="/" onclick="return spaNav(event,'home')" class="flex items-center nav-link shrink-0">
       <img src="assets/logo.png" alt="CloudBridge — Study Abroad Consultants" class="h-16 md:h-20 lg:h-24 w-auto object-contain">
     </a>
     <nav class="hidden md:flex items-center gap-1 text-[21px] font-medium font-display">
-      <a onclick="go('home')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="home">Home</a>
+      <a href="/" onclick="return spaNav(event,'home')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="home">Home</a>
       <div class="nav-drop">
         <span class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block" data-page="about">About ▾</span>
         <div class="nav-drop-panel">
-          <a onclick="go('about')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">About Us</a>
-          <a onclick="go('our-team')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Our Team</a>
+          <a href="/about" onclick="return spaNav(event,'about')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">About Us</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Our Team</a>
         </div>
       </div>
-      <a onclick="go('university-college')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="university-college">University &amp; College</a>
-      <a onclick="go('programs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Course</a>
-      <a onclick="go('scholarship')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="scholarship">Scholarship</a>
-      <a onclick="go('events')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="events">Events</a>
-      <a onclick="go('home','lead-form')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50">Apply Now</a>
-      <a onclick="go('blogs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="blogs">Blogs</a>
-      <a onclick="go('contact')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="contact">Contact</a>
+      <a href="/university-college" onclick="return spaNav(event,'university-college')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="university-college">University &amp; College</a>
+      <a href="/programs" onclick="return spaNav(event,'programs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Course</a>
+      <a href="/scholarship" onclick="return spaNav(event,'scholarship')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="scholarship">Scholarship</a>
+      <a href="/events" onclick="return spaNav(event,'events')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="events">Events</a>
+      <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50">Apply Now</a>
+      <a href="/blogs" onclick="return spaNav(event,'blogs')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="blogs">Blogs</a>
+      <a href="/contact" onclick="return spaNav(event,'contact')" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="contact">Contact</a>
     </nav>
     <div class="hidden md:flex items-center shrink-0">
-      <a onclick="go('home','lead-form')" class="btn-primary !px-5 !py-2 text-sm inline-flex items-center gap-1.5 !rounded-lg !bg-[#db1f2a] !text-white hover:!bg-[#c01822]">
+      <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary !px-5 !py-2 text-sm inline-flex items-center gap-1.5 !rounded-lg !bg-[#db1f2a] !text-white hover:!bg-[#c01822]">
         Free Consultation
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4" aria-hidden="true"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
       </a>
@@ -144,17 +155,17 @@
     </button>
   </div>
   <nav id="mobileMenu" class="hidden md:hidden px-4 pb-4 border-t border-black/5 text-base font-display font-medium">
-    <a onclick="go('home')" class="nav-link block py-2 text-bridge-900">Home</a>
-    <a onclick="go('about')" class="nav-link block py-2 text-bridge-900">About</a>
-    <a onclick="go('our-team')" class="nav-link block py-2 pl-3 text-bridge-700">Our Team</a>
-    <a onclick="go('university-college')" class="nav-link block py-2 text-bridge-900">University &amp; College</a>
-    <a onclick="go('programs')" class="nav-link block py-2 text-bridge-900">Course</a>
-    <a onclick="go('scholarship')" class="nav-link block py-2 text-bridge-900">Scholarship</a>
-    <a onclick="go('events')" class="nav-link block py-2 text-bridge-900">Events</a>
-    <a onclick="go('home','lead-form')" class="nav-link block py-2 text-bridge-900">Apply Now</a>
-    <a onclick="go('blogs')" class="nav-link block py-2 text-bridge-900">Blogs</a>
-    <a onclick="go('contact')" class="nav-link block py-2 text-bridge-900">Contact</a>
-    <a onclick="go('home','lead-form')" class="btn-primary w-full !py-2 text-sm mt-2 inline-flex items-center justify-center gap-1.5 !rounded-lg !bg-[#db1f2a] !text-white hover:!bg-[#c01822]">
+    <a href="/" onclick="return spaNav(event,'home')" class="nav-link block py-2 text-bridge-900">Home</a>
+    <a href="/about" onclick="return spaNav(event,'about')" class="nav-link block py-2 text-bridge-900">About</a>
+    <a href="/our-team" onclick="return spaNav(event,'our-team')" class="nav-link block py-2 pl-3 text-bridge-700">Our Team</a>
+    <a href="/university-college" onclick="return spaNav(event,'university-college')" class="nav-link block py-2 text-bridge-900">University &amp; College</a>
+    <a href="/programs" onclick="return spaNav(event,'programs')" class="nav-link block py-2 text-bridge-900">Course</a>
+    <a href="/scholarship" onclick="return spaNav(event,'scholarship')" class="nav-link block py-2 text-bridge-900">Scholarship</a>
+    <a href="/events" onclick="return spaNav(event,'events')" class="nav-link block py-2 text-bridge-900">Events</a>
+    <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="nav-link block py-2 text-bridge-900">Apply Now</a>
+    <a href="/blogs" onclick="return spaNav(event,'blogs')" class="nav-link block py-2 text-bridge-900">Blogs</a>
+    <a href="/contact" onclick="return spaNav(event,'contact')" class="nav-link block py-2 text-bridge-900">Contact</a>
+    <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary w-full !py-2 text-sm mt-2 inline-flex items-center justify-center gap-1.5 !rounded-lg !bg-[#db1f2a] !text-white hover:!bg-[#c01822]">
       Free Consultation
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4" aria-hidden="true"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
     </a>
@@ -206,29 +217,29 @@
   <div class="max-w-container mx-auto px-4 md:px-8 pt-20 md:pt-24 pb-16">
     <div class="grid md:grid-cols-4 gap-10 lg:gap-16">
       <div>
-        <a onclick="go('home')" class="nav-link inline-flex items-center">
+        <a href="/" onclick="return spaNav(event,'home')" class="nav-link inline-flex items-center">
           <img src="assets/logo-white.png" alt="CloudBridge — Study Abroad Consultants" class="h-20 md:h-24 w-auto object-contain">
         </a>
         <p class="mt-4 max-w-xs text-sm text-white/60">Your trusted partner for studying abroad — from university shortlisting to visa approval.</p>
-        <a onclick="go('about')" class="nav-link footer-btn-red inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold text-white mt-6">Read More</a>
+        <a href="/about" onclick="return spaNav(event,'about')" class="nav-link footer-btn-red inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold text-white mt-6">Read More</a>
       </div>
 
       <div class="text-sm">
         <p class="font-display font-semibold text-white mb-6">Study Destinations</p>
-        <p class="mt-4"><a onclick="go('dest-uk')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Study in UK</a></p>
-        <p class="mt-4"><a onclick="go('dest-usa')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Study in USA</a></p>
-        <p class="mt-4"><a onclick="go('dest-malaysia')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Study in Malaysia</a></p>
-        <p class="mt-4"><a onclick="go('student-visa')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Student Visa</a></p>
-        <p class="mt-4"><a onclick="go('spouse-visa')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Spouse Visa</a></p>
+        <p class="mt-4"><a href="/dest-uk" onclick="return spaNav(event,'dest-uk')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Study in UK</a></p>
+        <p class="mt-4"><a href="/dest-usa" onclick="return spaNav(event,'dest-usa')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Study in USA</a></p>
+        <p class="mt-4"><a href="/dest-malaysia" onclick="return spaNav(event,'dest-malaysia')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Study in Malaysia</a></p>
+        <p class="mt-4"><a href="/student-visa" onclick="return spaNav(event,'student-visa')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Student Visa</a></p>
+        <p class="mt-4"><a href="/spouse-visa" onclick="return spaNav(event,'spouse-visa')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Spouse Visa</a></p>
       </div>
 
       <div class="text-sm">
         <p class="font-display font-semibold text-white mb-6">Useful Links</p>
-        <p class="mt-4"><a onclick="go('home')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Home</a></p>
-        <p class="mt-4"><a onclick="go('about')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> About Us</a></p>
-        <p class="mt-4"><a onclick="go('programs')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Programs</a></p>
-        <p class="mt-4"><a onclick="go('blogs')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Blogs</a></p>
-        <p class="mt-4"><a onclick="go('contact')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Contact Us</a></p>
+        <p class="mt-4"><a href="/" onclick="return spaNav(event,'home')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Home</a></p>
+        <p class="mt-4"><a href="/about" onclick="return spaNav(event,'about')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> About Us</a></p>
+        <p class="mt-4"><a href="/programs" onclick="return spaNav(event,'programs')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Programs</a></p>
+        <p class="mt-4"><a href="/blogs" onclick="return spaNav(event,'blogs')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Blogs</a></p>
+        <p class="mt-4"><a href="/contact" onclick="return spaNav(event,'contact')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Contact Us</a></p>
       </div>
 
       <div class="text-sm">
@@ -290,7 +301,7 @@ home: `
         <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Overseas Education Consultancy</p>
         <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">Your Bridge to Studying Abroad</h1>
         <p class="mt-5 max-w-md text-white/75">From university selection to visa approval — CloudBridge guides students across Bangladesh into universities in the UK, Malaysia, and the USA.</p>
-        <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
+        <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
       </div>
     </div>
   </div>
@@ -309,7 +320,7 @@ home: `
         <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Admissions Open</p>
         <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">Fall 2026 Intake Now Open</h1>
         <p class="mt-5 max-w-md text-white/75">100% free end-to-end counseling and application processing — from shortlisting your university to visa approval.</p>
-        <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
+        <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
       </div>
     </div>
   </div>
@@ -330,7 +341,7 @@ home: `
         <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Scholarships</p>
         <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">Scholarships at 500+ Universities</h1>
         <p class="mt-5 max-w-md text-white/75">Let our counsellors match you with funding you actually qualify for — most students never even check.</p>
-        <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
+        <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
       </div>
     </div>
   </div>
@@ -358,15 +369,15 @@ home: `
       <p class="mt-3 text-ink/60">Every country we work with, hand-picked for strong outcomes for Bangladeshi students.</p>
     </div>
     <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <a onclick="go('dest-uk')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#2e4a7a,#4d70a8)">
+      <a href="/dest-uk" onclick="return spaNav(event,'dest-uk')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#2e4a7a,#4d70a8)">
         <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
         <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">United Kingdom</h3><p class="mt-1 text-sm text-white/75">Globally respected degrees and diverse study opportunities.</p></div>
       </a>
-      <a onclick="go('dest-malaysia')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#1e786e,#22a396)">
+      <a href="/dest-malaysia" onclick="return spaNav(event,'dest-malaysia')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#1e786e,#22a396)">
         <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
         <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">Malaysia</h3><p class="mt-1 text-sm text-white/75">English-medium education with affordable living costs.</p></div>
       </a>
-      <a onclick="go('dest-usa')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#963c3c,#c25a5a)">
+      <a href="/dest-usa" onclick="return spaNav(event,'dest-usa')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#963c3c,#c25a5a)">
         <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
         <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">USA</h3><p class="mt-1 text-sm text-white/75">Small classes, academic freedom, strong mentorship.</p></div>
       </a>
@@ -616,7 +627,7 @@ home: `
       <p class="text-sunrise-600 font-display font-semibold text-sm uppercase tracking-wide mb-3">Free Consultation</p>
       <h2 class="section-heading">Talk with University Admission Expert</h2>
       <p class="mt-4 text-ink/60">Get personalised guidance from our expert counsellors on choosing the right university, course, and destination for your goals — completely free, with no obligation.</p>
-      <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-6 inline-flex">Send Admission Query</a>
+      <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-6 inline-flex">Send Admission Query</a>
     </div>
   </div>
 </section>
@@ -786,15 +797,15 @@ home: `
       <p class="mt-3 text-ink/60">Insights, updates, and expert guidance to help you study abroad with confidence.</p>
     </div>
     <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      <a onclick="go('blogs')" class="nav-link rounded-2xl border border-black/10 overflow-hidden block">
+      <a href="/blogs" onclick="return spaNav(event,'blogs')" class="nav-link rounded-2xl border border-black/10 overflow-hidden block">
         <div class="h-40" style="background:linear-gradient(160deg,#2e4a7a,#4d70a8)"></div>
         <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Visa Tips</p><h3 class="mt-1 font-display font-bold text-bridge-900">5 documents students forget before their visa interview</h3></div>
       </a>
-      <a onclick="go('blogs')" class="nav-link rounded-2xl border border-black/10 overflow-hidden block">
+      <a href="/blogs" onclick="return spaNav(event,'blogs')" class="nav-link rounded-2xl border border-black/10 overflow-hidden block">
         <div class="h-40" style="background:linear-gradient(160deg,#1e786e,#22a396)"></div>
         <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Scholarships</p><h3 class="mt-1 font-display font-bold text-bridge-900">How to find scholarships you actually qualify for</h3></div>
       </a>
-      <a onclick="go('blogs')" class="nav-link rounded-2xl border border-black/10 overflow-hidden block">
+      <a href="/blogs" onclick="return spaNav(event,'blogs')" class="nav-link rounded-2xl border border-black/10 overflow-hidden block">
         <div class="h-40" style="background:linear-gradient(160deg,#963c3c,#c25a5a)"></div>
         <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Life Abroad</p><h3 class="mt-1 font-display font-bold text-bridge-900">Your first month abroad: a practical checklist</h3></div>
       </a>
@@ -806,7 +817,7 @@ home: `
   <div class="max-w-container mx-auto px-4 md:px-8">
     <h2 class="text-2xl md:text-3xl font-extrabold">We're Here to Help You</h2>
     <p class="mt-3 text-white/70 max-w-xl mx-auto">Know your course and choose the right level for your higher study and future career.</p>
-    <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-6 inline-flex">Check Your Eligibility</a>
+    <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-6 inline-flex">Check Your Eligibility</a>
   </div>
 </section>
 
@@ -862,7 +873,7 @@ home: `
 about: `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / About us</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / About us</p>
     <p class="inline-block mt-4 mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">About CloudBridge</p>
     <h1 class="text-3xl md:text-5xl font-extrabold leading-tight max-w-2xl">Your partner from application to arrival</h1>
     <p class="mt-4 max-w-xl text-white/75">Cloud Bridge — International Student Consultancy (CBC) has been guiding Bangladeshi students to universities abroad since 2019.</p>
@@ -909,8 +920,8 @@ about: `
     <p class="text-xs font-semibold uppercase tracking-widest text-white/70">10,000+ Students Served Since 2019</p>
     <h2 class="mt-3 text-2xl md:text-4xl font-extrabold max-w-2xl mx-auto">Start Your Journey Today, Achieve More Tomorrow</h2>
     <div class="mt-7 flex flex-wrap justify-center gap-4">
-      <a onclick="go('blogs')" class="btn-primary nav-link !rounded-lg">Read Success Stories</a>
-      <a onclick="go('contact')" class="btn-secondary nav-link !rounded-lg">Contact Us</a>
+      <a href="/blogs" onclick="return spaNav(event,'blogs')" class="btn-primary nav-link !rounded-lg">Read Success Stories</a>
+      <a href="/contact" onclick="return spaNav(event,'contact')" class="btn-secondary nav-link !rounded-lg">Contact Us</a>
     </div>
   </div>
 </section>
@@ -1071,91 +1082,91 @@ about: `
           <img src="assets/team/shahan.jpg" alt="Mohammed Shahan" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Mohammed Shahan</h3>
           <p class="text-sm text-ink/60">Founder &amp; CEO</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="1">
           <img src="assets/team/ariful.jpg" alt="Ariful Islam" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Ariful Islam</h3>
           <p class="text-sm text-ink/60">Branch Manager (UK Specialist)</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">UK Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">UK Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="2">
           <img src="assets/team/sunny.jpg" alt="Sunny Arafat" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Sunny Arafat</h3>
           <p class="text-sm text-ink/60">Sr. Executive — Digital Marketing</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="3">
           <img src="assets/team/mehedi.jpg" alt="Mehedi Hasan" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Mehedi Hasan</h3>
           <p class="text-sm text-ink/60">Administrative Executive</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="4">
           <img src="assets/team/mim.jpg" alt="Kazi Mim" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Kazi Mim</h3>
           <p class="text-sm text-ink/60">Application Team</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="5">
           <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg></div>
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Team Member</h3>
           <p class="text-sm text-ink/60">Senior Visa Counsellor</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="6">
           <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg></div>
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Team Member</h3>
           <p class="text-sm text-ink/60">Head of Admissions — Canada &amp; USA</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="7">
           <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg></div>
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Team Member</h3>
           <p class="text-sm text-ink/60">Scholarship Advisor</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="8">
           <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg></div>
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Team Member</h3>
           <p class="text-sm text-ink/60">Application Processing Officer</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="9">
           <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg></div>
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Team Member</h3>
           <p class="text-sm text-ink/60">IT &amp; Systems Administrator</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Head Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="10">
           <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg></div>
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Team Member</h3>
           <p class="text-sm text-ink/60">Sylhet Branch Counsellor</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Sylhet Branch</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Sylhet Branch</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="11">
           <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg></div>
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Team Member</h3>
           <p class="text-sm text-ink/60">Student Support Officer</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Sylhet Branch</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Sylhet Branch</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="12">
           <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg></div>
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Team Member</h3>
           <p class="text-sm text-ink/60">Front Desk Coordinator</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Sylhet Branch</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Sylhet Branch</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="13">
           <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg></div>
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Team Member</h3>
           <p class="text-sm text-ink/60">UK Office Coordinator</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">UK Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">UK Office</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="14">
           <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg></div>
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Team Member</h3>
           <p class="text-sm text-ink/60">UK Admissions Counsellor</p>
-          <a onclick="go('our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">UK Office</a>
+          <a href="/our-team" onclick="return spaNav(event,'our-team')" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">UK Office</a>
         </div>
         </div>
         <div id="aboutTeamDots" class="mt-6 flex items-center justify-center gap-2"></div>
@@ -1164,7 +1175,7 @@ about: `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 010-1.06L10.94 10 7.21 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0z" clip-rule="evenodd" /></svg>
       </button>
     </div>
-    <div class="mt-6 text-center"><a onclick="go('our-team')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">See the full team &rarr;</a></div>
+    <div class="mt-6 text-center"><a href="/our-team" onclick="return spaNav(event,'our-team')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">See the full team &rarr;</a></div>
   </div>
 </section>
 
@@ -1188,7 +1199,7 @@ about: `
 <section class="py-16 bg-dusk-gradient text-white text-center">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <h2 class="text-2xl md:text-3xl font-extrabold">Ready to start your journey?</h2>
-    <a onclick="go('contact')" class="btn-primary nav-link mt-6 inline-flex">Talk to a Counsellor</a>
+    <a href="/contact" onclick="return spaNav(event,'contact')" class="btn-primary nav-link mt-6 inline-flex">Talk to a Counsellor</a>
   </div>
 </section>
 `,
@@ -1198,7 +1209,7 @@ about: `
 'our-team': `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / <a onclick="go('about')">About</a> / Our Team</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / <a href="/about" onclick="return spaNav(event,'about')">About</a> / Our Team</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Our Team</h1>
     <p class="mt-4 max-w-xl text-white/75">The counsellors and staff behind every successful application — real people who know your destination country inside out.</p>
   </div>
@@ -1336,7 +1347,7 @@ about: `
 <section class="py-16 bg-dusk-gradient text-white text-center">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <h2 class="text-2xl md:text-3xl font-extrabold">Want to meet your counsellor?</h2>
-    <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-6 inline-flex">Book Free Consultation</a>
+    <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-6 inline-flex">Book Free Consultation</a>
   </div>
 </section>
 `,
@@ -1344,22 +1355,22 @@ about: `
 destinations: `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / Study Destination</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / Study Destination</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Choose Your Destination</h1>
     <p class="mt-4 max-w-xl text-white/75">Every country we work with, hand-picked for strong outcomes for Bangladeshi students.</p>
   </div>
 </section>
 <section class="py-16">
   <div class="max-w-container mx-auto px-4 md:px-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <a onclick="go('dest-uk')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#2e4a7a,#4d70a8)">
+    <a href="/dest-uk" onclick="return spaNav(event,'dest-uk')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#2e4a7a,#4d70a8)">
       <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
       <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">United Kingdom</h3><p class="mt-1 text-sm text-white/75">Globally respected degrees and diverse study opportunities.</p></div>
     </a>
-    <a onclick="go('dest-malaysia')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#1e786e,#22a396)">
+    <a href="/dest-malaysia" onclick="return spaNav(event,'dest-malaysia')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#1e786e,#22a396)">
       <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
       <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">Malaysia</h3><p class="mt-1 text-sm text-white/75">English-medium education with affordable living costs.</p></div>
     </a>
-    <a onclick="go('dest-usa')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#963c3c,#c25a5a)">
+    <a href="/dest-usa" onclick="return spaNav(event,'dest-usa')" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(160deg,#963c3c,#c25a5a)">
       <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
       <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">USA</h3><p class="mt-1 text-sm text-white/75">Small classes, academic freedom, strong mentorship.</p></div>
     </a>
@@ -1370,10 +1381,10 @@ destinations: `
 'dest-uk': `
 <section class="text-white py-20" style="background-image:linear-gradient(160deg,#0f1c30,#2e4a7a); background-size:cover;">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / <a onclick="go('destinations')">Study Destination</a> / United Kingdom</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / <a href="/destinations" onclick="return spaNav(event,'destinations')">Study Destination</a> / United Kingdom</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Study in the United Kingdom</h1>
     <p class="mt-4 max-w-xl text-white/80">Globally respected degrees, world-class research, and a huge international student community.</p>
-    <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-8 inline-flex">Book Free Consultation</a>
+    <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-8 inline-flex">Book Free Consultation</a>
   </div>
 </section>
 <section class="py-16">
@@ -1403,10 +1414,10 @@ destinations: `
 'dest-malaysia': `
 <section class="text-white py-20" style="background-image:linear-gradient(160deg,#0f1c30,#1e786e); background-size:cover;">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / <a onclick="go('destinations')">Study Destination</a> / Malaysia</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / <a href="/destinations" onclick="return spaNav(event,'destinations')">Study Destination</a> / Malaysia</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Study in Malaysia</h1>
     <p class="mt-4 max-w-xl text-white/80">Globally recognized English-medium education with affordable tuition and living costs.</p>
-    <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-8 inline-flex">Book Free Consultation</a>
+    <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-8 inline-flex">Book Free Consultation</a>
   </div>
 </section>
 <section class="py-16">
@@ -1436,10 +1447,10 @@ destinations: `
 'dest-usa': `
 <section class="text-white py-20" style="background-image:linear-gradient(160deg,#0f1c30,#963c3c); background-size:cover;">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / <a onclick="go('destinations')">Study Destination</a> / USA</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / <a href="/destinations" onclick="return spaNav(event,'destinations')">Study Destination</a> / USA</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Study in the USA</h1>
     <p class="mt-4 max-w-xl text-white/80">Small classes, academic freedom, and strong mentorship at world-renowned universities.</p>
-    <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-8 inline-flex">Book Free Consultation</a>
+    <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-8 inline-flex">Book Free Consultation</a>
   </div>
 </section>
 <section class="py-16">
@@ -1469,7 +1480,7 @@ destinations: `
 programs: `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / Course</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / Course</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Available Courses</h1>
     <p class="mt-4 max-w-xl text-white/75">Search and filter real courses from our 40 partner universities across 10 countries — find the one that fits your subject, level, and schedule.</p>
   </div>
@@ -1543,7 +1554,7 @@ programs: `
 'student-visa': `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / Service / Student Visa</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / Service / Student Visa</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Student Visa Support</h1>
     <p class="mt-4 max-w-xl text-white/75">We prepare your documents, coach you for the interview, and track every deadline — so nothing gets left to chance.</p>
   </div>
@@ -1555,14 +1566,14 @@ programs: `
     <div class="rounded-2xl border border-black/10 p-6"><span class="font-display font-bold text-sunrise-600">Step 3</span><h3 class="mt-1 font-display font-bold text-bridge-900">Interview Coaching</h3><p class="mt-2 text-sm text-ink/60">Mock interviews and common-question prep so you walk in confident, if your destination requires an interview.</p></div>
     <div class="rounded-2xl border border-black/10 p-6"><span class="font-display font-bold text-sunrise-600">Step 4</span><h3 class="mt-1 font-display font-bold text-bridge-900">Pre-Departure Briefing</h3><p class="mt-2 text-sm text-ink/60">Once your visa is approved, we brief you on travel, accommodation, and what to expect in your first weeks.</p></div>
   </div>
-  <div class="mt-8"><a onclick="go('home','lead-form')" class="btn-primary nav-link">Start your visa process</a></div>
+  <div class="mt-8"><a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link">Start your visa process</a></div>
 </section>
 `,
 
 'spouse-visa': `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / Service / Spouse Visa</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / Service / Spouse Visa</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Spouse Visa Support</h1>
     <p class="mt-4 max-w-xl text-white/75">Studying abroad shouldn't mean leaving your family behind. We help eligible students bring their spouse along.</p>
   </div>
@@ -1574,14 +1585,14 @@ programs: `
     <div class="rounded-2xl border border-black/10 p-6"><h3 class="font-display font-bold text-bridge-900">Application Support</h3><p class="mt-2 text-sm text-ink/60">We prepare and file the dependent visa application alongside your own student visa application.</p></div>
     <div class="rounded-2xl border border-black/10 p-6"><h3 class="font-display font-bold text-bridge-900">Settling In Together</h3><p class="mt-2 text-sm text-ink/60">Guidance on accommodation, healthcare registration, and work rights for accompanying spouses.</p></div>
   </div>
-  <div class="mt-8"><a onclick="go('home','lead-form')" class="btn-primary nav-link">Ask about spouse visas</a></div>
+  <div class="mt-8"><a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link">Ask about spouse visas</a></div>
 </section>
 `,
 
 'university-college': `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / University & College</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / University & College</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">University & College</h1>
     <p class="mt-4 max-w-xl text-white/75">500+ partner universities and colleges across 10 countries. Filter by country, city, tuition budget, and intake to find your fit.</p>
   </div>
@@ -1739,15 +1750,15 @@ programs: `
 scholarship: `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / Scholarship</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / Scholarship</p>
     <div class="mt-4 grid md:grid-cols-2 gap-8 items-center">
       <div>
         <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Free Scholarship Guidance</p>
         <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">Scholarships at 500+ Universities</h1>
         <p class="mt-4 max-w-xl text-white/75">Let our counsellors match you with funding you actually qualify for — most students never even check. From merit awards to country-specific grants, we help you find real money for your degree.</p>
         <div class="mt-7 flex flex-wrap gap-3">
-          <a onclick="go('home','lead-form')" class="btn-primary nav-link inline-flex">Check My Eligibility</a>
-          <a onclick="go('contact')" class="btn-secondary nav-link inline-flex">Talk to a Counsellor</a>
+          <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link inline-flex">Check My Eligibility</a>
+          <a href="/contact" onclick="return spaNav(event,'contact')" class="btn-secondary nav-link inline-flex">Talk to a Counsellor</a>
         </div>
       </div>
       <div class="grid grid-cols-3 gap-4 text-center">
@@ -1820,7 +1831,7 @@ scholarship: `
           <h3 class="font-display font-bold">Not sure what you qualify for?</h3>
           <p class="mt-2 text-sm text-white/70">Share your academic profile once — we'll check every scholarship route across our partner universities for you, free of charge.</p>
         </div>
-        <a onclick="go('home','lead-form')" class="btn-primary nav-link mt-5 inline-flex !bg-[#db1f2a] hover:!bg-[#c01822]">Get My Free Match</a>
+        <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link mt-5 inline-flex !bg-[#db1f2a] hover:!bg-[#c01822]">Get My Free Match</a>
       </div>
     </div>
   </div>
@@ -1895,7 +1906,7 @@ scholarship: `
         <div class="p-6">
           <h3 class="font-display font-bold text-bridge-900">United Kingdom</h3>
           <p class="mt-2 text-sm text-ink/60">Merit scholarships, Chevening-style awards, and university-specific bursaries for international students.</p>
-          <a onclick="go('dest-uk')" class="uni-card-btn mt-4 inline-flex items-center gap-1 text-sm font-semibold text-bridge-800 border border-bridge-800/30 px-4 py-2 nav-link">Explore UK Options &rarr;</a>
+          <a href="/dest-uk" onclick="return spaNav(event,'dest-uk')" class="uni-card-btn mt-4 inline-flex items-center gap-1 text-sm font-semibold text-bridge-800 border border-bridge-800/30 px-4 py-2 nav-link">Explore UK Options &rarr;</a>
         </div>
       </div>
       <div class="university-card rounded-2xl overflow-hidden ring-1 ring-black/5 bg-white">
@@ -1903,7 +1914,7 @@ scholarship: `
         <div class="p-6">
           <h3 class="font-display font-bold text-bridge-900">Malaysia</h3>
           <p class="mt-2 text-sm text-ink/60">Tuition fee waivers and living-cost-friendly funding at partner universities across Malaysia.</p>
-          <a onclick="go('dest-malaysia')" class="uni-card-btn mt-4 inline-flex items-center gap-1 text-sm font-semibold text-bridge-800 border border-bridge-800/30 px-4 py-2 nav-link">Explore Malaysia Options &rarr;</a>
+          <a href="/dest-malaysia" onclick="return spaNav(event,'dest-malaysia')" class="uni-card-btn mt-4 inline-flex items-center gap-1 text-sm font-semibold text-bridge-800 border border-bridge-800/30 px-4 py-2 nav-link">Explore Malaysia Options &rarr;</a>
         </div>
       </div>
       <div class="university-card rounded-2xl overflow-hidden ring-1 ring-black/5 bg-white">
@@ -1911,7 +1922,7 @@ scholarship: `
         <div class="p-6">
           <h3 class="font-display font-bold text-bridge-900">USA</h3>
           <p class="mt-2 text-sm text-ink/60">Merit-based awards and assistantship routes at partner colleges and universities across the USA.</p>
-          <a onclick="go('dest-usa')" class="uni-card-btn mt-4 inline-flex items-center gap-1 text-sm font-semibold text-bridge-800 border border-bridge-800/30 px-4 py-2 nav-link">Explore USA Options &rarr;</a>
+          <a href="/dest-usa" onclick="return spaNav(event,'dest-usa')" class="uni-card-btn mt-4 inline-flex items-center gap-1 text-sm font-semibold text-bridge-800 border border-bridge-800/30 px-4 py-2 nav-link">Explore USA Options &rarr;</a>
         </div>
       </div>
     </div>
@@ -1951,8 +1962,8 @@ scholarship: `
     <h2 class="section-heading text-center mx-auto">Find Out What You Qualify For</h2>
     <p class="mt-3 max-w-xl mx-auto text-ink/60">Tell us your academic background and destination — we'll match you with real funding options, free of charge.</p>
     <div class="mt-6 flex flex-wrap justify-center gap-3">
-      <a onclick="go('home','lead-form')" class="btn-primary nav-link inline-flex">Check Scholarship Eligibility</a>
-      <a onclick="go('contact')" class="btn-outline nav-link inline-flex">Talk to a Counsellor</a>
+      <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link inline-flex">Check Scholarship Eligibility</a>
+      <a href="/contact" onclick="return spaNav(event,'contact')" class="btn-outline nav-link inline-flex">Talk to a Counsellor</a>
     </div>
   </div>
 </section>
@@ -1961,7 +1972,7 @@ scholarship: `
 events: `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / Events</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / Events</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Events</h1>
     <p class="mt-4 max-w-xl text-white/75">Join our expos, seminars, and info sessions to get expert guidance in person.</p>
   </div>
@@ -1983,7 +1994,7 @@ events: `
       </div>
     </div>
     <p class="mt-8 text-sm text-ink/50">More events added regularly — check back soon.</p>
-    <div class="mt-8"><a onclick="go('home','lead-form')" class="btn-primary nav-link inline-flex">Reserve Your Seat</a></div>
+    <div class="mt-8"><a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-primary nav-link inline-flex">Reserve Your Seat</a></div>
   </div>
 </section>
 `,
@@ -1991,7 +2002,7 @@ events: `
 blogs: `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / Blogs</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / Blogs</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Blogs</h1>
     <p class="mt-4 max-w-xl text-white/75">Guidance, tips, and updates for students planning to study abroad.</p>
   </div>
@@ -2018,7 +2029,7 @@ blogs: `
 contact: `
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb"><a onclick="go('home')">Home</a> / Contact Us</p>
+    <p class="crumb"><a href="/" onclick="return spaNav(event,'home')">Home</a> / Contact Us</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Contact Us</h1>
     <p class="mt-4 max-w-xl text-white/75">Visit one of our offices, or send us a message and a counsellor will get back to you.</p>
   </div>
@@ -2497,15 +2508,15 @@ function initUniversityDirectory() {
           </div>
           <div class="flex items-center justify-between">
             <span class="text-ink font-medium">About the university</span>
-            <a onclick="go('home','lead-form')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View Profile</a>
+            <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View Profile</a>
           </div>
           <div class="flex items-center justify-between">
             <span class="text-ink font-medium">Find Courses</span>
-            <a onclick="go('programs')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View All</a>
+            <a href="/programs" onclick="return spaNav(event,'programs')" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View All</a>
           </div>
         </div>
         <div class="mt-3 flex flex-wrap gap-1.5">${intakeBadges}</div>
-        <a onclick="go('home','lead-form')" class="btn-outline uni-card-btn !text-xs mt-4 w-full text-center nav-link">Apply Now</a>
+        <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="btn-outline uni-card-btn !text-xs mt-4 w-full text-center nav-link">Apply Now</a>
       </div>`;
   }
 
@@ -2642,7 +2653,7 @@ function initCourseDirectory() {
           </div>
         </div>
         <div class="shrink-0 w-full sm:w-auto">
-          <a onclick="go('home','lead-form')" class="course-detail-btn w-full sm:w-auto nav-link">Program Details</a>
+          <a href="/#lead-form" onclick="return spaNav(event,'home','lead-form')" class="course-detail-btn w-full sm:w-auto nav-link">Program Details</a>
         </div>
       </div>`;
   }
@@ -2700,12 +2711,56 @@ function initCourseDirectory() {
 
   applyFilters();
 }
+function idToPath(id) {
+  return id === 'home' ? '/' : '/' + id;
+}
+function pathToId(pathname) {
+  const clean = (pathname || '/').replace(/\/+$/, '');
+  if (clean === '') return 'home';
+  const id = clean.replace(/^\//, '');
+  return pages[id] ? id : null;
+}
+
+const PAGE_META = {
+  'home': { title: 'CloudBridge — Study Abroad Consultancy | UK, Malaysia & USA', description: 'CloudBridge guides students across Bangladesh into top universities in the UK, Malaysia, and the USA — free counselling, university selection, and visa support.' },
+  'about': { title: 'About Us | CloudBridge Study Abroad Consultancy', description: 'Learn how CloudBridge supports students from university shortlisting to visa approval, with expert counsellors guiding every step abroad.' },
+  'our-team': { title: 'Our Team | CloudBridge Study Abroad Consultants', description: 'Meet the CloudBridge counselling team helping students in Bangladesh apply to universities in the UK, Malaysia, and the USA.' },
+  'destinations': { title: 'Study Destinations | CloudBridge Study Abroad', description: 'Explore study destinations with CloudBridge — compare universities, costs, and visa pathways in the UK, Malaysia, and the USA.' },
+  'dest-uk': { title: 'Study in the UK | CloudBridge Study Abroad Consultancy', description: 'Everything you need to study in the United Kingdom — universities, courses, costs, and visa guidance from CloudBridge.' },
+  'dest-malaysia': { title: 'Study in Malaysia | CloudBridge Study Abroad Consultancy', description: 'Discover universities, courses, and visa requirements to study in Malaysia with guidance from CloudBridge counsellors.' },
+  'dest-usa': { title: 'Study in the USA | CloudBridge Study Abroad Consultancy', description: 'Plan your journey to study in the USA — university options, costs, and visa support from CloudBridge.' },
+  'programs': { title: 'Courses & Programs | CloudBridge Study Abroad', description: 'Browse available courses and programs across partner universities in the UK, Malaysia, and the USA with CloudBridge.' },
+  'student-visa': { title: 'Student Visa Support | CloudBridge', description: 'Step-by-step student visa support for the UK, Malaysia, and USA — documentation, interviews, and approval guidance from CloudBridge.' },
+  'spouse-visa': { title: 'Spouse Visa Support | CloudBridge', description: 'Guidance and documentation support for spouse and dependent visas so your family can join you abroad, from CloudBridge.' },
+  'university-college': { title: 'Universities & Colleges | CloudBridge Study Abroad', description: 'Browse 500+ partner universities and colleges in the UK, Malaysia, and the USA with CloudBridge\'s study abroad directory.' },
+  'scholarship': { title: 'Scholarships | CloudBridge Study Abroad', description: 'Find scholarships at 500+ universities — CloudBridge counsellors match you with funding you actually qualify for.' },
+  'events': { title: 'Events | CloudBridge Study Abroad', description: 'Upcoming CloudBridge education fairs, webinars, and campus events for students planning to study abroad.' },
+  'blogs': { title: 'Blogs | CloudBridge Study Abroad', description: 'Study abroad tips, visa updates, and university guides from the CloudBridge team.' },
+  'contact': { title: 'Contact Us | CloudBridge Study Abroad Consultancy', description: 'Get in touch with CloudBridge for a free consultation on studying in the UK, Malaysia, or the USA.' },
+};
+
+function applyMeta(id) {
+  const meta = PAGE_META[id] || PAGE_META.home;
+  const url = 'https://cloudbridge.info' + idToPath(id);
+  document.title = meta.title;
+  const setContent = (selector, value) => { const el = document.querySelector(selector); if (el) el.setAttribute('content', value); };
+  setContent('meta[name="description"]', meta.description);
+  setContent('meta[property="og:title"]', meta.title);
+  setContent('meta[property="og:description"]', meta.description);
+  setContent('meta[property="og:url"]', url);
+  setContent('meta[name="twitter:title"]', meta.title);
+  setContent('meta[name="twitter:description"]', meta.description);
+  const canonical = document.querySelector('link[rel="canonical"]');
+  if (canonical) canonical.setAttribute('href', url);
+}
+
 function renderPage(id, scrollToId) {
   const root = document.getElementById('pageRoot');
   root.innerHTML = pages[id] || pages.home;
   document.querySelectorAll('.nav-link[data-page]').forEach(a => a.classList.toggle('active', a.dataset.page === id));
   const mobileMenu = document.getElementById('mobileMenu');
   if (mobileMenu) mobileMenu.classList.add('hidden');
+  applyMeta(pages[id] ? id : 'home');
   initPageScripts();
   if (scrollToId) {
     setTimeout(() => { const el = document.getElementById(scrollToId); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60);
@@ -2717,16 +2772,36 @@ function renderPage(id, scrollToId) {
 function go(id, scrollToId) {
   const validId = pages[id] ? id : 'home';
   renderPage(validId, scrollToId);
-  if (location.hash.slice(1) !== validId) {
-    history.pushState({ page: validId }, '', '#' + validId);
+  const targetUrl = idToPath(validId) + (scrollToId ? '#' + scrollToId : '');
+  const currentUrl = location.pathname + location.hash;
+  if (currentUrl !== targetUrl) {
+    history.pushState({ page: validId }, '', targetUrl);
   }
 }
 window.go = go;
 
+// Progressive enhancement: every nav link now has a real href, so a plain
+// click (or ctrl/cmd/shift/middle-click, or right-click) still works as a
+// normal link — this only intercepts an ordinary left-click to do a fast
+// in-page transition instead of a full reload.
+function spaNav(event, id, scrollToId) {
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    return true;
+  }
+  event.preventDefault();
+  go(id, scrollToId);
+  return false;
+}
+window.spaNav = spaNav;
+
 // Browser back/forward support
 window.addEventListener('popstate', () => {
-  const id = location.hash.slice(1) || 'home';
-  renderPage(pages[id] ? id : 'home');
+  const id = pathToId(location.pathname) || 'home';
+  renderPage(id);
+  const hash = location.hash.slice(1);
+  if (hash) {
+    setTimeout(() => { const el = document.getElementById(hash); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60);
+  }
 });
 
 function initPageScripts() {
@@ -2823,14 +2898,26 @@ document.getElementById('mobileToggle').addEventListener('click', () => {
   document.getElementById('mobileMenu').classList.toggle('hidden');
 });
 
-// Boot: restore page from URL hash on load (fixes reload always jumping to home)
-const initialId = location.hash.slice(1);
-if (initialId && pages[initialId]) {
-  renderPage(initialId);
-  history.replaceState({ page: initialId }, '', '#' + initialId);
-} else {
-  go('home');
-}
+// Boot: restore page from the real URL path on load, and transparently
+// migrate any old-style hash link (e.g. /#university-college, /#home from
+// before this fix) to the new clean URL.
+(function boot() {
+  const hash = location.hash.slice(1);
+  const pathIsRoot = (location.pathname === '/' || location.pathname === '');
+
+  if (pathIsRoot && hash && pages[hash]) {
+    renderPage(hash);
+    history.replaceState({ page: hash }, '', idToPath(hash));
+    return;
+  }
+
+  const id = pathToId(location.pathname) || 'home';
+  renderPage(id);
+  history.replaceState({ page: id }, '', idToPath(id) + location.hash);
+  if (hash) {
+    setTimeout(() => { const el = document.getElementById(hash); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 60);
+  }
+})();
 </script>
 
 </body>
