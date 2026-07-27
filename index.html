@@ -2716,15 +2716,21 @@ window.sliderGoTo = sliderGoTo;
    prev/next arrows and dot indicators.
    ============================================================ */
 const TESTIMONIALS = [
-  { name: 'Farhana Akter', meta: "MSc, University of Manchester — UK", quote: "CloudBridge helped me secure admission and a partial scholarship at my dream university. The whole process felt supported from day one." },
-  { name: 'Tanvir Ahmed', meta: 'BSc, Sunway University — Malaysia', quote: "I was confused about which university to choose until I spoke with CloudBridge. They matched me with a course that fit my budget and career goals perfectly." },
-  { name: 'Mehjabin Rahman', meta: 'MSc, Arizona State University — USA', quote: "From my SOP to my visa interview prep, my counsellor was available every step of the way. I got my F-1 visa on the first attempt." },
-  { name: 'Shakil Hossain', meta: 'BEng, University of Leeds — UK', quote: "The team was honest about what I could realistically get into, which I appreciated. No false promises, just clear guidance." },
-  { name: 'Nusaiba Islam', meta: "BSc, Taylor's University — Malaysia", quote: "Affordable tuition and a smooth application — CloudBridge found me options I hadn't even considered." },
-  { name: 'Rafiul Karim', meta: 'MBA, University of Alabama — USA', quote: "I recommend CloudBridge to every junior at my college. Their after-arrival support made my first month abroad so much easier." },
+  { name: 'Farhana Akter', meta: "MSc, University of Manchester — UK", quote: "CloudBridge helped me secure admission and a partial scholarship at my dream university. The whole process felt supported from day one.", color: 'linear-gradient(160deg,#1c3255,#2f5182)' },
+  { name: 'Tanvir Ahmed', meta: 'BSc, Sunway University — Malaysia', quote: "I was confused about which university to choose until I spoke with CloudBridge. They matched me with a course that fit my budget and career goals perfectly.", color: 'linear-gradient(160deg,#157e69,#1c9c82)' },
+  { name: 'Mehjabin Rahman', meta: 'MSc, Arizona State University — USA', quote: "From my SOP to my visa interview prep, my counsellor was available every step of the way. I got my F-1 visa on the first attempt.", color: 'linear-gradient(160deg,#aa1821,#e12d38)' },
+  { name: 'Shakil Hossain', meta: 'BEng, University of Leeds — UK', quote: "The team was honest about what I could realistically get into, which I appreciated. No false promises, just clear guidance.", color: 'linear-gradient(160deg,#233f68,#4d70a8)' },
+  { name: 'Nusaiba Islam', meta: "BSc, Taylor's University — Malaysia", quote: "Affordable tuition and a smooth application — CloudBridge found me options I hadn't even considered.", color: 'linear-gradient(160deg,#157e69,#22a396)' },
+  { name: 'Rafiul Karim', meta: 'MBA, University of Alabama — USA', quote: "I recommend CloudBridge to every junior at my college. Their after-arrival support made my first month abroad so much easier.", color: 'linear-gradient(160deg,#86131a,#ce1d27)' },
 ];
 let testiIndex = 0;
 let testiTimer = null;
+function testiInitials(name) {
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0] ? parts[0][0] : '';
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+  return (first + last).toUpperCase();
+}
 function testiRender() {
   const track = document.getElementById('testiTrack');
   if (!track) return;
@@ -2733,9 +2739,12 @@ function testiRender() {
   track.innerHTML = visible.map(t => `
     <div class="bg-white rounded-2xl p-6 ring-1 ring-black/5 flex flex-col">
       <p class="text-sm text-ink/70 leading-relaxed flex-1">&ldquo;${t.quote}&rdquo;</p>
-      <div class="mt-5 pt-4 border-t border-black/5">
-        <p class="font-display font-bold text-bridge-900 text-sm">${t.name}</p>
-        <p class="text-xs text-ink/50">${t.meta}</p>
+      <div class="mt-5 pt-4 border-t border-black/5 flex items-center gap-3">
+        <div class="w-14 h-14 shrink-0 rounded-full flex items-center justify-center text-white font-display font-bold text-lg" style="background-image:${t.color}">${testiInitials(t.name)}</div>
+        <div>
+          <p class="font-display font-bold text-bridge-900 text-sm">${t.name}</p>
+          <p class="text-xs text-ink/50">${t.meta}</p>
+        </div>
       </div>
     </div>
   `).join('');
