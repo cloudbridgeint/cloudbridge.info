@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import blogStudyUsa from '../assets/blog/study-usa.jpg';
 const title = "Studying in the USA: What to Know Before Applying | CloudBridge";
 const description = "US tuition costs, the F-1 visa process, OPT, and scholarships — a complete guide to studying in the USA from CloudBridge.";
 ---
@@ -16,7 +18,7 @@ const description = "US tuition costs, the F-1 visa process, OPT, and scholarshi
     <h1 class="mt-4 text-3xl md:text-4xl font-extrabold text-bridge-950 leading-tight">Studying in the USA: What Bangladeshi Students Should Know Before Applying</h1>
     <p class="mt-4 text-sm text-ink/50">Updated July 2026 · 9 min read</p>
     <div class="mt-8 rounded-2xl overflow-hidden">
-      <img src="/assets/blog/study-usa.jpg" alt="A map of the United States with a small American flag marker, representing study destinations across the USA" class="w-full h-auto object-cover" width="960" height="548" loading="eager">
+      <Image src={blogStudyUsa} alt="A map of the United States with a small American flag marker, representing study destinations across the USA" class="w-full h-auto object-cover" loading="eager" fetchpriority="high" widths={[480, 768, 1200]} sizes="(min-width: 768px) 700px, 100vw" />
     </div>
 
     <p class="mt-8 text-lg text-ink/70 leading-relaxed">The USA has more universities than almost anywhere else in the world — over 4,000 of them — which is both the appeal and the problem. It's genuinely possible to find a program that fits your budget, your grades, and your goals, but only if you know where to start looking. Here's a straight answer to the questions we get asked most: what it costs, how the application actually works, and what your visa options look like once you're in.</p>

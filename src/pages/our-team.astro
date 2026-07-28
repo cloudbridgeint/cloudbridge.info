@@ -1,5 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import teamShahan from '../assets/team/shahan.jpg';
+import teamAriful from '../assets/team/ariful.jpg';
+import teamSunny from '../assets/team/sunny.jpg';
+import teamMehedi from '../assets/team/mehedi.jpg';
+import teamMim from '../assets/team/mim.jpg';
+import teamMahi from '../assets/team/mahi.jpg';
+import teamFahim from '../assets/team/fahim.jpg';
 const title = "Our Team | CloudBridge Study Abroad Consultants";
 const description = "Meet the CloudBridge counselling team helping students in Bangladesh apply to universities in the UK, Malaysia, and the USA.";
 ---
@@ -20,14 +28,14 @@ const description = "Meet the CloudBridge counselling team helping students in B
     </div>
     <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div class="rounded-2xl border border-black/10 overflow-hidden text-center shadow-sm">
-        <img src="/assets/team/shahan.jpg" alt="Mohammed Shahan" class="w-full aspect-square object-cover">
+        <Image src={teamShahan} alt="Mohammed Shahan" class="w-full aspect-square object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
         <div class="p-6">
           <h3 class="font-display font-bold text-bridge-900">Mohammed Shahan</h3>
           <p class="text-sm text-sunrise-600 font-semibold mt-0.5">Founder &amp; CEO</p>
         </div>
       </div>
       <div class="rounded-2xl border border-black/10 overflow-hidden text-center shadow-sm">
-        <img src="/assets/team/ariful.jpg" alt="Ariful Islam" class="w-full aspect-square object-cover">
+        <Image src={teamAriful} alt="Ariful Islam" class="w-full aspect-square object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
         <div class="p-6">
           <h3 class="font-display font-bold text-bridge-900">Ariful Islam</h3>
           <p class="text-sm text-sunrise-600 font-semibold mt-0.5">Branch Manager (UK Specialist)</p>
@@ -36,7 +44,7 @@ const description = "Meet the CloudBridge counselling team helping students in B
         </div>
       </div>
       <div class="rounded-2xl border border-black/10 overflow-hidden text-center shadow-sm">
-        <img src="/assets/team/sunny.jpg" alt="Sunny Arafat" class="w-full aspect-square object-cover">
+        <Image src={teamSunny} alt="Sunny Arafat" class="w-full aspect-square object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
         <div class="p-6">
           <h3 class="font-display font-bold text-bridge-900">Sunny Arafat</h3>
           <p class="text-sm text-sunrise-600 font-semibold mt-0.5">Sr. Executive — Digital Marketing</p>
@@ -45,7 +53,7 @@ const description = "Meet the CloudBridge counselling team helping students in B
         </div>
       </div>
       <div class="rounded-2xl border border-black/10 overflow-hidden text-center shadow-sm">
-        <img src="/assets/team/mehedi.jpg" alt="Mehedi Hasan" class="w-full aspect-square object-cover">
+        <Image src={teamMehedi} alt="Mehedi Hasan" class="w-full aspect-square object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
         <div class="p-6">
           <h3 class="font-display font-bold text-bridge-900">Mehedi Hasan</h3>
           <p class="text-sm text-sunrise-600 font-semibold mt-0.5">Administrative Executive</p>
@@ -54,7 +62,7 @@ const description = "Meet the CloudBridge counselling team helping students in B
         </div>
       </div>
       <div class="rounded-2xl border border-black/10 overflow-hidden text-center shadow-sm">
-        <img src="/assets/team/mim.jpg" alt="Kazi Mim" class="w-full aspect-square object-cover">
+        <Image src={teamMim} alt="Kazi Mim" class="w-full aspect-square object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
         <div class="p-6">
           <h3 class="font-display font-bold text-bridge-900">Kazi Mim</h3>
           <p class="text-sm text-sunrise-600 font-semibold mt-0.5">Application Team</p>
@@ -63,7 +71,7 @@ const description = "Meet the CloudBridge counselling team helping students in B
         </div>
       </div>
       <div class="rounded-2xl border border-black/10 overflow-hidden text-center shadow-sm">
-        <img src="/assets/team/mahi.jpg" alt="Mahpara Jahan Mahi" class="w-full aspect-square object-cover">
+        <Image src={teamMahi} alt="Mahpara Jahan Mahi" class="w-full aspect-square object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
         <div class="p-6">
           <h3 class="font-display font-bold text-bridge-900">Mahpara Jahan Mahi</h3>
           <p class="text-sm text-sunrise-600 font-semibold mt-0.5">Senior Counselor</p>
@@ -90,7 +98,7 @@ const description = "Meet the CloudBridge counselling team helping students in B
         </div>
       </div>
       <div class="rounded-2xl border border-black/10 overflow-hidden text-center shadow-sm">
-        <img src="/assets/team/fahim.jpg" alt="Fahim" class="w-full aspect-square object-cover">
+        <Image src={teamFahim} alt="Fahim" class="w-full aspect-square object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
         <div class="p-6">
           <h3 class="font-display font-bold text-bridge-900">Fahim</h3>
           <p class="text-sm text-sunrise-600 font-semibold mt-0.5">Executive — Operations</p>

@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import blogStudyEurope from '../assets/blog/study-europe.jpg';
 const title = "Studying in Europe: An Affordable Study Abroad Alternative | CloudBridge";
 const description = "Low-tuition universities in Germany, the Netherlands, France, and Ireland — a practical guide to studying in Europe from CloudBridge.";
 ---
@@ -16,7 +18,7 @@ const description = "Low-tuition universities in Germany, the Netherlands, Franc
     <h1 class="mt-4 text-3xl md:text-4xl font-extrabold text-bridge-950 leading-tight">Studying in Europe: An Affordable Alternative Worth Considering</h1>
     <p class="mt-4 text-sm text-ink/50">Updated July 2026 · 7 min read</p>
     <div class="mt-8 rounded-2xl overflow-hidden">
-      <img src="/assets/blog/study-europe.jpg" alt="A student traveller overlooking a harbour town on the European coastline" class="w-full h-auto object-cover" width="700" height="400" loading="eager">
+      <Image src={blogStudyEurope} alt="A student traveller overlooking a harbour town on the European coastline" class="w-full h-auto object-cover" loading="eager" fetchpriority="high" widths={[480, 768, 1200]} sizes="(min-width: 768px) 700px, 100vw" />
     </div>
 
     <p class="mt-8 text-lg text-ink/70 leading-relaxed">When students think about studying abroad, the conversation usually starts with the UK or the USA — and mainland Europe barely gets a mention. That's a shame, because for the right student, countries like Germany, the Netherlands, Ireland, and France offer genuinely strong universities, often at a fraction of the cost, with their own clear paths to post-study work. If budget is the main thing holding you back from studying abroad, Europe deserves a proper look before you rule it out.</p>

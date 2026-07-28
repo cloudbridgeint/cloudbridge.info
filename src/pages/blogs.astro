@@ -1,5 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import blogStudyUk from '../assets/blog/study-uk.jpg';
+import blogStudyUsa from '../assets/blog/study-usa.jpg';
+import blogStudyEurope from '../assets/blog/study-europe.jpg';
+import blogVisaTips from '../assets/blog/visa-tips.jpg';
+import blogScholarships from '../assets/blog/scholarships.jpg';
+import blogLifeAbroad from '../assets/blog/life-abroad.jpg';
 const title = "Blogs | CloudBridge Study Abroad";
 const description = "Study abroad tips, visa updates, and university guides from the CloudBridge team.";
 ---
@@ -16,27 +23,27 @@ const description = "Study abroad tips, visa updates, and university guides from
   <div class="max-w-container mx-auto px-4 md:px-8">
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
       <a href="/study-in-uk" class="nav-link rounded-2xl border border-black/10 overflow-hidden block bg-white group">
-        <div class="h-44 overflow-hidden"><img src="/assets/blog/study-uk.jpg" alt="Big Ben and the Houses of Parliament in London" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy"></div>
+        <div class="h-44 overflow-hidden"><Image src={blogStudyUk} alt="Big Ben and the Houses of Parliament in London" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" widths={[320, 480, 640]} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 100vw" /></div>
         <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Study Destinations</p><h3 class="mt-1 font-display font-bold text-bridge-900">Studying in the UK: A Practical Guide for Bangladeshi Students</h3><p class="mt-2 text-sm text-ink/60">Costs, entry requirements, visas, and scholarships — everything you need before applying.</p></div>
       </a>
       <a href="/study-in-usa" class="nav-link rounded-2xl border border-black/10 overflow-hidden block bg-white group">
-        <div class="h-44 overflow-hidden"><img src="/assets/blog/study-usa.jpg" alt="A map of the United States with a small American flag marker" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy"></div>
+        <div class="h-44 overflow-hidden"><Image src={blogStudyUsa} alt="A map of the United States with a small American flag marker" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" widths={[320, 480, 640]} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 100vw" /></div>
         <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Study Destinations</p><h3 class="mt-1 font-display font-bold text-bridge-900">Studying in the USA: What to Know Before Applying</h3><p class="mt-2 text-sm text-ink/60">Tuition ranges, the F-1 visa process, and how OPT works after graduation.</p></div>
       </a>
       <a href="/study-in-europe" class="nav-link rounded-2xl border border-black/10 overflow-hidden block bg-white group">
-        <div class="h-44 overflow-hidden"><img src="/assets/blog/study-europe.jpg" alt="A student traveller overlooking a harbour town on the European coastline" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy"></div>
+        <div class="h-44 overflow-hidden"><Image src={blogStudyEurope} alt="A student traveller overlooking a harbour town on the European coastline" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" widths={[320, 480, 640]} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 100vw" /></div>
         <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Study Destinations</p><h3 class="mt-1 font-display font-bold text-bridge-900">Studying in Europe: An Affordable Alternative Worth Considering</h3><p class="mt-2 text-sm text-ink/60">Where tuition is lowest, which countries teach in English, and what it really costs.</p></div>
       </a>
       <a href="/visa-interview-tips" class="nav-link rounded-2xl border border-black/10 overflow-hidden block bg-white group">
-        <div class="h-44 overflow-hidden"><img src="/assets/blog/visa-tips.jpg" alt="A student holding a passport and boarding pass in front of an airport window" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy"></div>
+        <div class="h-44 overflow-hidden"><Image src={blogVisaTips} alt="A student holding a passport and boarding pass in front of an airport window" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" widths={[320, 480, 640]} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 100vw" /></div>
         <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Visa Tips</p><h3 class="mt-1 font-display font-bold text-bridge-900">5 documents students forget before their visa interview</h3><p class="mt-2 text-sm text-ink/60">A quick checklist to make sure your file is complete before submission day.</p></div>
       </a>
       <a href="/find-scholarships" class="nav-link rounded-2xl border border-black/10 overflow-hidden block bg-white group">
-        <div class="h-44 overflow-hidden"><img src="/assets/blog/scholarships.jpg" alt="A graduation cap and diploma resting on a stack of books" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy"></div>
+        <div class="h-44 overflow-hidden"><Image src={blogScholarships} alt="A graduation cap and diploma resting on a stack of books" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" widths={[320, 480, 640]} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 100vw" /></div>
         <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Scholarships</p><h3 class="mt-1 font-display font-bold text-bridge-900">How to find scholarships you actually qualify for</h3><p class="mt-2 text-sm text-ink/60">Beyond the big-name awards — where smaller, less competitive funding hides.</p></div>
       </a>
       <a href="/first-month-abroad" class="nav-link rounded-2xl border border-black/10 overflow-hidden block bg-white group">
-        <div class="h-44 overflow-hidden"><img src="/assets/blog/life-abroad.jpg" alt="A group of international students walking together on a university campus" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy"></div>
+        <div class="h-44 overflow-hidden"><Image src={blogLifeAbroad} alt="A group of international students walking together on a university campus" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" widths={[320, 480, 640]} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 100vw" /></div>
         <div class="p-5"><p class="text-xs font-semibold uppercase tracking-wide text-sunrise-600">Life Abroad</p><h3 class="mt-1 font-display font-bold text-bridge-900">Your first month abroad: a practical checklist</h3><p class="mt-2 text-sm text-ink/60">Banking, SIM cards, groceries — the small things that make the first weeks easier.</p></div>
       </a>
     </div>

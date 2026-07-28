@@ -1,5 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import teamShahan from '../assets/team/shahan.jpg';
+import teamAriful from '../assets/team/ariful.jpg';
+import teamSunny from '../assets/team/sunny.jpg';
+import teamMehedi from '../assets/team/mehedi.jpg';
+import teamMim from '../assets/team/mim.jpg';
+import teamMahi from '../assets/team/mahi.jpg';
+import teamFahim from '../assets/team/fahim.jpg';
 const title = "About Us | CloudBridge Study Abroad Consultancy";
 const description = "Learn how CloudBridge supports students from university shortlisting to visa approval, with expert counsellors guiding every step abroad.";
 ---
@@ -213,40 +221,40 @@ const description = "Learn how CloudBridge supports students from university sho
       <div class="max-w-sm w-full">
         <div id="aboutTeamSlider">
         <div class="team-slide active flex-col items-center text-center" data-slide="0">
-          <img src="/assets/team/shahan.jpg" alt="Mohammed Shahan" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
+          <Image src={teamShahan} alt="Mohammed Shahan" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Mohammed Shahan</h3>
           <p class="text-sm text-ink/60">Founder &amp; CEO</p>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="1">
-          <img src="/assets/team/ariful.jpg" alt="Ariful Islam" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
+          <Image src={teamAriful} alt="Ariful Islam" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Ariful Islam</h3>
           <p class="text-sm text-ink/60">Branch Manager (UK Specialist)</p>
           <p class="text-xs text-ink/40">ID: 102042025</p>
           <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">UK Branch</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="2">
-          <img src="/assets/team/sunny.jpg" alt="Sunny Arafat" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
+          <Image src={teamSunny} alt="Sunny Arafat" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Sunny Arafat</h3>
           <p class="text-sm text-ink/60">Sr. Executive — Digital Marketing</p>
           <p class="text-xs text-ink/40">ID: 52012026</p>
           <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Branch</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="3">
-          <img src="/assets/team/mehedi.jpg" alt="Mehedi Hasan" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
+          <Image src={teamMehedi} alt="Mehedi Hasan" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Mehedi Hasan</h3>
           <p class="text-sm text-ink/60">Administrative Executive</p>
           <p class="text-xs text-ink/40">ID: 201042025</p>
           <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Branch</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="4">
-          <img src="/assets/team/mim.jpg" alt="Kazi Mim" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
+          <Image src={teamMim} alt="Kazi Mim" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Kazi Mim</h3>
           <p class="text-sm text-ink/60">Application Team</p>
           <p class="text-xs text-ink/40">ID: 301042025</p>
           <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Branch</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="5">
-          <img src="/assets/team/mahi.jpg" alt="Mahpara Jahan Mahi" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
+          <Image src={teamMahi} alt="Mahpara Jahan Mahi" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Mahpara Jahan Mahi</h3>
           <p class="text-sm text-ink/60">Senior Counselor</p>
           <p class="text-xs text-ink/40">ID: 501012026</p>
@@ -267,7 +275,7 @@ const description = "Learn how CloudBridge supports students from university sho
           <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Branch</a>
         </div>
         <div class="team-slide flex-col items-center text-center" data-slide="10">
-          <img src="/assets/team/fahim.jpg" alt="Fahim" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover">
+          <Image src={teamFahim} alt="Fahim" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
           <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Fahim</h3>
           <p class="text-sm text-ink/60">Executive — Operations</p>
           <p class="text-xs text-ink/40">ID: 01012026</p>

@@ -1,4 +1,8 @@
 ---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
+import logoWhite from '../assets/logo-white.png';
+
 export interface Props {
   title: string;
   description: string;
@@ -164,7 +168,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <header id="siteHeader" class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-black/5 shadow-md transition-transform duration-300">
   <div class="w-full px-4 md:px-8 lg:px-[198px] py-[7px] flex items-center justify-between gap-4">
     <a href="/" class="flex items-center nav-link shrink-0">
-      <img src="/assets/logo.png" alt="CloudBridge — Study Abroad Consultants" class="h-16 md:h-20 lg:h-24 w-auto object-contain">
+      <Image src={logo} alt="CloudBridge — Study Abroad Consultants" class="h-16 md:h-20 lg:h-24 w-auto object-contain" loading="eager" fetchpriority="high" widths={[128, 256, 384]} sizes="(min-width: 1024px) 96px, (min-width: 768px) 80px, 64px" />
     </a>
     <nav class="hidden md:flex items-center gap-1 text-[21px] font-medium font-display">
       <a href="/" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="home">Home</a>
@@ -273,7 +277,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <div class="grid md:grid-cols-4 gap-10 lg:gap-16">
       <div>
         <a href="/" onclick="return spaNav(event,'home')" class="nav-link inline-flex items-center">
-          <img src="/assets/logo-white.png" alt="CloudBridge — Study Abroad Consultants" class="h-20 md:h-24 w-auto object-contain">
+          <Image src={logoWhite} alt="CloudBridge — Study Abroad Consultants" class="h-20 md:h-24 w-auto object-contain" widths={[128, 256, 384]} sizes="(min-width: 768px) 96px, 80px" />
         </a>
         <p class="mt-4 max-w-xs text-sm text-white/60">Your trusted partner for studying abroad — from university shortlisting to visa approval.</p>
         <a href="/about" onclick="return spaNav(event,'about')" class="nav-link footer-btn-red inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold text-white mt-6">Read More</a>

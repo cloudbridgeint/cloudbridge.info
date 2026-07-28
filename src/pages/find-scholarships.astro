@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import blogScholarships from '../assets/blog/scholarships.jpg';
 const title = "How to Find Scholarships You Actually Qualify For | CloudBridge";
 const description = "Where scholarship money really is, whether you need top grades, and when to apply — a practical guide to funding your studies abroad.";
 ---
@@ -16,7 +18,7 @@ const description = "Where scholarship money really is, whether you need top gra
     <h1 class="mt-4 text-3xl md:text-4xl font-extrabold text-bridge-950 leading-tight">How to Find Scholarships You Actually Qualify For</h1>
     <p class="mt-4 text-sm text-ink/50">Updated July 2026 · 8 min read</p>
     <div class="mt-8 rounded-2xl overflow-hidden">
-      <img src="/assets/blog/scholarships.jpg" alt="A graduation cap and diploma resting on a stack of books" class="w-full h-auto object-cover" width="1200" height="550" loading="eager">
+      <Image src={blogScholarships} alt="A graduation cap and diploma resting on a stack of books" class="w-full h-auto object-cover" loading="eager" fetchpriority="high" widths={[480, 768, 1200]} sizes="(min-width: 768px) 700px, 100vw" />
     </div>
 
     <p class="mt-8 text-lg text-ink/70 leading-relaxed">Most students only look at the two or three most famous scholarships for their target country, decide they're too competitive, and stop looking. That's a mistake — the majority of scholarship money isn't in those big-name awards at all, it's in smaller, less competitive, university-specific and country-specific funding that barely anyone applies for. Here's how to actually find it.</p>

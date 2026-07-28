@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import blogVisaTips from '../assets/blog/visa-tips.jpg';
 const title = "5 Documents Students Forget Before Their Visa Interview | CloudBridge";
 const description = "What to bring to your student visa interview, why applications get refused, and how to answer common visa interview questions.";
 ---
@@ -16,7 +18,7 @@ const description = "What to bring to your student visa interview, why applicati
     <h1 class="mt-4 text-3xl md:text-4xl font-extrabold text-bridge-950 leading-tight">5 Documents Students Forget Before Their Visa Interview (And How to Prepare)</h1>
     <p class="mt-4 text-sm text-ink/50">Updated July 2026 · 7 min read</p>
     <div class="mt-8 rounded-2xl overflow-hidden">
-      <img src="/assets/blog/visa-tips.jpg" alt="A student holding a passport and boarding pass in front of an airport window" class="w-full h-auto object-cover" width="1200" height="674" loading="eager">
+      <Image src={blogVisaTips} alt="A student holding a passport and boarding pass in front of an airport window" class="w-full h-auto object-cover" loading="eager" fetchpriority="high" widths={[480, 768, 1200]} sizes="(min-width: 768px) 700px, 100vw" />
     </div>
 
     <p class="mt-8 text-lg text-ink/70 leading-relaxed">A surprising number of student visa applications aren't rejected because of grades or funding — they stall because one document was missing, out of date, or didn't match what the university reported. Here's exactly what to have ready, what actually gets asked in the interview, and why applications get refused so you can avoid the same mistakes.</p>
