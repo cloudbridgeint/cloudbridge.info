@@ -53,7 +53,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     }
   }
 </script>
-<style>
+<style is:global>
   html { scroll-behavior: smooth; }
   body { font-family: 'Lato', sans-serif; }
   h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Inter', sans-serif; }
