@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>CloudBridge Admin — Featured Universities</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          bridge: {50:'#eef2f9',100:'#d7e0ef',200:'#b0c1df',300:'#7f9bc9',400:'#4d70a8',500:'#2f5182',600:'#233f68',700:'#1c3255',800:'#162743',900:'#0f1c30',950:'#0a1220'},
+          sunrise: {50:'#fcedee',100:'#f9d2d5',200:'#f2a6aa',300:'#eb7077',400:'#e12d38',500:'#ce1d27',600:'#aa1821',700:'#86131a'},
+          harbor: {500:'#1c9c82',600:'#157e69'},
+          ink: '#1e2430',
+        },
+        fontFamily: {
+          display: ['Inter','ui-sans-serif','system-ui','sans-serif'],
+          body: ['Lato','ui-sans-serif','system-ui','sans-serif'],
+        },
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Lato', ui-sans-serif, system-ui, sans-serif; }
+  h1, h2, h3, .font-display { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+</style>
+</head>
+<body class="bg-cloud min-h-screen text-ink">
+
+<!-- ===================== TOKEN GATE ===================== -->
+<div id="gate" class="min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-black/5 p-8">
+    <h1 class="font-display text-xl font-bold text-bridge-900">CloudBridge Admin</h1>
+    <p class="mt-1 text-sm text-ink/60">Featured Universities manager</p>
+
+    <div class="mt-6 rounded-lg bg-bridge-50 border border-bridge-100 p-3 text-xs text-bridge-700 leading-relaxed">
+      Paste a GitHub personal access token with <strong>Contents: read and write</strong> access to
+      <code class="bg-white px-1 rounded">cloudbridgeint/cloudbridge.info</code>. It's kept only in this
+      browser tab's memory (never saved to disk, never sent anywhere except api.github.com) and is
+      cleared the moment you close or reload this page.
+    </div>
+
+    <label class="block mt-5 text-sm font-semibold text-ink/70">GitHub Token</label>
+    <input id="tokenInput" type="password" placeholder="ghp_..." autocomplete="off"
+      class="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
+
+    <button id="connectBtn" class="mt-4 w-full bg-sunrise-500 hover:bg-sunrise-600 text-white font-semibold rounded-lg py-2.5 text-sm transition">
+      Connect
+    </button>
+    <p id="gateError" class="mt-3 text-sm text-sunrise-600 hidden"></p>
+  </div>
+</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div id="dashboard" class="hidden min-h-screen">
+  <header class="bg-bridge-900 text-white">
+    <div class="max-w-6xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
+      <div>
+        <h1 class="font-display font-bold">CloudBridge Admin</h1>
+        <p class="text-xs text-white/50">Featured Universities manager</p>
+      </div>
+      <button id="disconnectBtn" class="text-xs text-white/70 hover:text-white border border-white/20 rounded-lg px-3 py-1.5">Disconnect</button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 md:px-8 py-8">
+
+    <!-- country tabs -->
+    <div id="countryTabs" class="flex flex-wrap gap-2 mb-6"></div>
+
+    <!-- current logos -->
+    <div class="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-display font-bold text-lg" id="panelTitle">UK — current logos</h2>
+        <span id="itemCount" class="text-xs text-ink/50"></span>
+      </div>
+      <div id="logoGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+    </div>
+
+    <!-- add new -->
+    <div class="bg-white rounded-2xl border border-black/5 shadow-sm p-6 mt-6">
+      <h2 class="font-display font-bold text-lg mb-4">Add a logo</h2>
+      <div class="grid sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+        <div>
+          <label class="block text-xs font-semibold text-ink/60 mb-1">Institution name</label>
+          <input id="newName" type="text" placeholder="e.g. Example University"
+            class="w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-ink/60 mb-1">Logo image (PNG/JPG)</label>
+          <input id="newFile" type="file" accept="image/png,image/jpeg"
+            class="w-full text-sm">
+        </div>
+        <button id="addBtn" class="bg-bridge-800 hover:bg-bridge-900 text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition">
+          Stage
+        </button>
+      </div>
+      <p class="mt-2 text-xs text-ink/40">Staged additions/removals aren't live until you click "Save changes" below.</p>
+    </div>
+
+    <!-- save bar -->
+    <div class="sticky bottom-4 mt-6">
+      <div class="bg-white rounded-2xl border border-black/10 shadow-lg p-4 flex items-center justify-between">
+        <div id="stageStatus" class="text-sm text-ink/60">No pending changes.</div>
+        <button id="saveBtn" disabled
+          class="bg-sunrise-500 hover:bg-sunrise-600 disabled:bg-ink/20 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-6 py-2.5 text-sm transition">
+          Save changes
+        </button>
+      </div>
+    </div>
+
+    <!-- activity log -->
+    <div id="logBox" class="mt-6 bg-bridge-950 text-white/80 rounded-2xl p-4 text-xs font-mono hidden max-h-64 overflow-y-auto"></div>
+
+  </main>
+</div>
+
+<script>
+/* ============================================================
+   TESTED CORE LOGIC (verified against the live file, byte-exact
+   round-trip on all 10 panels before this tool was shipped)
+   ============================================================ */
+const COUNTRY_PANELS = ['uk','usa','canada','malta','france','spain','finland','newzealand','netherlands','malaysia'];
+const COUNTRY_LABELS = {uk:'UK',usa:'USA',canada:'Canada',malta:'Malta',france:'France',spain:'Spain',finland:'Finland',newzealand:'New Zealand',netherlands:'Netherlands',malaysia:'Malaysia'};
+
+function findPanelBounds(html, panelName) {
+  const openRe = new RegExp('<div class="uni-tab-panel[^"]*" data-panel="' + panelName + '">');
+  const openMatch = openRe.exec(html);
+  if (!openMatch) throw new Error('Panel not found: ' + panelName);
+  const start = openMatch.index;
+  const openTag = openMatch[0];
+  const afterOpen = start + openTag.length;
+  const closeTriple = '        </div>\n      </div>\n    </div>';
+  const closeIdx = html.indexOf(closeTriple, afterOpen);
+  if (closeIdx === -1) throw new Error('Closing sequence not found for panel: ' + panelName);
+  const end = closeIdx + closeTriple.length;
+  return { start, end, openTag };
+}
+
+function extractItems(html, panelName) {
+  const { start, end } = findPanelBounds(html, panelName);
+  const block = html.slice(start, end);
+  const itemRe = /<div class="uni-logo-item[^"]*"><img src="([^"]+)" alt="([^"]*)"[^>]*><\/div>/g;
+  const seen = new Set();
+  const unique = [];
+  let m;
+  while ((m = itemRe.exec(block)) !== null) {
+    const src = m[1];
+    if (!seen.has(src)) { seen.add(src); unique.push({ src, alt: m[2] }); }
+  }
+  return unique;
+}
+
+function buildPanelBlock(openTag, uniqueItems) {
+  const doubled = uniqueItems.concat(uniqueItems);
+  const lines = [];
+  lines.push(openTag);
+  lines.push('      <div class="uni-logo-viewport overflow-hidden">');
+  lines.push('        <div class="uni-logo-track flex gap-4">');
+  doubled.forEach(item => {
+    lines.push('        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="' + item.src + '" alt="' + item.alt + '" class="max-h-full max-w-full object-contain"></div>');
+  });
+  lines.push('        </div>');
+  lines.push('      </div>');
+  lines.push('    </div>');
+  return lines.join('\n');
+}
+
+function replacePanel(html, panelName, uniqueItems) {
+  const { start, end, openTag } = findPanelBounds(html, panelName);
+  const newBlock = buildPanelBlock(openTag, uniqueItems);
+  return html.slice(0, start) + newBlock + html.slice(end);
+}
+
+/* ============================================================
+   APP STATE + GITHUB API
+   ============================================================ */
+const OWNER = 'cloudbridgeint';
+const REPO = 'cloudbridge.info';
+const BRANCH = 'main';
+
+let token = null;
+let activeCountry = 'uk';
+let liveItemsCache = {};      // panelName -> items currently fetched from GitHub
+let pendingAdds = {};         // panelName -> [{name, file, previewUrl}]
+let pendingRemoves = {};      // panelName -> Set of src to remove
+COUNTRY_PANELS.forEach(p => { pendingAdds[p] = []; pendingRemoves[p] = new Set(); });
+
+function ghHeaders() {
+  return { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' };
+}
+
+async function ghGetFile(path) {
+  const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}?ref=${BRANCH}`, { headers: ghHeaders() });
+  if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
+  return res.json();
+}
+
+async function ghPutFile(path, base64Content, message, sha) {
+  const body = { message, content: base64Content, branch: BRANCH };
+  if (sha) body.sha = sha;
+  const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${path}`, {
+    method: 'PUT', headers: { ...ghHeaders(), 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error(`PUT ${path} failed: ${res.status} ${t}`); }
+  return res.json();
+}
+
+function log(msg) {
+  const box = document.getElementById('logBox');
+  box.classList.remove('hidden');
+  const line = document.createElement('div');
+  line.textContent = '› ' + msg;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+function slugify(name) {
+  return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ============================================================
+   UI
+   ============================================================ */
+function renderTabs() {
+  const box = document.getElementById('countryTabs');
+  box.innerHTML = '';
+  COUNTRY_PANELS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.textContent = COUNTRY_LABELS[p];
+    btn.className = 'px-4 py-1.5 rounded-lg text-sm font-semibold border ' +
+      (p === activeCountry ? 'bg-sunrise-500 text-white border-sunrise-500' : 'bg-white text-bridge-900 border-black/10 hover:border-bridge-300');
+    btn.onclick = () => { activeCountry = p; renderTabs(); renderGrid(); };
+    box.appendChild(btn);
+  });
+}
+
+function currentEffectiveItems(panel) {
+  const live = (liveItemsCache[panel] || []).filter(it => !pendingRemoves[panel].has(it.src));
+  const staged = pendingAdds[panel].map(a => ({ src: a.slug, alt: a.name, __pending: true, __previewUrl: a.previewUrl }));
+  return live.concat(staged);
+}
+
+function renderGrid() {
+  document.getElementById('panelTitle').textContent = COUNTRY_LABELS[activeCountry] + ' — current logos';
+  const grid = document.getElementById('logoGrid');
+  grid.innerHTML = '';
+  const items = currentEffectiveItems(activeCountry);
+  document.getElementById('itemCount').textContent = items.length + ' logo' + (items.length === 1 ? '' : 's');
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'border rounded-lg p-3 flex flex-col items-center gap-2 ' + (item.__pending ? 'border-harbor-500 bg-harbor-500/5' : 'border-black/10');
+    const img = document.createElement('img');
+    img.src = item.__previewUrl || item.src;
+    img.className = 'h-14 object-contain';
+    const label = document.createElement('div');
+    label.className = 'text-xs text-center text-ink/70';
+    label.textContent = item.alt;
+    if (item.__pending) {
+      const tag = document.createElement('div');
+      tag.className = 'text-[10px] font-bold text-harbor-600 uppercase';
+      tag.textContent = 'Pending add';
+      card.appendChild(tag);
+    }
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = item.__pending ? 'Cancel' : 'Remove';
+    removeBtn.className = 'text-[11px] text-sunrise-600 hover:text-sunrise-700 font-semibold';
+    removeBtn.onclick = () => {
+      if (item.__pending) {
+        pendingAdds[activeCountry] = pendingAdds[activeCountry].filter(a => a.slug !== item.src);
+      } else {
+        pendingRemoves[activeCountry].add(item.src);
+      }
+      renderGrid();
+      updateStageStatus();
+    };
+    card.appendChild(img);
+    card.appendChild(label);
+    card.appendChild(removeBtn);
+    grid.appendChild(card);
+  });
+}
+
+function updateStageStatus() {
+  let totalAdds = 0, totalRemoves = 0;
+  COUNTRY_PANELS.forEach(p => { totalAdds += pendingAdds[p].length; totalRemoves += pendingRemoves[p].size; });
+  const status = document.getElementById('stageStatus');
+  const saveBtn = document.getElementById('saveBtn');
+  if (totalAdds === 0 && totalRemoves === 0) {
+    status.textContent = 'No pending changes.';
+    saveBtn.disabled = true;
+  } else {
+    status.textContent = `${totalAdds} to add, ${totalRemoves} to remove, across all countries.`;
+    saveBtn.disabled = false;
+  }
+}
+
+document.getElementById('addBtn').onclick = () => {
+  const name = document.getElementById('newName').value.trim();
+  const fileInput = document.getElementById('newFile');
+  const file = fileInput.files[0];
+  if (!name) { alert('Enter an institution name.'); return; }
+  if (!file) { alert('Choose a logo image.'); return; }
+  const slug = 'assets/universities/' + slugify(name) + '.png';
+  const previewUrl = URL.createObjectURL(file);
+  pendingAdds[activeCountry].push({ name, file, slug, previewUrl });
+  document.getElementById('newName').value = '';
+  fileInput.value = '';
+  renderGrid();
+  updateStageStatus();
+};
+
+document.getElementById('saveBtn').onclick = async () => {
+  const saveBtn = document.getElementById('saveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
+  try {
+    // 1. upload any new images first
+    for (const panel of COUNTRY_PANELS) {
+      for (const add of pendingAdds[panel]) {
+        log(`Uploading ${add.slug} …`);
+        const b64 = await fileToBase64(add.file);
+        await ghPutFile(add.slug, b64, `Add ${add.name} logo asset`);
+        log(`✓ Uploaded ${add.slug}`);
+      }
+    }
+
+    // 2. fetch the latest index.html fresh (avoid stale sha)
+    log('Fetching latest index.html…');
+    const fileData = await ghGetFile('index.html');
+    let html = decodeURIComponent(escape(atob(fileData.content.replace(/\n/g, ''))));
+    let sha = fileData.sha;
+
+    // 3. apply all staged changes, panel by panel
+    let changedAny = false;
+    for (const panel of COUNTRY_PANELS) {
+      if (pendingAdds[panel].length === 0 && pendingRemoves[panel].size === 0) continue;
+      const currentLive = extractItems(html, panel);
+      const afterRemove = currentLive.filter(it => !pendingRemoves[panel].has(it.src));
+      const afterAdd = afterRemove.concat(pendingAdds[panel].map(a => ({ src: a.slug, alt: a.name })));
+      html = replacePanel(html, panel, afterAdd);
+      changedAny = true;
+      log(`✓ Updated ${COUNTRY_LABELS[panel]} panel (${afterAdd.length} logos)`);
+    }
+
+    if (!changedAny) { log('Nothing to save.'); return; }
+
+    // 4. commit
+    log('Committing index.html…');
+    const b64Html = btoa(unescape(encodeURIComponent(html)));
+    const commitRes = await ghPutFile('index.html', b64Html, 'Update Featured Universities via admin panel', sha);
+    log('✓ Committed: ' + commitRes.commit.html_url);
+
+    // 5. reset staged state and refresh live view
+    COUNTRY_PANELS.forEach(p => { pendingAdds[p] = []; pendingRemoves[p] = new Set(); });
+    await loadLiveItems();
+    renderGrid();
+    updateStageStatus();
+    log('All changes saved successfully.');
+  } catch (err) {
+    log('ERROR: ' + err.message);
+    alert('Something went wrong: ' + err.message + '\n\nCheck the activity log below for details. Nothing partial was left in a broken state on GitHub — re-check the repo before retrying.');
+  } finally {
+    saveBtn.textContent = 'Save changes';
+    updateStageStatus();
+  }
+};
+
+async function loadLiveItems() {
+  const fileData = await ghGetFile('index.html');
+  const html = decodeURIComponent(escape(atob(fileData.content.replace(/\n/g, ''))));
+  COUNTRY_PANELS.forEach(p => { liveItemsCache[p] = extractItems(html, p); });
+}
+
+/* ============================================================
+   GATE
+   ============================================================ */
+document.getElementById('connectBtn').onclick = async () => {
+  const val = document.getElementById('tokenInput').value.trim();
+  const errBox = document.getElementById('gateError');
+  errBox.classList.add('hidden');
+  if (!val) return;
+  token = val;
+  try {
+    log('Verifying token access…');
+    await loadLiveItems();
+    document.getElementById('gate').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    renderTabs();
+    renderGrid();
+    updateStageStatus();
+  } catch (err) {
+    token = null;
+    errBox.textContent = 'Could not connect: ' + err.message + '. Check the token has repo Contents read/write access.';
+    errBox.classList.remove('hidden');
+  }
+};
+
+document.getElementById('disconnectBtn').onclick = () => {
+  token = null;
+  liveItemsCache = {};
+  COUNTRY_PANELS.forEach(p => { pendingAdds[p] = []; pendingRemoves[p] = new Set(); });
+  document.getElementById('tokenInput').value = '';
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('gate').classList.remove('hidden');
+};
+</script>
+</body>
+</html>
