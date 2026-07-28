@@ -55,3 +55,57 @@ export function mediaUrl(idOrUrl: string | null | undefined, fallback: string): 
   if (idOrUrl.startsWith('media:')) return `/api/media/${idOrUrl.slice(6)}`;
   return idOrUrl;
 }
+
+// ---- Analytics ----
+
+export async function getVisitSummary(db: D1Like) {
+  const total = await db.prepare('SELECT COUNT(*) as n FROM visits').first();
+  const today = await db.prepare("SELECT COUNT(*) as n FROM visits WHERE date(created_at) = date('now')").first();
+  const thisMonth = await db.prepare("SELECT COUNT(*) as n FROM visits WHERE strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')").first();
+  const thisYear = await db.prepare("SELECT COUNT(*) as n FROM visits WHERE strftime('%Y', created_at) = strftime('%Y', 'now')").first();
+  return {
+    total: (total as any)?.n ?? 0,
+    today: (today as any)?.n ?? 0,
+    thisMonth: (thisMonth as any)?.n ?? 0,
+    thisYear: (thisYear as any)?.n ?? 0,
+  };
+}
+
+export async function getVisitsByDay(db: D1Like, days = 30) {
+  const { results } = await db.prepare(
+    `SELECT date(created_at) as label, COUNT(*) as n FROM visits
+     WHERE created_at >= datetime('now', ?)
+     GROUP BY label ORDER BY label ASC`
+  ).bind(`-${days} days`).all();
+  return results as any[];
+}
+
+export async function getVisitsByMonth(db: D1Like, months = 12) {
+  const { results } = await db.prepare(
+    `SELECT strftime('%Y-%m', created_at) as label, COUNT(*) as n FROM visits
+     WHERE created_at >= datetime('now', ?)
+     GROUP BY label ORDER BY label ASC`
+  ).bind(`-${months} months`).all();
+  return results as any[];
+}
+
+export async function getVisitsByYear(db: D1Like) {
+  const { results } = await db.prepare(
+    `SELECT strftime('%Y', created_at) as label, COUNT(*) as n FROM visits GROUP BY label ORDER BY label ASC`
+  ).all();
+  return results as any[];
+}
+
+export async function getTopPages(db: D1Like, limit = 8) {
+  const { results } = await db.prepare(
+    `SELECT path, COUNT(*) as n FROM visits GROUP BY path ORDER BY n DESC LIMIT ?`
+  ).bind(limit).all();
+  return results as any[];
+}
+
+export async function getTopCountries(db: D1Like, limit = 8) {
+  const { results } = await db.prepare(
+    `SELECT COALESCE(NULLIF(country,''), 'Unknown') as country, COUNT(*) as n FROM visits GROUP BY country ORDER BY n DESC LIMIT ?`
+  ).bind(limit).all();
+  return results as any[];
+}

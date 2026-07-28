@@ -1,0 +1,154 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getVisitSummary, getVisitsByDay, getVisitsByMonth, getVisitsByYear, getTopPages, getTopCountries } from '../../lib/content';
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const summary = await getVisitSummary(db);
+const byDay = await getVisitsByDay(db, 30);
+const byMonth = await getVisitsByMonth(db, 12);
+const byYear = await getVisitsByYear(db);
+const topPages = await getTopPages(db, 8);
+const topCountries = await getTopCountries(db, 8);
+
+const maxDay = Math.max(1, ...byDay.map((r: any) => r.n));
+const maxMonth = Math.max(1, ...byMonth.map((r: any) => r.n));
+const maxYear = Math.max(1, ...byYear.map((r: any) => r.n));
+const maxPage = Math.max(1, ...topPages.map((r: any) => r.n));
+const maxCountry = Math.max(1, ...topCountries.map((r: any) => r.n));
+
+function monthLabel(ym: string) {
+  const [y, m] = ym.split('-');
+  const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${names[parseInt(m,10)-1]} '${y.slice(2)}`;
+}
+function dayLabel(d: string) {
+  const dt = new Date(d + 'T00:00:00Z');
+  return `${dt.getUTCDate()}/${dt.getUTCMonth()+1}`;
+}
+---
+<AdminLayout title="Analytics" active="analytics">
+  <h1 class="text-2xl font-bold text-bridge-950">Visitor Analytics</h1>
+  <p class="text-slate-500 mt-1 text-sm">Live traffic to the public site — tracked automatically on every page view.</p>
+
+  <!-- Summary cards -->
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+    <div class="rounded-2xl p-5 ring-1 ring-black/5 shadow-sm bg-gradient-to-br from-bridge-900 to-bridge-950 text-white">
+      <p class="text-white/60 text-xs font-medium uppercase tracking-wide">Total Visits</p>
+      <p class="text-3xl font-extrabold mt-2">{summary.total.toLocaleString()}</p>
+    </div>
+    <div class="rounded-2xl p-5 ring-1 ring-black/5 shadow-sm bg-white">
+      <p class="text-slate-400 text-xs font-medium uppercase tracking-wide">Today</p>
+      <p class="text-3xl font-extrabold text-bridge-950 mt-2">{summary.today.toLocaleString()}</p>
+    </div>
+    <div class="rounded-2xl p-5 ring-1 ring-black/5 shadow-sm bg-white">
+      <p class="text-slate-400 text-xs font-medium uppercase tracking-wide">This Month</p>
+      <p class="text-3xl font-extrabold text-bridge-950 mt-2">{summary.thisMonth.toLocaleString()}</p>
+    </div>
+    <div class="rounded-2xl p-5 ring-1 ring-black/5 shadow-sm bg-gradient-to-br from-sunrise-600 to-red-800 text-white">
+      <p class="text-white/70 text-xs font-medium uppercase tracking-wide">This Year</p>
+      <p class="text-3xl font-extrabold mt-2">{summary.thisYear.toLocaleString()}</p>
+    </div>
+  </div>
+
+  <!-- Daily chart -->
+  <div class="mt-6 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+    <h2 class="font-semibold text-bridge-950 mb-4">Last 30 Days</h2>
+    {byDay.length === 0 ? (
+      <p class="text-slate-400 text-sm">No visit data yet.</p>
+    ) : (
+      <div class="flex items-end gap-1 h-40">
+        {byDay.map((r: any) => (
+          <div class="flex-1 flex flex-col items-center justify-end h-full group relative">
+            <div class="w-full rounded-t-md bg-gradient-to-t from-bridge-800 to-bridge-500 hover:from-sunrise-700 hover:to-sunrise-500 transition-all" style={`height:${Math.max((r.n / maxDay) * 100, 4)}%`}></div>
+            <span class="absolute -top-6 opacity-0 group-hover:opacity-100 transition text-[10px] bg-bridge-950 text-white rounded px-1.5 py-0.5 whitespace-nowrap">{r.label}: {r.n}</span>
+          </div>
+        ))}
+      </div>
+    )}
+    <div class="flex justify-between mt-2 text-[10px] text-slate-400">
+      <span>{byDay[0] ? dayLabel(byDay[0].label) : ''}</span>
+      <span>{byDay.length ? dayLabel(byDay[byDay.length-1].label) : ''}</span>
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-6 mt-6">
+    <!-- Monthly chart -->
+    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <h2 class="font-semibold text-bridge-950 mb-4">Last 12 Months</h2>
+      {byMonth.length === 0 ? (
+        <p class="text-slate-400 text-sm">No visit data yet.</p>
+      ) : (
+        <div class="space-y-2.5">
+          {byMonth.map((r: any) => (
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-slate-500 w-14 shrink-0">{monthLabel(r.label)}</span>
+              <div class="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-bridge-700 to-bridge-900" style={`width:${Math.max((r.n / maxMonth) * 100, 3)}%`}></div>
+              </div>
+              <span class="text-xs font-semibold text-bridge-950 w-8 text-right shrink-0">{r.n}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <!-- Yearly chart -->
+    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <h2 class="font-semibold text-bridge-950 mb-4">By Year</h2>
+      {byYear.length === 0 ? (
+        <p class="text-slate-400 text-sm">No visit data yet.</p>
+      ) : (
+        <div class="space-y-3">
+          {byYear.map((r: any) => (
+            <div class="flex items-center gap-3">
+              <span class="text-sm text-slate-600 w-12 shrink-0 font-medium">{r.label}</span>
+              <div class="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-sunrise-700 to-sunrise-600" style={`width:${Math.max((r.n / maxYear) * 100, 3)}%`}></div>
+              </div>
+              <span class="text-sm font-bold text-bridge-950 w-10 text-right shrink-0">{r.n}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-6 mt-6">
+    <!-- Top pages -->
+    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <h2 class="font-semibold text-bridge-950 mb-4">Top Pages</h2>
+      {topPages.length === 0 ? <p class="text-slate-400 text-sm">No data yet.</p> : (
+        <div class="space-y-2.5">
+          {topPages.map((r: any) => (
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-slate-600 flex-1 truncate font-mono">{r.path}</span>
+              <div class="w-24 bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div class="h-full rounded-full bg-bridge-700" style={`width:${Math.max((r.n / maxPage) * 100, 3)}%`}></div>
+              </div>
+              <span class="text-xs font-semibold text-bridge-950 w-8 text-right">{r.n}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <!-- Top countries -->
+    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <h2 class="font-semibold text-bridge-950 mb-4">Top Countries</h2>
+      {topCountries.length === 0 ? <p class="text-slate-400 text-sm">No data yet.</p> : (
+        <div class="space-y-2.5">
+          {topCountries.map((r: any) => (
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-slate-600 flex-1 truncate">{r.country}</span>
+              <div class="w-24 bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div class="h-full rounded-full bg-sunrise-600" style={`width:${Math.max((r.n / maxCountry) * 100, 3)}%`}></div>
+              </div>
+              <span class="text-xs font-semibold text-bridge-950 w-8 text-right">{r.n}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+</AdminLayout>

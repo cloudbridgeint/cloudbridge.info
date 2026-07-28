@@ -14,6 +14,22 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 export const prerender = false;
 const db = (Astro.locals as any).runtime?.env?.DB;
 const cm = db ? await getAllContent(db) : {};
+
+// Log a page view for analytics (best-effort, never blocks or breaks the page)
+if (db) {
+  try {
+    const cf = (Astro.request as any).cf || {};
+    const referrer = Astro.request.headers.get('referer') || '';
+    const path = Astro.url.pathname;
+    (Astro.locals as any).runtime.ctx.waitUntil(
+      db.prepare('INSERT INTO visits (path, country, city, referrer) VALUES (?, ?, ?, ?)')
+        .bind(path, cf.country || '', cf.city || '', referrer)
+        .run()
+    );
+  } catch {
+    // never let analytics logging break the page
+  }
+}
 ---
 <!DOCTYPE html>
 <html lang="en">

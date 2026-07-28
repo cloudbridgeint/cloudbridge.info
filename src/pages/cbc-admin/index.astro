@@ -1,50 +1,90 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getVisitSummary, getVisitsByDay } from '../../lib/content';
 export const prerender = false;
 
 const db = (Astro.locals as any).runtime.env.DB;
-const [leadsCount, uniCount, blogCount, eventCount] = await Promise.all([
+const [leadsCount, uniCount, blogCount, eventCount, visits, byDay] = await Promise.all([
   db.prepare('SELECT COUNT(*) as n FROM leads').first(),
   db.prepare('SELECT COUNT(*) as n FROM universities WHERE active = 1').first(),
   db.prepare('SELECT COUNT(*) as n FROM blog_posts').first(),
   db.prepare('SELECT COUNT(*) as n FROM events').first(),
+  getVisitSummary(db),
+  getVisitsByDay(db, 14),
 ]);
 
-const cards = [
-  { label: 'Total Leads', value: leadsCount?.n ?? 0, href: '/cbc-admin/leads', color: 'bg-emerald-50 text-emerald-700' },
-  { label: 'Universities Listed', value: uniCount?.n ?? 0, href: '/cbc-admin/universities', color: 'bg-blue-50 text-blue-700' },
-  { label: 'Blog Posts', value: blogCount?.n ?? 0, href: '/cbc-admin/blogs', color: 'bg-purple-50 text-purple-700' },
-  { label: 'Events', value: eventCount?.n ?? 0, href: '/cbc-admin/events', color: 'bg-amber-50 text-amber-700' },
+const maxDay = Math.max(1, ...byDay.map((r: any) => r.n));
+
+const statCards = [
+  { label: 'Visitors Today', value: visits.today, icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12z', tone: 'from-bridge-900 to-bridge-950 text-white' },
+  { label: 'Visitors This Month', value: visits.thisMonth, icon: 'M8 2v4M16 2v4M3 9h18M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z', tone: 'bg-white text-bridge-950' },
+  { label: 'Total Leads', value: leadsCount?.n ?? 0, icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z', tone: 'bg-white text-bridge-950' },
+  { label: 'Blog Posts', value: blogCount?.n ?? 0, icon: 'M4 4h11a2 2 0 012 2v13a1 1 0 01-1.55.84L11 17l-4.45 2.84A1 1 0 015 19V6a2 2 0 012-2z', tone: 'from-sunrise-600 to-red-800 text-white' },
+];
+
+const quickLinks = [
+  { label: 'Edit Homepage Content', desc: 'Hero slides, sections, images', href: '/cbc-admin/homepage' },
+  { label: 'Manage Universities', desc: 'Add/remove featured logos', href: '/cbc-admin/universities' },
+  { label: 'Write a Blog Post', desc: 'Create and publish articles', href: '/cbc-admin/blogs' },
+  { label: 'View Full Analytics', desc: 'Visitor traffic, by day/month/year', href: '/cbc-admin/analytics' },
 ];
 ---
 <AdminLayout title="Dashboard" active="dashboard">
-  <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
-  <p class="text-slate-500 mt-1 text-sm">CloudBridge site content — quick overview.</p>
+  <p class="text-bridge-600 text-sm font-medium">Welcome back!</p>
+  <h1 class="text-2xl font-bold text-bridge-950">Dashboard</h1>
 
   <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-    {cards.map(c => (
-      <a href={c.href} class={`rounded-2xl p-5 shadow-sm ring-1 ring-black/5 hover:shadow-md transition ${c.color}`}>
+    {statCards.map(c => (
+      <div class={`rounded-2xl p-5 ring-1 ring-black/5 shadow-sm ${c.tone.startsWith('from') ? `bg-gradient-to-br ${c.tone}` : c.tone}`}>
+        <svg class="w-6 h-6 opacity-70 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={c.icon}/></svg>
         <p class="text-3xl font-extrabold">{c.value}</p>
-        <p class="text-sm font-medium mt-1">{c.label}</p>
-      </a>
+        <p class="text-sm font-medium mt-1 opacity-80">{c.label}</p>
+      </div>
     ))}
   </div>
 
-  <div class="mt-10 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
-    <h2 class="font-semibold text-slate-900 mb-3">Quick links</h2>
-    <div class="grid sm:grid-cols-2 gap-3 text-sm">
-      <a href="/cbc-admin/homepage" class="flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-bridge-700 hover:bg-bridge-50 transition">
-        <span>Edit Homepage Content (hero, sections, images)</span> <span>&rarr;</span>
-      </a>
-      <a href="/cbc-admin/universities" class="flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-bridge-700 hover:bg-bridge-50 transition">
-        <span>Manage Featured University Logos</span> <span>&rarr;</span>
-      </a>
-      <a href="/cbc-admin/blogs" class="flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-bridge-700 hover:bg-bridge-50 transition">
-        <span>Write / Publish Blog Posts</span> <span>&rarr;</span>
-      </a>
-      <a href="/cbc-admin/faq" class="flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-bridge-700 hover:bg-bridge-50 transition">
-        <span>Edit FAQ</span> <span>&rarr;</span>
-      </a>
+  <div class="grid lg:grid-cols-3 gap-6 mt-6">
+    <div class="lg:col-span-2 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-bridge-950">Visitors — Last 14 Days</h2>
+        <a href="/cbc-admin/analytics" class="text-xs font-medium text-bridge-700 hover:underline">Full analytics &rarr;</a>
+      </div>
+      {byDay.length === 0 ? (
+        <p class="text-slate-400 text-sm">No visit data yet — check back once the site gets traffic.</p>
+      ) : (
+        <div class="flex items-end gap-2 h-32">
+          {byDay.map((r: any) => (
+            <div class="flex-1 flex flex-col items-center justify-end h-full">
+              <div class="w-full rounded-t-md bg-gradient-to-t from-bridge-800 to-bridge-500" style={`height:${Math.max((r.n / maxDay) * 100, 4)}%`}></div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <h2 class="font-semibold text-bridge-950 mb-4">At a Glance</h2>
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between"><span class="text-slate-500">Total visits (all time)</span><span class="font-semibold text-bridge-950">{visits.total}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">This year</span><span class="font-semibold text-bridge-950">{visits.thisYear}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Universities listed</span><span class="font-semibold text-bridge-950">{uniCount?.n ?? 0}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Upcoming events</span><span class="font-semibold text-bridge-950">{eventCount?.n ?? 0}</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+    <h2 class="font-semibold text-bridge-950 mb-4">Quick Links</h2>
+    <div class="grid sm:grid-cols-2 gap-3">
+      {quickLinks.map(l => (
+        <a href={l.href} class="flex items-center justify-between px-4 py-3.5 rounded-xl border border-slate-200 hover:border-bridge-700 hover:bg-bridge-50 transition">
+          <div>
+            <p class="text-sm font-semibold text-bridge-950">{l.label}</p>
+            <p class="text-xs text-slate-400 mt-0.5">{l.desc}</p>
+          </div>
+          <span class="text-slate-300">&rarr;</span>
+        </a>
+      ))}
     </div>
   </div>
 </AdminLayout>
