@@ -41,6 +41,7 @@ export const prerender = false;
     @media (prefers-reduced-motion: reduce) {
       .bg-kenburns { animation: none; }
     }
+    #bgVideo { transition: opacity 0.4s linear; }
   </style>
 </head>
 <body class="min-h-screen relative flex items-center justify-center px-4 overflow-hidden">
@@ -102,6 +103,27 @@ export const prerender = false;
     setSlowRate();
     bgVideo.addEventListener('loadedmetadata', setSlowRate);
     bgVideo.addEventListener('play', setSlowRate);
+
+    // Smooth fade near the loop point so the seam feels seamless instead of a jump-cut
+    const FADE_WINDOW = 0.6; // seconds of *video* time
+    let lastTime = 0;
+    bgVideo.addEventListener('timeupdate', () => {
+      const t = bgVideo.currentTime;
+      const d = bgVideo.duration || 0;
+      if (d && d - t < FADE_WINDOW) {
+        bgVideo.style.transition = 'none';
+        bgVideo.style.opacity = String(Math.max((d - t) / FADE_WINDOW, 0));
+      } else if (t < lastTime) {
+        // just wrapped back to the start
+        bgVideo.style.transition = 'none';
+        bgVideo.style.opacity = '0';
+        requestAnimationFrame(() => {
+          bgVideo.style.transition = 'opacity 0.5s ease-in';
+          bgVideo.style.opacity = '1';
+        });
+      }
+      lastTime = t;
+    });
   </script>
 
   <script is:inline>
