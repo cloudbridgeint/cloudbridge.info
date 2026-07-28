@@ -1,6 +1,5 @@
 ---
 import logo from '../../assets/logo.png';
-import bgImage from '../../assets/hero/slide1.jpg';
 export const prerender = false;
 ---
 <!DOCTYPE html>
@@ -46,8 +45,10 @@ export const prerender = false;
 </head>
 <body class="min-h-screen relative flex items-center justify-center px-4 overflow-hidden">
 
-  <!-- Background image with slow cinematic zoom/pan (Ken Burns effect) -->
-  <img src={bgImage.src} alt="" class="bg-kenburns absolute inset-0 w-full h-full object-cover">
+  <!-- Background video (test clip) -->
+  <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
+    <source src="/videos/login-bg-test.mp4" type="video/mp4">
+  </video>
   <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(6,13,30,0.5) 0%, rgba(6,13,30,0.7) 100%)"></div>
 
   <!-- Top-left brand mark -->
