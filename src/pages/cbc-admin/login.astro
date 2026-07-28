@@ -1,5 +1,6 @@
 ---
 import logo from '../../assets/logo.png';
+import bgImage from '../../assets/hero/slide1.jpg';
 export const prerender = false;
 ---
 <!DOCTYPE html>
@@ -16,24 +17,66 @@ export const prerender = false;
       sunrise: { 600:'#aa1821' },
     } } } };
   </script>
+  <style is:global>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .glass-card {
+      background: rgba(15, 28, 48, 0.45);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    .glass-input {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+    }
+    .glass-input::placeholder { color: rgba(255,255,255,0.55); }
+    .glass-input:focus { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.5); outline: none; }
+    .btn-red-gradient { background-image: linear-gradient(90deg, #c0201f 0%, #aa1821 100%); }
+    .btn-red-gradient:hover { filter: brightness(1.08); }
+  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-bridge-950 to-bridge-700 px-4">
-  <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8">
-    <div class="text-center mb-6">
-      <img src={logo.src} alt="CloudBridge" class="w-20 h-20 rounded-full object-cover mx-auto shadow-md ring-4 ring-bridge-50">
-      <p class="text-sm text-slate-500 mt-3">Admin Panel Login</p>
+<body class="min-h-screen relative flex items-center justify-center px-4 overflow-hidden">
+
+  <!-- Background image -->
+  <img src={bgImage.src} alt="" class="absolute inset-0 w-full h-full object-cover">
+  <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(6,13,30,0.55) 0%, rgba(6,13,30,0.75) 100%)"></div>
+
+  <!-- Card -->
+  <div class="relative z-10 w-full max-w-sm glass-card rounded-2xl shadow-2xl p-8">
+    <div class="text-center mb-8">
+      <img src={logo.src} alt="CloudBridge" class="w-16 h-16 rounded-full object-cover mx-auto shadow-lg ring-4 ring-white/20">
+      <p class="mt-4 text-white font-display font-bold text-xl tracking-wide">CloudBridge</p>
+      <p class="text-white/60 text-xs uppercase tracking-widest mt-1">Admin Panel</p>
     </div>
+
     <form id="loginForm" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
-        <input type="email" id="email" required class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-700">
+      <div class="relative">
+        <input type="email" id="email" required placeholder="Enter your email"
+          class="glass-input w-full rounded-full pl-5 pr-11 py-3 text-sm transition">
+        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
       </div>
-      <div>
-        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-        <input type="password" id="password" required class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-700">
+
+      <div class="relative">
+        <input type="password" id="password" required placeholder="Enter your password"
+          class="glass-input w-full rounded-full pl-5 pr-11 py-3 text-sm transition">
+        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 10-8 0v4h8z"/>
+        </svg>
       </div>
-      <p id="errorMsg" class="hidden text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2"></p>
-      <button type="submit" class="w-full bg-sunrise-600 hover:bg-red-700 text-white font-semibold rounded-lg py-2.5 text-sm transition">
+
+      <div class="flex items-center justify-between text-xs text-white/60 px-1">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="remember" class="rounded accent-sunrise-600">
+          Remember me
+        </label>
+      </div>
+
+      <p id="errorMsg" class="hidden text-sm text-red-100 bg-red-600/30 border border-red-400/40 rounded-lg px-3 py-2"></p>
+
+      <button type="submit" class="btn-red-gradient w-full text-white font-semibold rounded-full py-3 text-sm shadow-lg transition mt-2">
         Log In
       </button>
     </form>
