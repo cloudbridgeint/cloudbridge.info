@@ -22,21 +22,21 @@ const totalCountryVisits = topCountries.reduce((s: number, r: any) => s + r.n, 0
 const segments = topCountries.map((r: any, i: number) => ({
   label: r.country,
   pct: Math.round((r.n / totalCountryVisits) * 100),
-  color: ['bg-bridge-800', 'bg-bridge-500', 'bg-sunrise-500'][i] || 'bg-slate-300',
+  color: ['bg-blue-600', 'bg-slate-200', 'bg-pink-500'][i] || 'bg-slate-300',
 }));
 
 const statCards = [
-  { label: 'Visitors Today', value: visits.today, badge: 'badge-navy', icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12z' },
-  { label: 'This Month', value: visits.thisMonth, badge: 'badge-slate', icon: 'M8 2v4M16 2v4M3 9h18M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z' },
-  { label: 'Total Leads', value: leadsCount?.n ?? 0, badge: 'badge-red', icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z' },
-  { label: 'Blog Posts', value: blogCount?.n ?? 0, badge: 'badge-rose', icon: 'M4 4h11a2 2 0 012 2v13a1 1 0 01-1.55.84L11 17l-4.45 2.84A1 1 0 015 19V6a2 2 0 012-2z' },
+  { label: 'Visitors Today', value: visits.today, badge: 'badge-blue', icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12z' },
+  { label: 'This Month', value: visits.thisMonth, badge: 'badge-teal', icon: 'M8 2v4M16 2v4M3 9h18M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z' },
+  { label: 'Total Leads', value: leadsCount?.n ?? 0, badge: 'badge-pink', icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z' },
+  { label: 'Blog Posts', value: blogCount?.n ?? 0, badge: 'badge-purple', icon: 'M4 4h11a2 2 0 012 2v13a1 1 0 01-1.55.84L11 17l-4.45 2.84A1 1 0 015 19V6a2 2 0 012-2z' },
 ];
 ---
 <AdminLayout title="Dashboard" active="dashboard">
 
   <div class="grid lg:grid-cols-2 gap-5">
     <!-- Recent Activity (Next Game equivalent) -->
-    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-semibold text-bridge-950">Latest Lead</h2>
         <a href="/cbc-admin/leads" class="text-xs font-medium text-bridge-600 hover:underline">View All</a>
@@ -58,7 +58,7 @@ const statCards = [
     </div>
 
     <!-- Traffic split (Games Statistic equivalent) -->
-    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-semibold text-bridge-950">Traffic by Country</h2>
         <a href="/cbc-admin/analytics" class="text-xs font-medium text-bridge-600 hover:underline">View All Statistic</a>
@@ -85,7 +85,7 @@ const statCards = [
 
   <div class="grid lg:grid-cols-2 gap-5 mt-5">
     <!-- Recent leads table (Standings equivalent) -->
-    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-semibold text-bridge-950">Recent Leads</h2>
         <a href="/cbc-admin/leads" class="text-xs font-medium text-bridge-600 hover:underline">View All</a>
@@ -117,7 +117,7 @@ const statCards = [
     <!-- 2x2 stat badge cards -->
     <div class="grid grid-cols-2 gap-4">
       {statCards.map(c => (
-        <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
+        <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
           <div class={`w-10 h-10 rounded-xl ${c.badge} flex items-center justify-center mb-3`}>
             <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={c.icon}/></svg>
           </div>
@@ -129,7 +129,7 @@ const statCards = [
   </div>
 
   <!-- Mini 14-day chart -->
-  <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6 mt-5">
+  <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6 mt-5">
     <div class="flex items-center justify-between mb-4">
       <h2 class="font-semibold text-bridge-950">Visitors — Last 14 Days</h2>
       <a href="/cbc-admin/analytics" class="text-xs font-medium text-bridge-600 hover:underline">Full analytics &rarr;</a>

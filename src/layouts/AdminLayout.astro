@@ -52,26 +52,30 @@ const navItemsBottom = [
       height: 100vh;
       overflow: hidden;
       position: relative;
-      background: linear-gradient(160deg, #1c3255 0%, #2f5182 45%, #3d6099 75%, #6f8fb8 100%);
+      background: linear-gradient(135deg, #6dd5f0 0%, #3aa8e8 28%, #1665c9 52%, #0d3a8a 68%, #bcdcf7 100%);
     }
     .app-canvas::before {
       content: '';
       position: absolute; inset: 0;
       background:
-        radial-gradient(45% 40% at 88% 6%, rgba(224,32,38,0.55), transparent 60%),
-        radial-gradient(55% 45% at 8% 100%, rgba(15,28,48,0.55), transparent 65%);
+        radial-gradient(48% 55% at 92% 10%, rgba(13,58,138,0.55), transparent 60%),
+        radial-gradient(60% 50% at 5% 100%, rgba(180,222,247,0.65), transparent 65%);
       pointer-events: none;
     }
     .nav-active { background-image: linear-gradient(135deg, #254368, #0f1c30); color: #fff; box-shadow: 0 8px 20px -6px rgba(15,28,48,0.5); }
-    .badge-navy { background-image: linear-gradient(135deg, #2f5182, #15263f); }
-    .badge-red { background-image: linear-gradient(135deg, #e5302e, #8f1519); }
-    .badge-slate { background-image: linear-gradient(135deg, #3d6099, #1c3255); }
-    .badge-rose { background-image: linear-gradient(135deg, #f2726f, #aa1821); }
+    .card-soft {
+      background: linear-gradient(160deg, rgba(255,255,255,0.9), rgba(244,248,253,0.75));
+      backdrop-filter: blur(6px);
+    }
+    .badge-purple { background-image: linear-gradient(135deg, #a78bfa, #7c3aed); }
+    .badge-pink { background-image: linear-gradient(135deg, #f9a8d4, #db2777); }
+    .badge-blue { background-image: linear-gradient(135deg, #60a5fa, #1d4ed8); }
+    .badge-teal { background-image: linear-gradient(135deg, #5eead4, #0d9488); }
   </style>
 </head>
 <body class="app-canvas">
-  <div class="relative z-10 max-w-[1360px] mx-auto p-4 md:p-8 h-screen box-border">
-    <div class="flex bg-white/95 backdrop-blur rounded-[28px] shadow-2xl ring-1 ring-black/5 overflow-hidden h-full">
+  <div class="relative z-10 p-6 md:p-8 h-screen box-border">
+    <div class="flex bg-white/90 backdrop-blur rounded-[28px] shadow-2xl ring-1 ring-black/5 overflow-hidden h-full">
 
       <!-- Sidebar -->
       <aside class="hidden md:flex w-60 shrink-0 flex-col border-r border-slate-100 px-4 py-6 overflow-y-auto">
