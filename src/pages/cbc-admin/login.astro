@@ -46,7 +46,7 @@ export const prerender = false;
 <body class="min-h-screen relative flex items-center justify-center px-4 overflow-hidden">
 
   <!-- Background video (test clip) -->
-  <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
+  <video id="bgVideo" autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
     <source src="/videos/login-bg-test.mp4" type="video/mp4">
   </video>
   <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(6,13,30,0.5) 0%, rgba(6,13,30,0.7) 100%)"></div>
@@ -95,6 +95,14 @@ export const prerender = false;
       </button>
     </form>
   </div>
+
+  <script is:inline>
+    const bgVideo = document.getElementById('bgVideo');
+    function setSlowRate() { bgVideo.playbackRate = 0.2; }
+    setSlowRate();
+    bgVideo.addEventListener('loadedmetadata', setSlowRate);
+    bgVideo.addEventListener('play', setSlowRate);
+  </script>
 
   <script is:inline>
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
