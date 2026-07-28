@@ -325,8 +325,8 @@ if (db) {
       <div class="text-sm">
         <p class="font-display font-semibold text-white mb-6">Newsletter</p>
         <p class="text-white/60 mb-5">Sign up for alerts, our latest blogs, thoughts, and insights.</p>
-        <form class="demo-form flex flex-col gap-3">
-          <input type="email" required placeholder="Your email address" class="rounded-lg px-4 py-2.5 text-sm text-ink w-full border-none">
+        <form class="demo-form flex flex-col gap-3" data-source="newsletter">
+          <input name="email" type="email" required placeholder="Your email address" class="rounded-lg px-4 py-2.5 text-sm text-ink w-full border-none">
           <button type="submit" class="footer-btn-red w-full !py-2.5 text-sm rounded-full font-semibold">Subscribe Now</button>
         </form>
         <p class="demo-form-thanks hidden text-sm text-harbor-500 mt-2 font-medium">Thanks! You're subscribed. <span class="block text-xs text-white/40 font-normal">(demo only)</span></p>

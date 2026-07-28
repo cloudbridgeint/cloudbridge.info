@@ -292,6 +292,24 @@ function applySubmitForm() {
   const thanks = document.getElementById('applyThanks');
   if (body) body.classList.add('hidden');
   if (thanks) thanks.classList.remove('hidden');
+
+  try {
+    const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+    const firstName = val('applyFirstName');
+    const lastName = val('applyLastName');
+    const payload = {
+      name: `${firstName} ${lastName}`.trim(),
+      email: val('applyEmail'),
+      phone: val('applyPhone'),
+      message: '',
+      source_page: 'apply-now',
+    };
+    fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {});
+  } catch (err) { /* never let lead capture break the UX */ }
 }
 window.applyNext = applyNext;
 window.applyBack = applyBack;
@@ -1023,13 +1041,34 @@ function initPageScripts() {
   }, { threshold: 0.5 });
   counters.forEach(c => io.observe(c));
 
-  // Demo forms (no backend — just show a thank-you state)
+  // Forms: show a thank-you state immediately, and best-effort send the lead to the backend
   document.querySelectorAll('.demo-form').forEach(form => {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       form.classList.add('hidden');
       const thanks = form.nextElementSibling;
       if (thanks) thanks.classList.remove('hidden');
+
+      try {
+        const source = form.dataset.source || 'website';
+        const get = (n) => { const el = form.querySelector(`[name="${n}"]`); return el ? el.value : ''; };
+        const firstName = get('firstName');
+        const lastName = get('lastName');
+        const plainName = get('name');
+        const name = plainName || `${firstName} ${lastName}`.trim();
+        const payload = {
+          name,
+          email: get('email'),
+          phone: get('phone'),
+          message: get('message'),
+          source_page: source,
+        };
+        fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).catch(() => {});
+      } catch (err) { /* never let lead capture break the UX */ }
     });
   });
 }

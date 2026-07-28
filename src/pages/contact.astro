@@ -59,11 +59,11 @@ const description = "Get in touch with CloudBridge for a free consultation on st
     </div>
     <div>
       <h2 class="section-heading">Get In Touch</h2>
-      <form class="demo-form mt-8 grid gap-4 bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
-        <input required placeholder="Name" class="form-input rounded-xl border border-black/10 px-4 py-3 text-sm">
-        <input type="email" required placeholder="Email" class="form-input rounded-xl border border-black/10 px-4 py-3 text-sm">
-        <input required placeholder="Phone" class="form-input rounded-xl border border-black/10 px-4 py-3 text-sm">
-        <textarea placeholder="Message" rows="4" class="form-input rounded-xl border border-black/10 px-4 py-3 text-sm"></textarea>
+      <form class="demo-form mt-8 grid gap-4 bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5" data-source="contact">
+        <input name="name" required placeholder="Name" class="form-input rounded-xl border border-black/10 px-4 py-3 text-sm">
+        <input name="email" type="email" required placeholder="Email" class="form-input rounded-xl border border-black/10 px-4 py-3 text-sm">
+        <input name="phone" required placeholder="Phone" class="form-input rounded-xl border border-black/10 px-4 py-3 text-sm">
+        <textarea name="message" placeholder="Message" rows="4" class="form-input rounded-xl border border-black/10 px-4 py-3 text-sm"></textarea>
         <button type="submit" class="rounded-xl py-3 font-display font-semibold text-white shadow-sm transition hover:brightness-110 justify-self-start px-8" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%)">Submit</button>
       </form>
       <div class="demo-form-thanks hidden mt-6 rounded-2xl bg-harbor-500/10 p-6 text-center text-harbor-600 font-display font-semibold">

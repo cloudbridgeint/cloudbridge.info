@@ -1,0 +1,33 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare(
+  "SELECT * FROM leads WHERE source_page = 'contact' ORDER BY created_at DESC LIMIT 200"
+).all();
+const queries = results as any[];
+---
+<AdminLayout title="Query" active="query">
+  <h1 class="text-2xl font-bold text-bridge-950">Query</h1>
+  <p class="text-slate-500 mt-1 text-sm">Submissions from the Contact Us form.</p>
+
+  <div class="mt-8 space-y-3">
+    {queries.length === 0 ? (
+      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-8 text-center">
+        <p class="text-slate-400 text-sm">No queries yet — they'll show up here once someone submits the Contact Us form.</p>
+      </div>
+    ) : queries.map((q: any) => (
+      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="font-semibold text-bridge-950 text-sm">{q.name || 'Anonymous'}</p>
+            <p class="text-xs text-slate-400">{q.email} {q.phone ? `· ${q.phone}` : ''}</p>
+          </div>
+          <p class="text-xs text-slate-400 whitespace-nowrap">{q.created_at}</p>
+        </div>
+        {q.message && <p class="text-sm text-slate-600 mt-3 leading-relaxed">{q.message}</p>}
+      </div>
+    ))}
+  </div>
+</AdminLayout>
