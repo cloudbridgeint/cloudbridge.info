@@ -1,0 +1,162 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('home.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+function resolveImg(v: string | undefined, fallback: string) {
+  if (!v) return fallback;
+  if (v.startsWith('media:')) return `/api/media/${v.slice(6)}`;
+  return v;
+}
+
+const sections = [
+  {
+    title: 'Hero Slider — Slide 1',
+    fields: [
+      { key: 'home.hero.slide1.image', label: 'Slide image', type: 'image', fallback: '/assets/hero/slide1.jpg' },
+      { key: 'home.hero.slide1.badge', label: 'Badge text', type: 'text', default: 'Overseas Education Consultancy' },
+      { key: 'home.hero.slide1.heading', label: 'Heading', type: 'text', default: "Your Bridge to Studying Abroad" },
+      { key: 'home.hero.slide1.text', label: 'Subtext', type: 'textarea', default: 'From university selection to visa approval — CloudBridge guides students across Bangladesh into universities in the UK, Malaysia, and the USA.' },
+    ],
+  },
+  {
+    title: 'Hero Slider — Slide 2',
+    fields: [
+      { key: 'home.hero.slide2.image', label: 'Slide image', type: 'image', fallback: '/assets/hero/slide2.jpg' },
+      { key: 'home.hero.slide2.badge', label: 'Badge text', type: 'text', default: 'Admissions Open' },
+      { key: 'home.hero.slide2.heading', label: 'Heading', type: 'text', default: 'Fall 2026 Intake Open Now' },
+      { key: 'home.hero.slide2.text', label: 'Subtext', type: 'textarea', default: '100% free end-to-end counseling and application processing — from shortlisting your university to visa approval.' },
+    ],
+  },
+  {
+    title: 'Hero Slider — Slide 3',
+    fields: [
+      { key: 'home.hero.slide3.image', label: 'Slide image', type: 'image', fallback: '/assets/hero/slide3.jpg' },
+      { key: 'home.hero.slide3.badge', label: 'Badge text', type: 'text', default: 'Scholarships' },
+      { key: 'home.hero.slide3.heading', label: 'Heading', type: 'text', default: 'Scholarships at 500+ Universities' },
+      { key: 'home.hero.slide3.text', label: 'Subtext', type: 'textarea', default: 'Let our counsellors match you with funding you actually qualify for — most students never even check.' },
+    ],
+  },
+  {
+    title: '"Years of Experience" badge (floating on hero)',
+    fields: [
+      { key: 'home.hero.badge_number', label: 'Number', type: 'text', default: '7' },
+      { key: 'home.hero.badge_label', label: 'Label', type: 'text', default: 'years' },
+      { key: 'home.hero.badge_subtext', label: 'Subtext', type: 'text', default: 'of student service excellence' },
+    ],
+  },
+  {
+    title: 'Choose Your Destination',
+    fields: [
+      { key: 'home.destination.heading', label: 'Section heading', type: 'text', default: 'Choose Your Destination' },
+    ],
+  },
+  {
+    title: 'Featured Universities',
+    fields: [
+      { key: 'home.universities.heading', label: 'Section heading', type: 'text', default: 'Featured Universities' },
+    ],
+    note: 'To add/remove/edit individual university logos, go to the Universities page.',
+  },
+  {
+    title: 'Talk with University Admission Expert',
+    fields: [
+      { key: 'home.admission_expert.image', label: 'Image', type: 'image', fallback: '/assets/admission-expert.jpg' },
+      { key: 'home.admission_expert.heading', label: 'Heading', type: 'text', default: 'Talk with University Admission Expert' },
+      { key: 'home.admission_expert.text', label: 'Paragraph', type: 'textarea', default: 'Get personalised guidance from our expert counsellors on choosing the right university, course, and destination for your goals — completely free, with no obligation.' },
+    ],
+  },
+  {
+    title: 'Trusted education consultant',
+    fields: [
+      { key: 'home.trusted.heading', label: 'Heading', type: 'text', default: 'Trusted education consultant' },
+      { key: 'home.trusted.text', label: 'Subtext', type: 'textarea', default: 'Our company has grown by helping international students find admission to universities abroad.' },
+      { key: 'home.trusted.stat_students', label: 'Stat — Students Placed', type: 'text', default: '10000' },
+      { key: 'home.trusted.stat_universities', label: 'Stat — Partner Universities', type: 'text', default: '500' },
+      { key: 'home.trusted.stat_years', label: 'Stat — Years of Experience', type: 'text', default: '13' },
+      { key: 'home.trusted.stat_visa_rate', label: 'Stat — Visa Success Rate (%)', type: 'text', default: '99' },
+    ],
+  },
+  {
+    title: 'Get Your Entry Requirements',
+    fields: [
+      { key: 'home.entry_requirements.image', label: 'Image', type: 'image', fallback: '/assets/entry-consultation.jpg' },
+      { key: 'home.entry_requirements.heading', label: 'Heading', type: 'text', default: 'Get Your Entry Requirements' },
+      { key: 'home.entry_requirements.text', label: 'Paragraph', type: 'textarea', default: "Fill up the form and we'll send you the exact entry requirements for your destination, university, and program of choice." },
+    ],
+  },
+];
+---
+<AdminLayout title="Homepage Content" active="homepage">
+  <h1 class="text-2xl font-bold text-slate-900">Homepage Content</h1>
+  <p class="text-slate-500 mt-1 text-sm">Edit the text and images shown on the homepage, section by section. Changes are live immediately after saving.</p>
+
+  <div class="mt-8 space-y-6">
+    {sections.map(section => (
+      <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+        <h2 class="font-semibold text-slate-900 mb-1">{section.title}</h2>
+        {section.note && <p class="text-xs text-slate-400 mb-4">{section.note}</p>}
+        <div class="space-y-4 mt-4">
+          {section.fields.map((f: any) => (
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">{f.label}</label>
+              {f.type === 'image' ? (
+                <div class="flex items-center gap-4">
+                  <img class="img-preview h-16 w-24 object-cover rounded-lg border" data-key={f.key} src={resolveImg(cm[f.key], f.fallback)}>
+                  <input type="file" accept="image/*" class="img-file text-sm" data-key={f.key}>
+                  <input type="hidden" class="field-input" data-key={f.key} value={cm[f.key] ?? ''}>
+                </div>
+              ) : f.type === 'textarea' ? (
+                <textarea class="field-input w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" rows="2" data-key={f.key}>{cm[f.key] ?? f.default}</textarea>
+              ) : (
+                <input class="field-input w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" data-key={f.key} value={cm[f.key] ?? f.default}>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="sticky bottom-4 mt-6 flex justify-end">
+    <button id="saveBtn" class="bg-sunrise-600 hover:bg-red-700 text-white font-semibold rounded-xl px-6 py-3 shadow-lg transition">Save All Changes</button>
+  </div>
+</AdminLayout>
+
+<style>
+  .bg-sunrise-600 { background-color: #aa1821; }
+</style>
+
+<script is:inline>
+  document.querySelectorAll('.img-file').forEach(input => {
+    input.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const key = input.dataset.key;
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        const res = await fetch('/api/media', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        const value = `media:${data.id}`;
+        document.querySelector(`.field-input[data-key="${key}"]`).value = value;
+        document.querySelector(`.img-preview[data-key="${key}"]`).src = data.url;
+        showToast('Image uploaded — click "Save All Changes" to apply');
+      } catch (err) { showToast(err.message, 'error'); }
+    });
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const payload = {};
+    document.querySelectorAll('.field-input').forEach(el => { payload[el.dataset.key] = el.value; });
+    try {
+      await apiFetch('/api/content', { method: 'PUT', body: JSON.stringify(payload) });
+      showToast('Homepage updated — refresh the site to see changes');
+    } catch (e) { showToast(e.message, 'error'); }
+  });
+</script>

@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { Image } from 'astro:assets';
+import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts } from '../lib/content';
 import heroSlide1 from '../assets/hero/slide1.jpg';
 import heroSlide2 from '../assets/hero/slide2.jpg';
 import heroSlide3 from '../assets/hero/slide3.jpg';
@@ -11,54 +12,77 @@ import blogStudyUsa from '../assets/blog/study-usa.jpg';
 import blogStudyEurope from '../assets/blog/study-europe.jpg';
 const title = "CloudBridge — Study Abroad Consultancy | UK, Malaysia & USA";
 const description = "CloudBridge guides students across Bangladesh into top universities in the UK, Malaysia, and the USA — free counselling, university selection, and visa support.";
+
+export const prerender = false;
+const db = (Astro.locals as any).runtime.env.DB;
+const cm = await getAllContent(db);
+const universities = await getUniversities(db);
+const faqs = await getFaqs(db);
+
+const uniByCountry: Record<string, any[]> = {};
+for (const u of universities) {
+  (uniByCountry[u.country] ||= []).push(u);
+}
 ---
 <Layout title={title} description={description}>
 
 <section class="relative overflow-hidden bg-bridge-950 text-white" id="heroSlider">
 
   <div class="slider-slide relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="0">
-    <Image src={heroSlide1} alt="A student ready to study abroad, with landmarks from partner destination countries in the background" class="absolute inset-0 w-full h-full object-cover hero-img-1" loading="eager" fetchpriority="high" widths={[480, 768, 1200, 1920]} sizes="100vw" />
+    {cm['home.hero.slide1.image'] ? (
+      <img src={cImage(cm, 'home.hero.slide1.image', '')} alt={c(cm, 'home.hero.slide1.heading', 'Your Bridge to Studying Abroad')} class="absolute inset-0 w-full h-full object-cover hero-img-1" loading="eager" fetchpriority="high">
+    ) : (
+      <Image src={heroSlide1} alt="A student ready to study abroad, with landmarks from partner destination countries in the background" class="absolute inset-0 w-full h-full object-cover hero-img-1" loading="eager" fetchpriority="high" widths={[480, 768, 1200, 1920]} sizes="100vw" />
+    )}
     <div class="absolute inset-0 bg-gradient-to-r from-cloud/50 via-cloud/25 to-transparent"></div>
     <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
       <div class="max-w-xl">
-        <p class="inline-block mb-4 px-4 py-1 rounded-full border border-bridge-900/15 text-sunrise-600 text-sm font-medium">Overseas Education Consultancy</p>
-        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight text-bridge-950" style="font-family:'Times New Roman', Times, serif">Your Bridge to<br class="md:hidden"> Studying Abroad</h1>
-        <p class="mt-5 max-w-md text-ink/70">From university selection to visa approval — CloudBridge guides students across Bangladesh into universities in the UK, Malaysia, and the USA.</p>
+        <p class="inline-block mb-4 px-4 py-1 rounded-full border border-bridge-900/15 text-sunrise-600 text-sm font-medium">{c(cm, 'home.hero.slide1.badge', 'Overseas Education Consultancy')}</p>
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight text-bridge-950" style="font-family:'Times New Roman', Times, serif" set:html={c(cm, 'home.hero.slide1.heading', "Your Bridge to<br class='md:hidden'> Studying Abroad")} />
+        <p class="mt-5 max-w-md text-ink/70">{c(cm, 'home.hero.slide1.text', 'From university selection to visa approval — CloudBridge guides students across Bangladesh into universities in the UK, Malaysia, and the USA.')}</p>
         <a href="/#lead-form" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
       </div>
     </div>
   </div>
 
   <div class="slider-slide hidden relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="1">
-    <Image src={heroSlide2} alt="A student ready to study in the UK, with Big Ben and London landmarks in the background" class="absolute inset-0 w-full h-full object-cover" style="object-position:76% center" widths={[480, 768, 1200, 1920]} sizes="100vw" />
+    {cm['home.hero.slide2.image'] ? (
+      <img src={cImage(cm, 'home.hero.slide2.image', '')} alt={c(cm, 'home.hero.slide2.heading', 'Fall 2026 Intake Open Now')} class="absolute inset-0 w-full h-full object-cover" style="object-position:76% center">
+    ) : (
+      <Image src={heroSlide2} alt="A student ready to study in the UK, with Big Ben and London landmarks in the background" class="absolute inset-0 w-full h-full object-cover" style="object-position:76% center" widths={[480, 768, 1200, 1920]} sizes="100vw" />
+    )}
     <div class="absolute inset-0 bg-gradient-to-r from-cloud/50 via-cloud/25 to-transparent"></div>
     <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
       <div class="max-w-xl">
-        <p class="inline-block mb-4 px-4 py-1 rounded-full border border-bridge-900/15 text-sunrise-600 text-sm font-medium">Admissions Open</p>
-        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight text-bridge-950" style="font-family:'Times New Roman', Times, serif">Fall 2026 Intake<br class="md:hidden"> Open Now</h1>
-        <p class="mt-5 max-w-md text-ink/70">100% free end-to-end counseling and application processing — from shortlisting your university to visa approval.</p>
+        <p class="inline-block mb-4 px-4 py-1 rounded-full border border-bridge-900/15 text-sunrise-600 text-sm font-medium">{c(cm, 'home.hero.slide2.badge', 'Admissions Open')}</p>
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight text-bridge-950" style="font-family:'Times New Roman', Times, serif" set:html={c(cm, 'home.hero.slide2.heading', "Fall 2026 Intake<br class='md:hidden'> Open Now")} />
+        <p class="mt-5 max-w-md text-ink/70">{c(cm, 'home.hero.slide2.text', '100% free end-to-end counseling and application processing — from shortlisting your university to visa approval.')}</p>
         <a href="/#lead-form" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
       </div>
     </div>
   </div>
 
   <div class="slider-slide hidden relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="2">
-    <Image src={heroSlide3} alt="A student ready to study abroad, with a university campus in the background" class="absolute inset-0 w-full h-full object-cover hero-img-3" widths={[480, 768, 1200, 1920]} sizes="100vw" />
+    {cm['home.hero.slide3.image'] ? (
+      <img src={cImage(cm, 'home.hero.slide3.image', '')} alt={c(cm, 'home.hero.slide3.heading', 'Scholarships at 500+ Universities')} class="absolute inset-0 w-full h-full object-cover hero-img-3">
+    ) : (
+      <Image src={heroSlide3} alt="A student ready to study abroad, with a university campus in the background" class="absolute inset-0 w-full h-full object-cover hero-img-3" widths={[480, 768, 1200, 1920]} sizes="100vw" />
+    )}
     <div class="absolute inset-0 bg-gradient-to-r from-cloud/50 via-cloud/25 to-transparent"></div>
     <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
       <div class="max-w-xl">
-        <p class="inline-block mb-4 px-4 py-1 rounded-full border border-bridge-900/15 text-sunrise-600 text-sm font-medium">Scholarships</p>
-        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight text-bridge-950" style="font-family:'Times New Roman', Times, serif">Scholarships at 500+ Universities</h1>
-        <p class="mt-5 max-w-md text-ink/70">Let our counsellors match you with funding you actually qualify for — most students never even check.</p>
+        <p class="inline-block mb-4 px-4 py-1 rounded-full border border-bridge-900/15 text-sunrise-600 text-sm font-medium">{c(cm, 'home.hero.slide3.badge', 'Scholarships')}</p>
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight text-bridge-950" style="font-family:'Times New Roman', Times, serif">{c(cm, 'home.hero.slide3.heading', 'Scholarships at 500+ Universities')}</h1>
+        <p class="mt-5 max-w-md text-ink/70">{c(cm, 'home.hero.slide3.text', 'Let our counsellors match you with funding you actually qualify for — most students never even check.')}</p>
         <a href="/#lead-form" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
       </div>
     </div>
   </div>
 
   <div class="hidden lg:flex absolute right-10 top-1/2 -translate-y-1/2 z-20 flex-col items-center justify-center w-52 aspect-square rounded-2xl text-center shadow-2xl px-5" style="background-image:linear-gradient(135deg,#2f5182,#aa1821)">
-    <p class="font-display text-5xl font-extrabold leading-none">7<span class="text-sunrise-100 align-top text-2xl">+</span></p>
-    <p class="mt-1 text-base font-semibold">years</p>
-    <p class="mt-2 text-xs text-white/85 leading-snug">of student service excellence</p>
+    <p class="font-display text-5xl font-extrabold leading-none">{c(cm, 'home.hero.badge_number', '7')}<span class="text-sunrise-100 align-top text-2xl">+</span></p>
+    <p class="mt-1 text-base font-semibold">{c(cm, 'home.hero.badge_label', 'years')}</p>
+    <p class="mt-2 text-xs text-white/85 leading-snug">{c(cm, 'home.hero.badge_subtext', 'of student service excellence')}</p>
   </div>
 
   <button onclick="sliderMove(-1)" class="slider-arrow" style="left:1rem" aria-label="Previous slide">‹</button>
@@ -74,7 +98,7 @@ const description = "CloudBridge guides students across Bangladesh into top univ
 <section class="py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <div class="max-w-xl mx-auto text-center">
-      <h2 class="section-heading text-center">Choose Your Destination</h2>
+      <h2 class="section-heading text-center">{c(cm, 'home.destination.heading', 'Choose Your Destination')}</h2>
       <p class="mt-3 text-ink/60">Every country we work with, hand-picked for strong outcomes for Bangladeshi students.</p>
     </div>
     <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -99,240 +123,45 @@ const description = "CloudBridge guides students across Bangladesh into top univ
 
 <section class="py-12 bg-white border-y border-black/5">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <h2 class="section-heading text-center mb-6">Featured Universities</h2>
+    <h2 class="section-heading text-center mb-6">{c(cm, 'home.universities.heading', 'Featured Universities')}</h2>
     <div class="flex flex-wrap justify-center gap-2 mb-8">
-      <button class="uni-tab-btn btn-outline !text-xs active" data-tab="uk">UK</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="usa">USA</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="canada">Canada</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="malta">Malta</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="france">France</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="spain">Spain</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="finland">Finland</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="newzealand">New Zealand</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="netherlands">Netherlands</button>
-      <button class="uni-tab-btn btn-outline !text-xs" data-tab="malaysia">Malaysia</button>
+      {Object.keys(uniByCountry).map((country, idx) => (
+        <button class={`uni-tab-btn btn-outline !text-xs ${idx === 0 ? 'active' : ''}`} data-tab={country}>{country}</button>
+      ))}
     </div>
-    <div class="uni-tab-panel" data-panel="uk">
-      <div class="uni-logo-viewport overflow-hidden">
-        <div class="uni-logo-track flex gap-4">
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
+    {Object.entries(uniByCountry).map(([country, unis], idx) => (
+      <div class={`uni-tab-panel ${idx === 0 ? '' : 'hidden'}`} data-panel={country}>
+        <div class="uni-logo-viewport overflow-hidden">
+          <div class="uni-logo-track flex gap-4">
+            {[...unis, ...unis].map((u: any) => (
+              <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4">
+                <img src={u.logo_url ? (u.logo_url.startsWith('media:') ? `/api/media/${u.logo_url.slice(6)}` : u.logo_url) : '/assets/logo.png'} alt={u.name} class="max-h-full max-w-full object-contain" loading="lazy" decoding="async">
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-    <div class="uni-tab-panel hidden" data-panel="usa">
-      <div class="uni-logo-viewport overflow-hidden">
-        <div class="uni-logo-track flex gap-4">
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        </div>
-      </div>
-    </div>
-    <div class="uni-tab-panel hidden" data-panel="canada">
-      <div class="uni-logo-viewport overflow-hidden">
-        <div class="uni-logo-track flex gap-4">
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        </div>
-      </div>
-    </div>
-    <div class="uni-tab-panel hidden" data-panel="malta">
-      <div class="uni-logo-viewport overflow-hidden">
-        <div class="uni-logo-track flex gap-4">
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/gbs-malta.png" alt="GBS Malta" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/global-college-malta.png" alt="Global College Malta" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/global-business-school-malta.png" alt="Global Business School Malta" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/malta-international-college.png" alt="Malta International College" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/london-school-of-commerce.png" alt="London School of Commerce" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/avanza-training-academy.png" alt="Avanza Training Academy" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/gbs-malta.png" alt="GBS Malta" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/global-college-malta.png" alt="Global College Malta" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/global-business-school-malta.png" alt="Global Business School Malta" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/malta-international-college.png" alt="Malta International College" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/london-school-of-commerce.png" alt="London School of Commerce" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/avanza-training-academy.png" alt="Avanza Training Academy" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        </div>
-      </div>
-    </div>
-    <div class="uni-tab-panel hidden" data-panel="france">
-      <div class="uni-logo-viewport overflow-hidden">
-        <div class="uni-logo-track flex gap-4">
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        </div>
-      </div>
-    </div>
-    <div class="uni-tab-panel hidden" data-panel="spain">
-      <div class="uni-logo-viewport overflow-hidden">
-        <div class="uni-logo-track flex gap-4">
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        </div>
-      </div>
-    </div>
-    <div class="uni-tab-panel hidden" data-panel="finland">
-      <div class="uni-logo-viewport overflow-hidden">
-        <div class="uni-logo-track flex gap-4">
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        </div>
-      </div>
-    </div>
-    <div class="uni-tab-panel hidden" data-panel="newzealand">
-      <div class="uni-logo-viewport overflow-hidden">
-        <div class="uni-logo-track flex gap-4">
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        </div>
-      </div>
-    </div>
-    <div class="uni-tab-panel hidden" data-panel="netherlands">
-      <div class="uni-logo-viewport overflow-hidden">
-        <div class="uni-logo-track flex gap-4">
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/aston.png" alt="Aston University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/arden.png" alt="Arden University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bcu.png" alt="Birmingham City University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/bangor.png" alt="Bangor University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/abertay.png" alt="Abertay University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/demontfort.png" alt="De Montfort University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        </div>
-      </div>
-    </div>
-    <div class="uni-tab-panel hidden" data-panel="malaysia">
-      <div class="uni-logo-viewport overflow-hidden">
-        <div class="uni-logo-track flex gap-4">
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/segi-university.png" alt="SEGi University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/mahsa-university.png" alt="MAHSA University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/inti-international-university.png" alt="INTI International University & Colleges" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/city-university-malaysia.png" alt="City University Malaysia" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/lincoln-university.png" alt="Lincoln University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/unitar-international-university.png" alt="UNITAR International University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/unikl.png" alt="Universiti Kuala Lumpur (UniKL)" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/limkokwing-university.png" alt="Limkokwing University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/taylors-university.png" alt="Taylor's University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/apu.png" alt="Asia Pacific University (APU)" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/manipal-university-college-malaysia.png" alt="Manipal University College Malaysia" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/ucsi-university.png" alt="UCSI University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/mmu.png" alt="Multimedia University (MMU)" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/curtin-university-malaysia.png" alt="Curtin University Malaysia" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/nilai-university.png" alt="Nilai University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/university-of-cyberjaya.png" alt="University of Cyberjaya" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/infrastructure-university-kl.png" alt="Infrastructure University Kuala Lumpur" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/unirazak.png" alt="UNIRAZAK" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/utm.png" alt="Universiti Teknologi Malaysia (UTM)" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/university-of-malaya.png" alt="University of Malaya" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/segi-university.png" alt="SEGi University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/mahsa-university.png" alt="MAHSA University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/inti-international-university.png" alt="INTI International University & Colleges" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/city-university-malaysia.png" alt="City University Malaysia" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/lincoln-university.png" alt="Lincoln University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/unitar-international-university.png" alt="UNITAR International University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/unikl.png" alt="Universiti Kuala Lumpur (UniKL)" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/limkokwing-university.png" alt="Limkokwing University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/taylors-university.png" alt="Taylor's University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/apu.png" alt="Asia Pacific University (APU)" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/manipal-university-college-malaysia.png" alt="Manipal University College Malaysia" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/ucsi-university.png" alt="UCSI University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/mmu.png" alt="Multimedia University (MMU)" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/curtin-university-malaysia.png" alt="Curtin University Malaysia" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/nilai-university.png" alt="Nilai University" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/university-of-cyberjaya.png" alt="University of Cyberjaya" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/infrastructure-university-kl.png" alt="Infrastructure University Kuala Lumpur" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/unirazak.png" alt="UNIRAZAK" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/utm.png" alt="Universiti Teknologi Malaysia (UTM)" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        <div class="uni-logo-item shrink-0 h-24 w-40 rounded-lg bg-white border border-black/10 shadow flex items-center justify-center p-4"><img src="/assets/universities/university-of-malaya.png" alt="University of Malaya" class="max-h-full max-w-full object-contain" loading="lazy" decoding="async"></div>
-        </div>
-      </div>
-    </div>
-    <p class="text-center text-xs text-ink/30 mt-4">(placeholder — real partner university logos go here)</p>
+    ))}
+    {universities.length === 0 && (
+      <p class="text-center text-xs text-ink/30 mt-4">No universities added yet — add some from the admin panel.</p>
+    )}
   </div>
 </section>
+
 
 <section class="py-16 bg-bridge-50/50">
   <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10 items-center">
     <div class="order-2 md:order-1 rounded-2xl h-64 md:h-80 overflow-hidden">
-      <Image src={admissionExpert} alt="A university admission expert consulting with a student about study abroad options" class="w-full h-full object-cover" widths={[400, 640, 960]} sizes="(min-width: 768px) 50vw, 100vw" />
+      {cm['home.admission_expert.image'] ? (
+        <img src={cImage(cm, 'home.admission_expert.image', '')} alt="A university admission expert consulting with a student about study abroad options" class="w-full h-full object-cover">
+      ) : (
+        <Image src={admissionExpert} alt="A university admission expert consulting with a student about study abroad options" class="w-full h-full object-cover" widths={[400, 640, 960]} sizes="(min-width: 768px) 50vw, 100vw" />
+      )}
     </div>
     <div class="order-1 md:order-2">
       <p class="text-sunrise-600 font-display font-semibold text-sm uppercase tracking-wide mb-3">Free Consultation</p>
-      <h2 class="section-heading">Talk with University Admission Expert</h2>
-      <p class="mt-4 text-ink/60">Get personalised guidance from our expert counsellors on choosing the right university, course, and destination for your goals — completely free, with no obligation.</p>
+      <h2 class="section-heading">{c(cm, 'home.admission_expert.heading', 'Talk with University Admission Expert')}</h2>
+      <p class="mt-4 text-ink/60">{c(cm, 'home.admission_expert.text', 'Get personalised guidance from our expert counsellors on choosing the right university, course, and destination for your goals — completely free, with no obligation.')}</p>
       <a href="/#lead-form" class="btn-primary nav-link mt-6 inline-flex">Send Admission Query</a>
     </div>
   </div>
@@ -341,14 +170,14 @@ const description = "CloudBridge guides students across Bangladesh into top univ
 <section class="bg-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <div class="max-w-xl mx-auto text-center">
-      <h2 class="section-heading text-center">Trusted education consultant</h2>
-      <p class="mt-3 text-ink/60">Our company has grown by helping international students find admission to universities abroad.</p>
+      <h2 class="section-heading text-center">{c(cm, 'home.trusted.heading', 'Trusted education consultant')}</h2>
+      <p class="mt-3 text-ink/60">{c(cm, 'home.trusted.text', 'Our company has grown by helping international students find admission to universities abroad.')}</p>
     </div>
     <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target="10000">0</p><p class="mt-2 text-sm font-medium text-ink/60">Students Placed</p></div>
-      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target="500">0</p><p class="mt-2 text-sm font-medium text-ink/60">Partner Universities</p></div>
-      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target="13" data-suffix="">0</p><p class="mt-2 text-sm font-medium text-ink/60">Years of Experience</p></div>
-      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target="99" data-suffix="%">0</p><p class="mt-2 text-sm font-medium text-ink/60">Visa Success Rate</p></div>
+      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target={c(cm, 'home.trusted.stat_students', '10000')}>0</p><p class="mt-2 text-sm font-medium text-ink/60">Students Placed</p></div>
+      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target={c(cm, 'home.trusted.stat_universities', '500')}>0</p><p class="mt-2 text-sm font-medium text-ink/60">Partner Universities</p></div>
+      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target={c(cm, 'home.trusted.stat_years', '13')} data-suffix="">0</p><p class="mt-2 text-sm font-medium text-ink/60">Years of Experience</p></div>
+      <div><p class="counter font-display text-4xl font-extrabold text-bridge-700" data-target={c(cm, 'home.trusted.stat_visa_rate', '99')} data-suffix="%">0</p><p class="mt-2 text-sm font-medium text-ink/60">Visa Success Rate</p></div>
     </div>
   </div>
 </section>
@@ -356,12 +185,16 @@ const description = "CloudBridge guides students across Bangladesh into top univ
 <section class="py-16 bg-bridge-50/50">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <div class="max-w-xl mx-auto text-center">
-      <h2 class="section-heading text-center">Get Your Entry Requirements</h2>
-      <p class="mt-3 text-ink/60">Fill up the form and we'll send you the exact entry requirements for your destination, university, and program of choice.</p>
+      <h2 class="section-heading text-center">{c(cm, 'home.entry_requirements.heading', 'Get Your Entry Requirements')}</h2>
+      <p class="mt-3 text-ink/60">{c(cm, 'home.entry_requirements.text', "Fill up the form and we'll send you the exact entry requirements for your destination, university, and program of choice.")}</p>
     </div>
     <div class="mt-10 grid md:grid-cols-2 gap-8 items-stretch">
       <div class="relative rounded-2xl overflow-hidden min-h-[320px] md:min-h-[480px]">
-        <Image src={entryConsultation} alt="A CloudBridge counsellor reviewing entry requirements with a student" class="absolute inset-0 w-full h-full object-cover" widths={[400, 640, 960]} sizes="(min-width: 768px) 50vw, 100vw" />
+        {cm['home.entry_requirements.image'] ? (
+          <img src={cImage(cm, 'home.entry_requirements.image', '')} alt="A CloudBridge counsellor reviewing entry requirements with a student" class="absolute inset-0 w-full h-full object-cover">
+        ) : (
+          <Image src={entryConsultation} alt="A CloudBridge counsellor reviewing entry requirements with a student" class="absolute inset-0 w-full h-full object-cover" widths={[400, 640, 960]} sizes="(min-width: 768px) 50vw, 100vw" />
+        )}
         <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/25 to-transparent"></div>
         <div class="absolute left-6 right-6 bottom-6 md:left-8 md:right-8 md:bottom-8">
           <p class="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-sunrise-200 text-xs font-semibold">500+ Partner Universities</p>
@@ -736,18 +569,12 @@ const description = "CloudBridge guides students across Bangladesh into top univ
   <div class="max-w-container mx-auto px-4 md:px-8 max-w-3xl">
     <h2 class="section-heading text-center">Frequently Asked Questions</h2>
     <div class="mt-10 border border-black/10 rounded-2xl divide-y divide-black/10 bg-white">
-      <div>
-        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Is CloudBridge's consultation really free?<span class="faq-icon transition-transform">+</span></button>
-        <p class="faq-answer px-6 pb-5 text-sm text-ink/70">Yes — the initial consultation, university shortlisting, and application support are all free of charge.</p>
-      </div>
-      <div>
-        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Do I need IELTS to apply?<span class="faq-icon transition-transform">+</span></button>
-        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">Not always. Many universities accept alternative English tests or an MOI certificate — your counsellor will confirm what applies to you.</p>
-      </div>
-      <div>
-        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">How long does the visa process take?<span class="faq-icon transition-transform">+</span></button>
-        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">It varies by country, but we start preparing your documents as soon as you receive an offer to avoid delays.</p>
-      </div>
+      {faqs.map((f: any, i: number) => (
+        <div>
+          <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">{f.question}<span class="faq-icon transition-transform">+</span></button>
+          <p class={`faq-answer ${i === 0 ? '' : 'hidden'} px-6 pb-5 text-sm text-ink/70`}>{f.answer}</p>
+        </div>
+      ))}
     </div>
   </div>
 </section>

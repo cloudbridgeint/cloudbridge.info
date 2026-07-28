@@ -1,0 +1,50 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const [leadsCount, uniCount, blogCount, eventCount] = await Promise.all([
+  db.prepare('SELECT COUNT(*) as n FROM leads').first(),
+  db.prepare('SELECT COUNT(*) as n FROM universities WHERE active = 1').first(),
+  db.prepare('SELECT COUNT(*) as n FROM blog_posts').first(),
+  db.prepare('SELECT COUNT(*) as n FROM events').first(),
+]);
+
+const cards = [
+  { label: 'Total Leads', value: leadsCount?.n ?? 0, href: '/cbc-admin/leads', color: 'bg-emerald-50 text-emerald-700' },
+  { label: 'Universities Listed', value: uniCount?.n ?? 0, href: '/cbc-admin/universities', color: 'bg-blue-50 text-blue-700' },
+  { label: 'Blog Posts', value: blogCount?.n ?? 0, href: '/cbc-admin/blogs', color: 'bg-purple-50 text-purple-700' },
+  { label: 'Events', value: eventCount?.n ?? 0, href: '/cbc-admin/events', color: 'bg-amber-50 text-amber-700' },
+];
+---
+<AdminLayout title="Dashboard" active="dashboard">
+  <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
+  <p class="text-slate-500 mt-1 text-sm">CloudBridge site content — quick overview.</p>
+
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+    {cards.map(c => (
+      <a href={c.href} class={`rounded-2xl p-5 shadow-sm ring-1 ring-black/5 hover:shadow-md transition ${c.color}`}>
+        <p class="text-3xl font-extrabold">{c.value}</p>
+        <p class="text-sm font-medium mt-1">{c.label}</p>
+      </a>
+    ))}
+  </div>
+
+  <div class="mt-10 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+    <h2 class="font-semibold text-slate-900 mb-3">Quick links</h2>
+    <div class="grid sm:grid-cols-2 gap-3 text-sm">
+      <a href="/cbc-admin/homepage" class="flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-bridge-700 hover:bg-bridge-50 transition">
+        <span>Edit Homepage Content (hero, sections, images)</span> <span>&rarr;</span>
+      </a>
+      <a href="/cbc-admin/universities" class="flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-bridge-700 hover:bg-bridge-50 transition">
+        <span>Manage Featured University Logos</span> <span>&rarr;</span>
+      </a>
+      <a href="/cbc-admin/blogs" class="flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-bridge-700 hover:bg-bridge-50 transition">
+        <span>Write / Publish Blog Posts</span> <span>&rarr;</span>
+      </a>
+      <a href="/cbc-admin/faq" class="flex items-center justify-between px-4 py-3 rounded-xl border border-slate-200 hover:border-bridge-700 hover:bg-bridge-50 transition">
+        <span>Edit FAQ</span> <span>&rarr;</span>
+      </a>
+    </div>
+  </div>
+</AdminLayout>

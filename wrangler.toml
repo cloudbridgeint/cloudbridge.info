@@ -1,0 +1,8 @@
+name = "cloudbridge-astro-staging"
+compatibility_date = "2024-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cloudbridge-cms"
+database_id = "15075c9a-5374-48f9-840b-5172ec4d969d"

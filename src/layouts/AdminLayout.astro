@@ -1,0 +1,107 @@
+---
+export const prerender = false;
+export interface Props {
+  title: string;
+  active?: string;
+}
+const { title, active = '' } = Astro.props;
+
+const navItems = [
+  { key: 'dashboard', label: 'Dashboard', href: '/cbc-admin', icon: '&#9632;' },
+  { key: 'homepage', label: 'Homepage Content', href: '/cbc-admin/homepage', icon: '&#9998;' },
+  { key: 'universities', label: 'Universities', href: '/cbc-admin/universities', icon: '&#127891;' },
+  { key: 'blogs', label: 'Blogs', href: '/cbc-admin/blogs', icon: '&#128221;' },
+  { key: 'events', label: 'Events', href: '/cbc-admin/events', icon: '&#128197;' },
+  { key: 'faq', label: 'FAQ', href: '/cbc-admin/faq', icon: '&#10067;' },
+  { key: 'footer', label: 'Footer', href: '/cbc-admin/footer', icon: '&#128279;' },
+  { key: 'leads', label: 'Leads', href: '/cbc-admin/leads', icon: '&#128172;' },
+];
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{title} — CloudBridge Admin</title>
+  <script src="https://cdn.tailwindcss.com" is:inline></script>
+  <script is:inline>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bridge: { 50:'#f0f4f9',100:'#dbe6f2',600:'#2f5182',700:'#254368',800:'#1c3255',900:'#15263f',950:'#0f1c30' },
+            sunrise: { 100:'#ffe6d9',600:'#aa1821' },
+          },
+        },
+      },
+    };
+  </script>
+  <style is:global>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+    .toast { animation: slideIn 0.25s ease; }
+    @keyframes slideIn { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex">
+
+  <aside class="w-64 shrink-0 bg-bridge-950 text-white min-h-screen sticky top-0 flex flex-col">
+    <div class="px-6 py-6 border-b border-white/10">
+      <p class="font-bold text-lg leading-tight">CloudBridge</p>
+      <p class="text-xs text-white/50">Admin Panel</p>
+    </div>
+    <nav class="flex-1 py-4 px-3 space-y-1">
+      {navItems.map(item => (
+        <a href={item.href}
+           class={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${active === item.key ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}>
+          <span class="w-5 text-center" set:html={item.icon} />
+          {item.label}
+        </a>
+      ))}
+    </nav>
+    <div class="p-3 border-t border-white/10">
+      <button id="logoutBtn" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition">
+        <span class="w-5 text-center">&#8618;</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+    <div class="max-w-5xl mx-auto px-6 py-8">
+      <slot />
+    </div>
+  </main>
+
+  <script is:inline>
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+      await fetch('/api/logout', { method: 'POST' });
+      location.href = '/cbc-admin/login';
+    });
+
+    function showToast(message, type) {
+      type = type || 'success';
+      const el = document.createElement('div');
+      const colors = { success: 'bg-emerald-600', error: 'bg-red-600' };
+      el.className = `toast ${colors[type] || colors.success} text-white text-sm px-4 py-3 rounded-lg shadow-lg`;
+      el.textContent = message;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+    window.showToast = showToast;
+
+    async function apiFetch(url, options) {
+      options = options || {};
+      options.headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+      const res = await fetch(url, options);
+      if (res.status === 401) { location.href = '/cbc-admin/login'; throw new Error('Unauthorized'); }
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    }
+    window.apiFetch = apiFetch;
+  </script>
+</body>
+</html>

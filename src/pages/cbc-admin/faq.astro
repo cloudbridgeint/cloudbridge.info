@@ -1,0 +1,103 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+---
+<AdminLayout title="FAQ" active="faq">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">FAQ</h1>
+      <p class="text-slate-500 mt-1 text-sm">Manage the Frequently Asked Questions shown on the homepage.</p>
+    </div>
+    <button id="addBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition">+ Add FAQ</button>
+  </div>
+
+  <div id="listContainer" class="mt-8 space-y-3"></div>
+
+  <div id="modal" class="hidden fixed inset-0 bg-black/40 z-40 flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6">
+      <h3 id="modalTitle" class="font-bold text-lg text-slate-900 mb-4">Add FAQ</h3>
+      <input type="hidden" id="editId">
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Question</label>
+          <input id="fQ" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Answer</label>
+          <textarea id="fA" rows="4" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 mt-6">
+        <button id="cancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Cancel</button>
+        <button id="saveBtn" class="px-4 py-2 text-sm rounded-lg bg-bridge-700 hover:bg-bridge-800 text-white font-semibold">Save</button>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script is:inline>
+  let allFaqs = [];
+  function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  async function load() {
+    allFaqs = await apiFetch('/api/faqs');
+    render();
+  }
+
+  function render() {
+    const container = document.getElementById('listContainer');
+    container.innerHTML = allFaqs.map(f => `
+      <div class="bg-white rounded-xl ring-1 ring-black/5 shadow-sm p-4 flex items-start justify-between gap-4">
+        <div>
+          <p class="font-medium text-slate-900 text-sm">${escapeHtml(f.question)}</p>
+          <p class="text-sm text-slate-500 mt-1">${escapeHtml(f.answer)}</p>
+        </div>
+        <div class="flex gap-3 shrink-0">
+          <button class="text-xs text-bridge-700 hover:underline" onclick="editFaq(${f.id})">Edit</button>
+          <button class="text-xs text-red-600 hover:underline" onclick="deleteFaq(${f.id})">Delete</button>
+        </div>
+      </div>
+    `).join('') || '<p class="text-slate-500 text-sm">No FAQs yet.</p>';
+  }
+
+  window.editFaq = (id) => {
+    const f = allFaqs.find(x => x.id === id);
+    if (!f) return;
+    document.getElementById('modalTitle').textContent = 'Edit FAQ';
+    document.getElementById('editId').value = f.id;
+    document.getElementById('fQ').value = f.question;
+    document.getElementById('fA').value = f.answer;
+    document.getElementById('modal').classList.remove('hidden');
+  };
+
+  window.deleteFaq = async (id) => {
+    if (!confirm('Delete this FAQ?')) return;
+    try { await apiFetch(`/api/faqs/${id}`, { method: 'DELETE' }); showToast('Deleted'); load(); }
+    catch (e) { showToast(e.message, 'error'); }
+  };
+
+  document.getElementById('addBtn').addEventListener('click', () => {
+    document.getElementById('modalTitle').textContent = 'Add FAQ';
+    document.getElementById('editId').value = '';
+    document.getElementById('fQ').value = '';
+    document.getElementById('fA').value = '';
+    document.getElementById('modal').classList.remove('hidden');
+  });
+  document.getElementById('cancelBtn').addEventListener('click', () => document.getElementById('modal').classList.add('hidden'));
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const id = document.getElementById('editId').value;
+    const question = document.getElementById('fQ').value.trim();
+    const answer = document.getElementById('fA').value.trim();
+    if (!question || !answer) { showToast('Question and answer are required', 'error'); return; }
+    try {
+      if (id) await apiFetch(`/api/faqs/${id}`, { method: 'PUT', body: JSON.stringify({ question, answer }) });
+      else await apiFetch('/api/faqs', { method: 'POST', body: JSON.stringify({ question, answer }) });
+      showToast('Saved');
+      document.getElementById('modal').classList.add('hidden');
+      load();
+    } catch (e) { showToast(e.message, 'error'); }
+  });
+
+  load();
+</script>

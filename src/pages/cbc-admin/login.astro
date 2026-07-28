@@ -1,0 +1,64 @@
+---
+export const prerender = false;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Login — CloudBridge Admin</title>
+  <script src="https://cdn.tailwindcss.com" is:inline></script>
+  <script is:inline>
+    tailwind.config = { theme: { extend: { colors: {
+      bridge: { 700:'#254368', 900:'#15263f', 950:'#0f1c30' },
+      sunrise: { 600:'#aa1821' },
+    } } } };
+  </script>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-bridge-950 to-bridge-700 px-4">
+  <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8">
+    <div class="text-center mb-6">
+      <p class="font-extrabold text-2xl text-bridge-950">CloudBridge</p>
+      <p class="text-sm text-slate-500 mt-1">Admin Panel Login</p>
+    </div>
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+        <input type="email" id="email" required class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-700">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+        <input type="password" id="password" required class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-700">
+      </div>
+      <p id="errorMsg" class="hidden text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2"></p>
+      <button type="submit" class="w-full bg-sunrise-600 hover:bg-red-700 text-white font-semibold rounded-lg py-2.5 text-sm transition">
+        Log In
+      </button>
+    </form>
+  </div>
+
+  <script is:inline>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.classList.add('hidden');
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login failed');
+        location.href = '/cbc-admin';
+      } catch (err) {
+        errorMsg.textContent = err.message;
+        errorMsg.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

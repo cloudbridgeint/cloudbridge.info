@@ -1,0 +1,48 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('footer.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+const fields = [
+  { key: 'footer.description', label: 'Footer tagline / description', type: 'textarea', default: 'Your trusted partner for studying abroad — from university shortlisting to visa approval.' },
+  { key: 'footer.phone_dhaka', label: 'Phone — Dhaka office', type: 'text', default: '+880 1686 007004' },
+  { key: 'footer.phone_sylhet', label: 'Phone — Sylhet office', type: 'text', default: '+880 1619 130469' },
+  { key: 'footer.email_apply', label: 'Email — Apply', type: 'text', default: 'apply@cloudbridge.info' },
+  { key: 'footer.email_info', label: 'Email — Info', type: 'text', default: 'info@cloudbridge.info' },
+  { key: 'footer.address_dhaka', label: 'Address — Dhaka', type: 'text', default: 'Lift 3, House 27, Road 21, Nikunjo-2, Dhaka 1229' },
+  { key: 'footer.address_sylhet', label: 'Address — Sylhet', type: 'text', default: '405-406 Manru Shopping City, 4th Floor, Chowhatta, Sylhet 3100' },
+];
+---
+<AdminLayout title="Footer" active="footer">
+  <h1 class="text-2xl font-bold text-slate-900">Footer</h1>
+  <p class="text-slate-500 mt-1 text-sm">Edit the contact info and text shown in the site footer (appears on every page).</p>
+
+  <div class="mt-8 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6 space-y-5">
+    {fields.map(f => (
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">{f.label}</label>
+        {f.type === 'textarea' ? (
+          <textarea data-key={f.key} rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">{cm[f.key] ?? f.default}</textarea>
+        ) : (
+          <input data-key={f.key} value={cm[f.key] ?? f.default} class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        )}
+      </div>
+    ))}
+    <button id="saveBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition">Save Changes</button>
+  </div>
+</AdminLayout>
+
+<script is:inline>
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const payload = {};
+    document.querySelectorAll('[data-key]').forEach(el => { payload[el.dataset.key] = el.value; });
+    try {
+      await apiFetch('/api/content', { method: 'PUT', body: JSON.stringify(payload) });
+      showToast('Footer updated');
+    } catch (e) { showToast(e.message, 'error'); }
+  });
+</script>

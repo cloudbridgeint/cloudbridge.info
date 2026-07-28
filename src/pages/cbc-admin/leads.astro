@@ -1,0 +1,40 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT * FROM leads ORDER BY created_at DESC LIMIT 200').all();
+const leads = results as any[];
+---
+<AdminLayout title="Leads" active="leads">
+  <h1 class="text-2xl font-bold text-slate-900">Leads</h1>
+  <p class="text-slate-500 mt-1 text-sm">Form submissions from the site (contact, apply now, free consultation, entry requirements).</p>
+
+  <div class="mt-8 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-xs text-slate-500 border-b border-slate-100">
+          <th class="px-4 py-3 font-medium">Name</th>
+          <th class="px-4 py-3 font-medium">Contact</th>
+          <th class="px-4 py-3 font-medium">Message</th>
+          <th class="px-4 py-3 font-medium">Source</th>
+          <th class="px-4 py-3 font-medium">Location</th>
+          <th class="px-4 py-3 font-medium">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {leads.map(l => (
+          <tr class="border-b border-slate-50 hover:bg-slate-50">
+            <td class="px-4 py-3 font-medium text-slate-800">{l.name || '—'}</td>
+            <td class="px-4 py-3 text-slate-600">{l.email}<br/><span class="text-xs text-slate-400">{l.phone}</span></td>
+            <td class="px-4 py-3 text-slate-600 max-w-xs truncate">{l.message}</td>
+            <td class="px-4 py-3 text-slate-500 text-xs">{l.source_page}</td>
+            <td class="px-4 py-3 text-slate-500 text-xs">{l.city}{l.city && l.country ? ', ' : ''}{l.country}</td>
+            <td class="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{l.created_at}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {leads.length === 0 && <p class="text-slate-500 text-sm p-6">No leads yet.</p>}
+  </div>
+</AdminLayout>

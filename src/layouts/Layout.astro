@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import logo from '../assets/logo.png';
 import logoWhite from '../assets/logo-white.png';
+import { getAllContent, c } from '../lib/content';
 
 export interface Props {
   title: string;
@@ -9,6 +10,10 @@ export interface Props {
 }
 const { title, description } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+export const prerender = false;
+const db = (Astro.locals as any).runtime?.env?.DB;
+const cm = db ? await getAllContent(db) : {};
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -246,8 +251,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         </span>
         <div>
           <p class="font-display font-semibold text-white">Call Us Anytime</p>
-          <p class="text-sm text-white/90 mt-1">+880 1686 007004 <span class="text-white/60">(Dhaka)</span></p>
-          <p class="text-sm text-white/90">+880 1619 130469 <span class="text-white/60">(Sylhet)</span></p>
+          <p class="text-sm text-white/90 mt-1">{c(cm, 'footer.phone_dhaka', '+880 1686 007004')} <span class="text-white/60">(Dhaka)</span></p>
+          <p class="text-sm text-white/90">{c(cm, 'footer.phone_sylhet', '+880 1619 130469')} <span class="text-white/60">(Sylhet)</span></p>
         </div>
       </div>
       <div class="flex items-start gap-4">
@@ -256,8 +261,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         </span>
         <div>
           <p class="font-display font-semibold text-white">Send Mail</p>
-          <p class="text-sm text-white/90 mt-1">apply@cloudbridge.info</p>
-          <p class="text-sm text-white/90">info@cloudbridge.info</p>
+          <p class="text-sm text-white/90 mt-1">{c(cm, 'footer.email_apply', 'apply@cloudbridge.info')}</p>
+          <p class="text-sm text-white/90">{c(cm, 'footer.email_info', 'info@cloudbridge.info')}</p>
         </div>
       </div>
       <div class="flex items-start gap-4">
@@ -266,8 +271,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         </span>
         <div>
           <p class="font-display font-semibold text-white">Our Address</p>
-          <p class="text-sm text-white/90 mt-1"><span class="font-semibold">Dhaka —</span> Lift 3, House 27, Road 21, Nikunjo-2, Dhaka 1229</p>
-          <p class="text-sm text-white/90"><span class="font-semibold">Sylhet —</span> 405-406 Manru Shopping City, 4th Floor, Chowhatta, Sylhet 3100</p>
+          <p class="text-sm text-white/90 mt-1"><span class="font-semibold">Dhaka —</span> {c(cm, 'footer.address_dhaka', 'Lift 3, House 27, Road 21, Nikunjo-2, Dhaka 1229')}</p>
+          <p class="text-sm text-white/90"><span class="font-semibold">Sylhet —</span> {c(cm, 'footer.address_sylhet', '405-406 Manru Shopping City, 4th Floor, Chowhatta, Sylhet 3100')}</p>
         </div>
       </div>
     </div>
@@ -279,7 +284,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         <a href="/" onclick="return spaNav(event,'home')" class="nav-link inline-flex items-center">
           <Image src={logoWhite} alt="CloudBridge — Study Abroad Consultants" class="h-20 md:h-24 w-auto object-contain" widths={[128, 256, 384]} sizes="(min-width: 768px) 96px, 80px" />
         </a>
-        <p class="mt-4 max-w-xs text-sm text-white/60">Your trusted partner for studying abroad — from university shortlisting to visa approval.</p>
+        <p class="mt-4 max-w-xs text-sm text-white/60">{c(cm, 'footer.description', 'Your trusted partner for studying abroad — from university shortlisting to visa approval.')}</p>
         <a href="/about" onclick="return spaNav(event,'about')" class="nav-link footer-btn-red inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold text-white mt-6">Read More</a>
       </div>
 
@@ -323,90 +328,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   </div>
 </footer>
 
-<div id="cbAdminRoot" class="hidden fixed inset-0 z-[9999] bg-cloud overflow-y-auto" style="font-family:'Lato',ui-sans-serif,system-ui,sans-serif;">
-
-  <div id="cbAdminLoginGate" class="min-h-screen flex items-center justify-center px-4">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-black/5 p-8">
-      <div class="font-bold text-xl text-bridge-900" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">CloudBridge Admin</div>
-      <p class="mt-1 text-sm text-ink/60">Sign in to continue</p>
-      <label class="block mt-5 text-sm font-semibold text-ink/70">Email</label>
-      <input id="cbAdminEmailInput" type="email" placeholder="you@example.com" autocomplete="off"
-        class="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
-      <label class="block mt-3 text-sm font-semibold text-ink/70">Password</label>
-      <input id="cbAdminPasswordInput" type="password" placeholder="Password" autocomplete="off"
-        class="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
-      <button id="cbAdminLoginBtn" class="mt-4 w-full bg-bridge-800 hover:bg-bridge-900 text-white font-semibold rounded-lg py-2.5 text-sm transition">Sign in</button>
-      <p id="cbAdminLoginError" class="mt-3 text-sm text-sunrise-600 hidden"></p>
-    </div>
-  </div>
-
-  <div id="cbAdminGate" class="hidden min-h-screen flex items-center justify-center px-4">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-black/5 p-8">
-      <div class="font-bold text-xl text-bridge-900" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">CloudBridge Admin</div>
-      <p class="mt-1 text-sm text-ink/60">Featured Universities manager</p>
-      <div class="mt-6 rounded-lg bg-bridge-50 border border-bridge-100 p-3 text-xs text-bridge-700 leading-relaxed">
-        Paste a GitHub personal access token with <strong>Contents: read and write</strong> access to
-        <code class="bg-white px-1 rounded">cloudbridgeint/cloudbridge.info</code>. Kept only in this
-        browser tab's memory — never saved, never sent anywhere except api.github.com.
-      </div>
-      <label class="block mt-5 text-sm font-semibold text-ink/70">GitHub Token</label>
-      <input id="cbAdminTokenInput" type="password" placeholder="ghp_..." autocomplete="off"
-        class="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
-      <button id="cbAdminConnectBtn" class="mt-4 w-full bg-sunrise-500 hover:bg-sunrise-600 text-white font-semibold rounded-lg py-2.5 text-sm transition">Connect</button>
-      <p id="cbAdminGateError" class="mt-3 text-sm text-sunrise-600 hidden"></p>
-    </div>
-  </div>
-
-  <div id="cbAdminDashboard" class="hidden min-h-screen">
-    <header class="bg-bridge-900 text-white">
-      <div class="max-w-6xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
-        <div>
-          <div class="font-bold" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">CloudBridge Admin</div>
-          <p class="text-xs text-white/50">Featured Universities manager</p>
-        </div>
-        <button id="cbAdminDisconnectBtn" class="text-xs text-white/70 hover:text-white border border-white/20 rounded-lg px-3 py-1.5">Disconnect</button>
-      </div>
-    </header>
-    <main class="max-w-6xl mx-auto px-4 md:px-8 py-8">
-      <div id="cbAdminCountryTabs" class="flex flex-wrap gap-2 mb-6"></div>
-      <div class="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-bold text-lg" id="cbAdminPanelTitle" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">UK — current logos</h2>
-          <span id="cbAdminItemCount" class="text-xs text-ink/50"></span>
-        </div>
-        <div id="cbAdminLogoGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
-      </div>
-      <div class="bg-white rounded-2xl border border-black/5 shadow-sm p-6 mt-6">
-        <h2 class="font-bold text-lg mb-4" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">Add a logo</h2>
-        <div class="grid sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
-          <div>
-            <label class="block text-xs font-semibold text-ink/60 mb-1">Institution name</label>
-            <input id="cbAdminNewName" type="text" placeholder="e.g. Example University"
-              class="w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-ink/60 mb-1">Logo image (PNG/JPG)</label>
-            <input id="cbAdminNewFile" type="file" accept="image/png,image/jpeg" class="w-full text-sm">
-          </div>
-          <button id="cbAdminAddBtn" class="bg-bridge-800 hover:bg-bridge-900 text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition">Stage</button>
-        </div>
-        <p class="mt-2 text-xs text-ink/40">Staged additions/removals aren't live until you click "Save changes" below.</p>
-      </div>
-      <div class="sticky bottom-4 mt-6">
-        <div class="bg-white rounded-2xl border border-black/10 shadow-lg p-4 flex items-center justify-between">
-          <div id="cbAdminStageStatus" class="text-sm text-ink/60">No pending changes.</div>
-          <button id="cbAdminSaveBtn" disabled
-            class="bg-sunrise-500 hover:bg-sunrise-600 disabled:bg-ink/20 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-6 py-2.5 text-sm transition">Save changes</button>
-        </div>
-      </div>
-      <div id="cbAdminLogBox" class="mt-6 bg-bridge-950 text-white/80 rounded-2xl p-4 text-xs font-mono hidden max-h-64 overflow-y-auto"></div>
-    </main>
-  </div>
-</div>
-
-
-
 <script src="/scripts/main.js" is:inline></script>
-<script src="/scripts/admin.js" is:inline></script>
 </body>
 </html>
