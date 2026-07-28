@@ -99,7 +99,7 @@ export const prerender = false;
 
   <script is:inline>
     const bgVideo = document.getElementById('bgVideo');
-    function setSlowRate() { bgVideo.playbackRate = 0.2; }
+    function setSlowRate() { bgVideo.playbackRate = 0.5; }
     setSlowRate();
     bgVideo.addEventListener('loadedmetadata', setSlowRate);
     bgVideo.addEventListener('play', setSlowRate);
