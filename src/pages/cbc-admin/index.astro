@@ -1,90 +1,158 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import { getVisitSummary, getVisitsByDay } from '../../lib/content';
+import { getVisitSummary, getVisitsByDay, getTopCountries } from '../../lib/content';
 export const prerender = false;
 
 const db = (Astro.locals as any).runtime.env.DB;
-const [leadsCount, uniCount, blogCount, eventCount, visits, byDay] = await Promise.all([
+const [leadsCount, uniCount, blogCount, eventCount, visits, byDay, topCountries, recentLeads] = await Promise.all([
   db.prepare('SELECT COUNT(*) as n FROM leads').first(),
   db.prepare('SELECT COUNT(*) as n FROM universities WHERE active = 1').first(),
   db.prepare('SELECT COUNT(*) as n FROM blog_posts').first(),
   db.prepare('SELECT COUNT(*) as n FROM events').first(),
   getVisitSummary(db),
   getVisitsByDay(db, 14),
+  getTopCountries(db, 3),
+  db.prepare('SELECT name, email, source_page, status, created_at FROM leads ORDER BY created_at DESC LIMIT 6').all(),
 ]);
 
 const maxDay = Math.max(1, ...byDay.map((r: any) => r.n));
+const leadsList = (recentLeads as any).results || [];
+
+const totalCountryVisits = topCountries.reduce((s: number, r: any) => s + r.n, 0) || 1;
+const segments = topCountries.map((r: any, i: number) => ({
+  label: r.country,
+  pct: Math.round((r.n / totalCountryVisits) * 100),
+  color: ['bg-bridge-800', 'bg-bridge-500', 'bg-sunrise-500'][i] || 'bg-slate-300',
+}));
 
 const statCards = [
-  { label: 'Visitors Today', value: visits.today, icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12z', tone: 'from-bridge-900 to-bridge-950 text-white' },
-  { label: 'Visitors This Month', value: visits.thisMonth, icon: 'M8 2v4M16 2v4M3 9h18M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z', tone: 'bg-white text-bridge-950' },
-  { label: 'Total Leads', value: leadsCount?.n ?? 0, icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z', tone: 'bg-white text-bridge-950' },
-  { label: 'Blog Posts', value: blogCount?.n ?? 0, icon: 'M4 4h11a2 2 0 012 2v13a1 1 0 01-1.55.84L11 17l-4.45 2.84A1 1 0 015 19V6a2 2 0 012-2z', tone: 'from-sunrise-600 to-red-800 text-white' },
-];
-
-const quickLinks = [
-  { label: 'Edit Homepage Content', desc: 'Hero slides, sections, images', href: '/cbc-admin/homepage' },
-  { label: 'Manage Universities', desc: 'Add/remove featured logos', href: '/cbc-admin/universities' },
-  { label: 'Write a Blog Post', desc: 'Create and publish articles', href: '/cbc-admin/blogs' },
-  { label: 'View Full Analytics', desc: 'Visitor traffic, by day/month/year', href: '/cbc-admin/analytics' },
+  { label: 'Visitors Today', value: visits.today, badge: 'badge-navy', icon: 'M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.06 7-9.54 7S3.73 16.06 2.46 12z' },
+  { label: 'This Month', value: visits.thisMonth, badge: 'badge-slate', icon: 'M8 2v4M16 2v4M3 9h18M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z' },
+  { label: 'Total Leads', value: leadsCount?.n ?? 0, badge: 'badge-red', icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z' },
+  { label: 'Blog Posts', value: blogCount?.n ?? 0, badge: 'badge-rose', icon: 'M4 4h11a2 2 0 012 2v13a1 1 0 01-1.55.84L11 17l-4.45 2.84A1 1 0 015 19V6a2 2 0 012-2z' },
 ];
 ---
 <AdminLayout title="Dashboard" active="dashboard">
-  <p class="text-bridge-600 text-sm font-medium">Welcome back!</p>
-  <h1 class="text-2xl font-bold text-bridge-950">Dashboard</h1>
 
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-    {statCards.map(c => (
-      <div class={`rounded-2xl p-5 ring-1 ring-black/5 shadow-sm ${c.tone.startsWith('from') ? `bg-gradient-to-br ${c.tone}` : c.tone}`}>
-        <svg class="w-6 h-6 opacity-70 mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={c.icon}/></svg>
-        <p class="text-3xl font-extrabold">{c.value}</p>
-        <p class="text-sm font-medium mt-1 opacity-80">{c.label}</p>
-      </div>
-    ))}
-  </div>
-
-  <div class="grid lg:grid-cols-3 gap-6 mt-6">
-    <div class="lg:col-span-2 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+  <div class="grid lg:grid-cols-2 gap-5">
+    <!-- Recent Activity (Next Game equivalent) -->
+    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="font-semibold text-bridge-950">Visitors — Last 14 Days</h2>
-        <a href="/cbc-admin/analytics" class="text-xs font-medium text-bridge-700 hover:underline">Full analytics &rarr;</a>
+        <h2 class="font-semibold text-bridge-950">Latest Lead</h2>
+        <a href="/cbc-admin/leads" class="text-xs font-medium text-bridge-600 hover:underline">View All</a>
       </div>
-      {byDay.length === 0 ? (
-        <p class="text-slate-400 text-sm">No visit data yet — check back once the site gets traffic.</p>
-      ) : (
-        <div class="flex items-end gap-2 h-32">
-          {byDay.map((r: any) => (
-            <div class="flex-1 flex flex-col items-center justify-end h-full">
-              <div class="w-full rounded-t-md bg-gradient-to-t from-bridge-800 to-bridge-500" style={`height:${Math.max((r.n / maxDay) * 100, 4)}%`}></div>
+      {leadsList.length > 0 ? (
+        <div>
+          <p class="text-xs text-slate-400">{leadsList[0].source_page || 'Website form'} &middot; {leadsList[0].created_at}</p>
+          <div class="mt-3 flex items-center justify-between">
+            <div>
+              <p class="font-display font-bold text-lg text-bridge-950">{leadsList[0].name || 'Anonymous'}</p>
+              <p class="text-sm text-slate-500">{leadsList[0].email}</p>
             </div>
-          ))}
+            <span class="text-xs font-semibold px-3 py-1.5 rounded-full bg-bridge-50 text-bridge-700 capitalize">{leadsList[0].status}</span>
+          </div>
         </div>
+      ) : (
+        <p class="text-slate-400 text-sm py-6">No leads yet — they'll show up here once the contact forms start getting submissions.</p>
       )}
     </div>
 
+    <!-- Traffic split (Games Statistic equivalent) -->
     <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
-      <h2 class="font-semibold text-bridge-950 mb-4">At a Glance</h2>
-      <div class="space-y-3 text-sm">
-        <div class="flex justify-between"><span class="text-slate-500">Total visits (all time)</span><span class="font-semibold text-bridge-950">{visits.total}</span></div>
-        <div class="flex justify-between"><span class="text-slate-500">This year</span><span class="font-semibold text-bridge-950">{visits.thisYear}</span></div>
-        <div class="flex justify-between"><span class="text-slate-500">Universities listed</span><span class="font-semibold text-bridge-950">{uniCount?.n ?? 0}</span></div>
-        <div class="flex justify-between"><span class="text-slate-500">Upcoming events</span><span class="font-semibold text-bridge-950">{eventCount?.n ?? 0}</span></div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-bridge-950">Traffic by Country</h2>
+        <a href="/cbc-admin/analytics" class="text-xs font-medium text-bridge-600 hover:underline">View All Statistic</a>
       </div>
+      {segments.length > 0 ? (
+        <>
+          <div class="flex w-full h-2.5 rounded-full overflow-hidden bg-slate-100">
+            {segments.map(s => <div class={`h-full ${s.color}`} style={`width:${s.pct}%`}></div>)}
+          </div>
+          <div class="flex justify-between mt-4">
+            {segments.map(s => (
+              <div class="text-center">
+                <p class="text-xs text-slate-400">{s.label}</p>
+                <p class="font-semibold text-bridge-950 text-sm mt-0.5">{s.pct}%</p>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <p class="text-slate-400 text-sm py-6">No traffic data yet.</p>
+      )}
     </div>
   </div>
 
-  <div class="mt-6 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
-    <h2 class="font-semibold text-bridge-950 mb-4">Quick Links</h2>
-    <div class="grid sm:grid-cols-2 gap-3">
-      {quickLinks.map(l => (
-        <a href={l.href} class="flex items-center justify-between px-4 py-3.5 rounded-xl border border-slate-200 hover:border-bridge-700 hover:bg-bridge-50 transition">
-          <div>
-            <p class="text-sm font-semibold text-bridge-950">{l.label}</p>
-            <p class="text-xs text-slate-400 mt-0.5">{l.desc}</p>
+  <div class="grid lg:grid-cols-2 gap-5 mt-5">
+    <!-- Recent leads table (Standings equivalent) -->
+    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-bridge-950">Recent Leads</h2>
+        <a href="/cbc-admin/leads" class="text-xs font-medium text-bridge-600 hover:underline">View All</a>
+      </div>
+      {leadsList.length > 0 ? (
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-slate-400">
+              <th class="font-medium pb-2">Name</th>
+              <th class="font-medium pb-2">Source</th>
+              <th class="font-medium pb-2 text-right">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {leadsList.map((l: any) => (
+              <tr class="border-t border-slate-50">
+                <td class="py-2.5 font-medium text-bridge-950">{l.name || 'Anonymous'}</td>
+                <td class="py-2.5 text-slate-500">{l.source_page || '—'}</td>
+                <td class="py-2.5 text-right"><span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-bridge-50 text-bridge-700 capitalize">{l.status}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p class="text-slate-400 text-sm py-6">No leads yet.</p>
+      )}
+    </div>
+
+    <!-- 2x2 stat badge cards -->
+    <div class="grid grid-cols-2 gap-4">
+      {statCards.map(c => (
+        <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
+          <div class={`w-10 h-10 rounded-xl ${c.badge} flex items-center justify-center mb-3`}>
+            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={c.icon}/></svg>
           </div>
-          <span class="text-slate-300">&rarr;</span>
-        </a>
+          <p class="text-xs text-slate-400 uppercase tracking-wide font-medium">{c.label}</p>
+          <p class="text-2xl font-extrabold text-bridge-950 mt-1">{c.value}</p>
+        </div>
       ))}
     </div>
+  </div>
+
+  <!-- Mini 14-day chart -->
+  <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6 mt-5">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-semibold text-bridge-950">Visitors — Last 14 Days</h2>
+      <a href="/cbc-admin/analytics" class="text-xs font-medium text-bridge-600 hover:underline">Full analytics &rarr;</a>
+    </div>
+    {byDay.length === 0 ? (
+      <p class="text-slate-400 text-sm">No visit data yet.</p>
+    ) : (
+      <div class="flex items-end gap-2 h-28">
+        {byDay.map((r: any) => (
+          <div class="flex-1 flex flex-col items-center justify-end h-full">
+            <div class="w-full rounded-t-md bg-gradient-to-t from-bridge-800 to-bridge-500" style={`height:${Math.max((r.n / maxDay) * 100, 4)}%`}></div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <!-- CTA banner -->
+  <div class="mt-5 rounded-2xl overflow-hidden relative bg-gradient-to-br from-bridge-900 to-bridge-950 p-8 flex items-center justify-between gap-6">
+    <div>
+      <p class="text-sunrise-400 text-xs font-bold uppercase tracking-wide mb-2">Reminder</p>
+      <p class="text-white text-xl md:text-2xl font-display font-bold leading-snug">Review your latest leads<br class="hidden md:block"> before they go cold</p>
+    </div>
+    <a href="/cbc-admin/leads" class="shrink-0 bg-white text-bridge-950 font-semibold text-sm rounded-full px-6 py-3 hover:bg-slate-100 transition whitespace-nowrap">Review Leads</a>
   </div>
 </AdminLayout>
