@@ -1,0 +1,228 @@
+---
+import Layout from '../layouts/Layout.astro';
+const title = "Scholarships | CloudBridge Study Abroad";
+const description = "Find scholarships at 500+ universities — CloudBridge counsellors match you with funding you actually qualify for.";
+---
+<Layout title={title} description={description}>
+
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a href="/">Home</a> / Scholarship</p>
+    <div class="mt-4 grid md:grid-cols-2 gap-8 items-center">
+      <div>
+        <p class="inline-block mb-4 px-4 py-1 rounded-full border border-white/20 text-sunrise-200 text-sm font-medium">Free Scholarship Guidance</p>
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">Scholarships at 500+ Universities</h1>
+        <p class="mt-4 max-w-xl text-white/75">Let our counsellors match you with funding you actually qualify for — most students never even check. From merit awards to country-specific grants, we help you find real money for your degree.</p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href="/#lead-form" class="btn-primary nav-link inline-flex">Check My Eligibility</a>
+          <a href="/contact" class="btn-secondary nav-link inline-flex">Talk to a Counsellor</a>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <div class="bg-white/5 border border-white/10 rounded-2xl px-3 py-5">
+          <p class="counter font-display text-3xl font-extrabold text-sunrise-200" data-target="500">0</p>
+          <p class="mt-1 text-xs text-white/70">Partner Universities</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl px-3 py-5">
+          <p class="counter font-display text-3xl font-extrabold text-sunrise-200" data-target="10000">0</p>
+          <p class="mt-1 text-xs text-white/70">Students Placed</p>
+        </div>
+        <div class="bg-white/5 border border-white/10 rounded-2xl px-3 py-5">
+          <p class="counter font-display text-3xl font-extrabold text-sunrise-200" data-target="13">0</p>
+          <p class="mt-1 text-xs text-white/70">Years of Experience</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-xl">
+      <h2 class="section-heading">Types of Funding</h2>
+      <p class="mt-3 text-ink/60">Scholarships and funding come in more forms than most students realise — our counsellors check every option that applies to your profile.</p>
+    </div>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
+        <div class="w-11 h-11 rounded-xl bg-bridge-50 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-bridge-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 3 8.5 12 13l9-4.5L12 4Z"/><path d="M6.5 10.6V15c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3v-4.4"/></svg>
+        </div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Merit-Based Scholarships</h3>
+        <p class="mt-2 text-sm text-ink/60">Awarded for strong academic results — often applied automatically during admission.</p>
+        <span class="course-badge mt-4">Academic Results</span>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
+        <div class="w-11 h-11 rounded-xl bg-bridge-50 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-bridge-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.5 14.2s.9 1.3 2.5 1.3 2.5-.8 2.5-1.7c0-2.4-5-1.1-5-3.5 0-.9 1-1.7 2.5-1.7s2.5 1.3 2.5 1.3"/><path d="M12 7.3v1.1M12 15.6v1.1"/></svg>
+        </div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Need-Based Funding</h3>
+        <p class="mt-2 text-sm text-ink/60">Partial or full tuition support based on demonstrated financial need.</p>
+        <span class="course-badge mt-4">Tuition Support</span>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
+        <div class="w-11 h-11 rounded-xl bg-bridge-50 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-bridge-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.7 12h16.6M12 3.7c2.2 2.3 3.4 5.2 3.4 8.3s-1.2 6-3.4 8.3c-2.2-2.3-3.4-5.2-3.4-8.3s1.2-6 3.4-8.3Z"/></svg>
+        </div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Country &amp; University Grants</h3>
+        <p class="mt-2 text-sm text-ink/60">Destination-specific and university-specific awards for international students.</p>
+        <span class="course-badge mt-4">Destination-Specific</span>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
+        <div class="w-11 h-11 rounded-xl bg-bridge-50 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-bridge-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v5.2M8.4 6.6 12 9.2l3.6-2.6"/><path d="M6 9.5v3.8c0 3.2 2.7 5.8 6 5.8s6-2.6 6-5.8V9.5"/><path d="M9.5 19.1 9 21m6-1.9.5 1.9"/></svg>
+        </div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Talent &amp; Sports Awards</h3>
+        <p class="mt-2 text-sm text-ink/60">Funding for demonstrated ability in sports, arts, leadership, or extracurriculars.</p>
+        <span class="course-badge mt-4">Non-Academic</span>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5">
+        <div class="w-11 h-11 rounded-xl bg-bridge-50 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 text-bridge-700" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="6" width="17" height="12" rx="2"/><path d="M3.5 10.5h17"/><path d="M7 14.2h4"/></svg>
+        </div>
+        <h3 class="mt-4 font-display font-bold text-bridge-900">Application &amp; Fee Waivers</h3>
+        <p class="mt-2 text-sm text-ink/60">Reduced or waived application fees and early-bird tuition discounts at partner institutions.</p>
+        <span class="course-badge mt-4">Cost Savings</span>
+      </div>
+      <div class="bg-bridge-950 text-white rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <h3 class="font-display font-bold">Not sure what you qualify for?</h3>
+          <p class="mt-2 text-sm text-white/70">Share your academic profile once — we'll check every scholarship route across our partner universities for you, free of charge.</p>
+        </div>
+        <a href="/#lead-form" class="btn-primary nav-link mt-5 inline-flex !bg-[#db1f2a] hover:!bg-[#c01822]">Get My Free Match</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-bridge-50/50">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <h2 class="section-heading text-center mx-auto">How Scholarship Support Works</h2>
+    <p class="mt-3 text-ink/60 text-center max-w-xl mx-auto">Four simple steps from your first message to a confirmed funding offer.</p>
+
+    <div class="mt-12 timeline-wrap max-w-3xl mx-auto">
+      <div class="timeline-line"></div>
+
+      <div class="relative pl-12 md:pl-0 md:grid md:grid-cols-2 md:gap-10 pb-10">
+        <div class="timeline-dot" style="top:0.4rem"></div>
+        <div class="md:text-right md:pr-2">
+          <div class="timeline-card inline-block text-left">
+            <span class="timeline-year">Step 1</span>
+            <h3 class="font-display font-bold text-bridge-900">Free Eligibility Check</h3>
+            <p class="mt-1 text-sm text-ink/60">Tell us your academics, destination, and budget — we screen every scholarship you could realistically qualify for.</p>
+          </div>
+        </div>
+        <div class="hidden md:block"></div>
+      </div>
+
+      <div class="relative pl-12 md:pl-0 md:grid md:grid-cols-2 md:gap-10 pb-10">
+        <div class="timeline-dot" style="top:0.4rem"></div>
+        <div class="hidden md:block"></div>
+        <div class="md:pl-2">
+          <div class="timeline-card inline-block text-left">
+            <span class="timeline-year">Step 2</span>
+            <h3 class="font-display font-bold text-bridge-900">Profile &amp; Document Review</h3>
+            <p class="mt-1 text-sm text-ink/60">Your counsellor reviews transcripts, test scores, and statements to strengthen your scholarship case.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative pl-12 md:pl-0 md:grid md:grid-cols-2 md:gap-10 pb-10">
+        <div class="timeline-dot" style="top:0.4rem"></div>
+        <div class="md:text-right md:pr-2">
+          <div class="timeline-card inline-block text-left">
+            <span class="timeline-year">Step 3</span>
+            <h3 class="font-display font-bold text-bridge-900">Application &amp; Matching</h3>
+            <p class="mt-1 text-sm text-ink/60">We apply on your behalf to matching university and country-specific funding alongside your admission.</p>
+          </div>
+        </div>
+        <div class="hidden md:block"></div>
+      </div>
+
+      <div class="relative pl-12 md:pl-0 md:grid md:grid-cols-2 md:gap-10">
+        <div class="timeline-dot" style="top:0.4rem"></div>
+        <div class="hidden md:block"></div>
+        <div class="md:pl-2">
+          <div class="timeline-card inline-block text-left">
+            <span class="timeline-year">Step 4</span>
+            <h3 class="font-display font-bold text-bridge-900">Award &amp; Visa Support</h3>
+            <p class="mt-1 text-sm text-ink/60">Once your funding is confirmed, we carry straight on into visa document prep — no gaps, no guesswork.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <h2 class="section-heading text-center mx-auto">Scholarships by Destination</h2>
+    <p class="mt-3 text-ink/60 text-center max-w-xl mx-auto">Funding rules and amounts vary by country — explore what's available where you want to study.</p>
+    <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="university-card rounded-2xl overflow-hidden ring-1 ring-black/5 bg-white">
+        <div class="h-2 bg-bridge-700"></div>
+        <div class="p-6">
+          <h3 class="font-display font-bold text-bridge-900">United Kingdom</h3>
+          <p class="mt-2 text-sm text-ink/60">Merit scholarships, Chevening-style awards, and university-specific bursaries for international students.</p>
+          <a href="/dest-uk" class="uni-card-btn mt-4 inline-flex items-center gap-1 text-sm font-semibold text-bridge-800 border border-bridge-800/30 px-4 py-2 nav-link">Explore UK Options &rarr;</a>
+        </div>
+      </div>
+      <div class="university-card rounded-2xl overflow-hidden ring-1 ring-black/5 bg-white">
+        <div class="h-2 bg-harbor-500"></div>
+        <div class="p-6">
+          <h3 class="font-display font-bold text-bridge-900">Malaysia</h3>
+          <p class="mt-2 text-sm text-ink/60">Tuition fee waivers and living-cost-friendly funding at partner universities across Malaysia.</p>
+          <a href="/dest-malaysia" class="uni-card-btn mt-4 inline-flex items-center gap-1 text-sm font-semibold text-bridge-800 border border-bridge-800/30 px-4 py-2 nav-link">Explore Malaysia Options &rarr;</a>
+        </div>
+      </div>
+      <div class="university-card rounded-2xl overflow-hidden ring-1 ring-black/5 bg-white">
+        <div class="h-2 bg-sunrise-400"></div>
+        <div class="p-6">
+          <h3 class="font-display font-bold text-bridge-900">USA</h3>
+          <p class="mt-2 text-sm text-ink/60">Merit-based awards and assistantship routes at partner colleges and universities across the USA.</p>
+          <a href="/dest-usa" class="uni-card-btn mt-4 inline-flex items-center gap-1 text-sm font-semibold text-bridge-800 border border-bridge-800/30 px-4 py-2 nav-link">Explore USA Options &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-bridge-50/50">
+  <div class="max-w-container mx-auto px-4 md:px-8 max-w-3xl">
+    <h2 class="section-heading text-center mx-auto">Scholarship FAQs</h2>
+    <div class="mt-10 border border-black/10 rounded-2xl divide-y divide-black/10 bg-white">
+      <div>
+        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Is the scholarship check really free?<span class="faq-icon transition-transform">+</span></button>
+        <p class="faq-answer px-6 pb-5 text-sm text-ink/70">Yes — reviewing your eligibility and matching you with available funding is part of our free consultation, with no upfront cost to you.</p>
+      </div>
+      <div>
+        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Do all universities offer scholarships?<span class="faq-icon transition-transform">+</span></button>
+        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">Most of our 500+ partner universities offer at least one form of funding, though the amount and type vary by course, intake, and your academic profile.</p>
+      </div>
+      <div>
+        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">When should I apply for a scholarship?<span class="faq-icon transition-transform">+</span></button>
+        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">As early as possible. Many merit and country-specific awards close before general admission deadlines, so we check funding options the moment you shortlist a university.</p>
+      </div>
+      <div>
+        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Can I combine a scholarship with a student loan?<span class="faq-icon transition-transform">+</span></button>
+        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">In most cases, yes. A scholarship simply reduces the amount you need to fund separately — your counsellor can help you plan both together.</p>
+      </div>
+      <div>
+        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Will a low IELTS score affect my scholarship chances?<span class="faq-icon transition-transform">+</span></button>
+        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">It can for some merit awards, but many need-based and country-specific grants weigh academic results and financial need more heavily. We'll tell you honestly where you stand.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-white text-center">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <h2 class="section-heading text-center mx-auto">Find Out What You Qualify For</h2>
+    <p class="mt-3 max-w-xl mx-auto text-ink/60">Tell us your academic background and destination — we'll match you with real funding options, free of charge.</p>
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+      <a href="/#lead-form" class="btn-primary nav-link inline-flex">Check Scholarship Eligibility</a>
+      <a href="/contact" class="btn-outline nav-link inline-flex">Talk to a Counsellor</a>
+    </div>
+  </div>
+</section>
+
+</Layout>

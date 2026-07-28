@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/Layout.astro';
+const title = "Study in the UK | CloudBridge Study Abroad Consultancy";
+const description = "Everything you need to study in the United Kingdom — universities, courses, costs, and visa guidance from CloudBridge.";
+---
+<Layout title={title} description={description}>
+
+<section class="text-white py-20" style="background-image:linear-gradient(160deg,#0f1c30,#2e4a7a); background-size:cover;">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a href="/">Home</a> / <a href="/destinations">Study Destination</a> / United Kingdom</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Study in the United Kingdom</h1>
+    <p class="mt-4 max-w-xl text-white/80">Globally respected degrees, world-class research, and a huge international student community.</p>
+    <a href="/#lead-form" class="btn-primary nav-link mt-8 inline-flex">Book Free Consultation</a>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10">
+    <div>
+      <h2 class="font-display text-xl font-bold text-bridge-900">Why study in the UK?</h2>
+      <ul class="mt-4 space-y-3 text-sm text-ink/70">
+        <li>• 99% visa success rate with our application support</li>
+        <li>• 150+ partner universities across the UK</li>
+        <li>• 1-2 year Master's programs — faster than most countries</li>
+        <li>• Post-study Graduate Route visa (2 years)</li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="font-display text-xl font-bold text-bridge-900">Popular programs</h2>
+      <ul class="mt-4 space-y-3 text-sm text-ink/70">
+        <li>• Business & Management (MSc/MBA)</li>
+        <li>• Computer Science & Data Science</li>
+        <li>• Civil & Mechanical Engineering</li>
+        <li>• Public Health & Nursing</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</Layout>

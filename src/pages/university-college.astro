@@ -1,0 +1,163 @@
+---
+import Layout from '../layouts/Layout.astro';
+const title = "Universities & Colleges | CloudBridge Study Abroad";
+const description = "Browse 500+ partner universities and colleges in the UK, Malaysia, and the USA with CloudBridge's study abroad directory.";
+---
+<Layout title={title} description={description}>
+
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a href="/">Home</a> / University & College</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">University & College</h1>
+    <p class="mt-4 max-w-xl text-white/75">500+ partner universities and colleges across 10 countries. Filter by country, city, tuition budget, and intake to find your fit.</p>
+  </div>
+</section>
+
+<section class="py-10 md:py-14 bg-white">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+
+    <h2 class="section-heading text-center mx-auto mb-2">Select Your Preferred University and Apply Today</h2>
+    <p id="uniResultsCount" class="text-sm text-ink/60 mb-8 text-center">Showing all universities</p>
+
+    <button id="uniFilterToggle" class="lg:hidden w-full mb-4 flex items-center justify-between rounded-xl border border-black/10 px-4 py-3 font-display font-semibold text-bridge-900">
+      <span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M2.5 4.5A1 1 0 013.5 3.5h13a1 1 0 01.8 1.6l-5.3 6.9v4a1 1 0 01-.45.834l-2 1.333A1 1 0 017.5 17V12l-5.3-6.9a1 1 0 01-.2-.6z" clip-rule="evenodd" /></svg>Filters</span>
+      <svg id="uniFilterToggleIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 transition-transform"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+    </button>
+
+    <div class="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8 lg:items-start">
+
+      <aside id="uniFilterPanel" class="hidden lg:block mb-6 lg:mb-0">
+        <div class="lg:sticky lg:top-24 rounded-2xl border border-black/10 shadow-sm p-5 space-y-6 max-h-[calc(100vh-7rem)] overflow-y-auto">
+
+          <div class="flex items-center justify-between">
+            <h3 class="font-display font-bold text-bridge-900 text-lg">Filters</h3>
+            <button id="uniClearFilters" class="text-sm font-semibold text-sunrise-600 hover:underline">Reset</button>
+          </div>
+
+          <div id="uniActiveChips" class="flex flex-wrap gap-2 hidden"></div>
+
+          <div class="space-y-3">
+
+            <div class="uni-accordion" data-acc="country">
+              <button class="uni-accordion-btn" type="button">
+                <span>Country<span class="uni-accordion-count hidden" id="uniCountCountry"></span></span>
+                <svg class="uni-accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+              <div class="uni-accordion-panel hidden">
+                <div id="uniFilterCountry" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+              </div>
+            </div>
+
+            <div class="uni-accordion" data-acc="university">
+              <button class="uni-accordion-btn" type="button">
+                <span>University</span>
+                <svg class="uni-accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+              <div class="uni-accordion-panel hidden">
+                <input id="uniSearchInput" type="text" placeholder="Search University" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sunrise-400 mb-2">
+                <div id="uniFilterUniversity" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+              </div>
+            </div>
+
+            <div class="uni-accordion" data-acc="faculty">
+              <button class="uni-accordion-btn" type="button">
+                <span>Faculty<span class="uni-accordion-count hidden" id="uniCountFaculty"></span></span>
+                <svg class="uni-accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+              <div class="uni-accordion-panel hidden">
+                <div id="uniFilterFaculty" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+              </div>
+            </div>
+
+            <div class="uni-accordion" data-acc="studylevel">
+              <button class="uni-accordion-btn" type="button">
+                <span>Study Level<span class="uni-accordion-count hidden" id="uniCountStudyLevel"></span></span>
+                <svg class="uni-accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+              <div class="uni-accordion-panel hidden">
+                <div id="uniFilterStudyLevel" class="space-y-1.5"></div>
+              </div>
+            </div>
+
+            <div class="uni-accordion" data-acc="intakemonth">
+              <button class="uni-accordion-btn" type="button">
+                <span>Intake Month<span class="uni-accordion-count hidden" id="uniCountIntake"></span></span>
+                <svg class="uni-accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+              <div class="uni-accordion-panel hidden">
+                <div id="uniFilterIntake" class="space-y-1.5"></div>
+              </div>
+            </div>
+
+            <div class="uni-accordion" data-acc="intakeyear">
+              <button class="uni-accordion-btn" type="button">
+                <span>Intake Year<span class="uni-accordion-count hidden" id="uniCountIntakeYear"></span></span>
+                <svg class="uni-accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+              <div class="uni-accordion-panel hidden">
+                <div id="uniFilterIntakeYear" class="space-y-1.5"></div>
+              </div>
+            </div>
+
+            <div class="uni-accordion" data-acc="location">
+              <button class="uni-accordion-btn" type="button">
+                <span>Location<span class="uni-accordion-count hidden" id="uniCountCity"></span></span>
+                <svg class="uni-accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+              <div class="uni-accordion-panel hidden">
+                <div id="uniFilterCity" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+              </div>
+            </div>
+
+            <div class="uni-accordion" data-acc="ranking">
+              <button class="uni-accordion-btn" type="button">
+                <span>Ranking</span>
+                <svg class="uni-accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+              <div class="uni-accordion-panel hidden">
+                <select id="uniFilterRanking" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm">
+                  <option value="any">Any Ranking</option>
+                  <option value="100">Top 100</option>
+                  <option value="300">Top 300</option>
+                  <option value="500">Top 500</option>
+                  <option value="1000">Top 1000</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="uni-accordion" data-acc="fee">
+              <button class="uni-accordion-btn" type="button">
+                <span>Tuition Fee</span>
+                <svg class="uni-accordion-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+              <div class="uni-accordion-panel hidden">
+                <div class="flex items-center gap-2">
+                  <select id="uniFilterFeeMin" class="w-1/2 rounded-lg border border-black/15 px-2 py-2 text-sm"></select>
+                  <span class="text-ink/40 text-sm">to</span>
+                  <select id="uniFilterFeeMax" class="w-1/2 rounded-lg border border-black/15 px-2 py-2 text-sm"></select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <button id="uniApplyFilters" class="btn-primary w-full !rounded-lg justify-center">Apply Filters</button>
+
+        </div>
+      </aside>
+
+      <div>
+        <div id="uniDirectoryGrid" class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+
+        <div id="uniEmptyState" class="hidden text-center py-16">
+          <p class="font-display font-bold text-bridge-900 text-lg">No universities match your filters</p>
+          <p class="mt-1 text-sm text-ink/60">Try widening your fee range or clearing a filter.</p>
+          <button id="uniEmptyClear" class="btn-outline mt-4">Clear all filters</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</Layout>

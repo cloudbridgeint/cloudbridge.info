@@ -1,0 +1,79 @@
+---
+import Layout from '../layouts/Layout.astro';
+const title = "Courses & Programs | CloudBridge Study Abroad";
+const description = "Browse available courses and programs across partner universities in the UK, Malaysia, and the USA with CloudBridge.";
+---
+<Layout title={title} description={description}>
+
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a href="/">Home</a> / Course</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Available Courses</h1>
+    <p class="mt-4 max-w-xl text-white/75">Search and filter real courses from our 40 partner universities across 10 countries — find the one that fits your subject, level, and schedule.</p>
+  </div>
+</section>
+
+<section class="py-10 md:py-14 bg-white">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+
+    <h2 class="section-heading text-center mx-auto mb-2">Find Your Course and Apply Today</h2>
+    <p id="courseResultsCount" class="text-sm text-ink/60 mb-8 text-center">Showing all courses</p>
+
+    <button id="courseFilterToggle" class="lg:hidden w-full mb-4 flex items-center justify-between rounded-xl border border-black/10 px-4 py-3 font-display font-semibold text-bridge-900">
+      <span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M2.5 4.5A1 1 0 013.5 3.5h13a1 1 0 01.8 1.6l-5.3 6.9v4a1 1 0 01-.45.834l-2 1.333A1 1 0 017.5 17V12l-5.3-6.9a1 1 0 01-.2-.6z" clip-rule="evenodd" /></svg>Filters</span>
+      <svg id="courseFilterToggleIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 transition-transform"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.063a.75.75 0 111.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0l-4.25-4.65a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+    </button>
+
+    <div class="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8 lg:items-start">
+
+      <aside id="courseFilterPanel" class="hidden lg:block mb-6 lg:mb-0">
+        <div class="lg:sticky lg:top-24 rounded-2xl border border-black/10 shadow-sm p-5 space-y-4 max-h-[calc(100vh-7rem)] overflow-y-auto">
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Search</label>
+            <input id="courseSearchInput" type="text" placeholder="Search course..." class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sunrise-400">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Subject</label>
+            <select id="courseFilterSubject" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm"><option value="">Select</option></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Study Level</label>
+            <select id="courseFilterLevel" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm"><option value="">Select</option></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Delivery Method</label>
+            <select id="courseFilterDelivery" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm"><option value="">Select</option></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-ink/40 mb-2">Duration</label>
+            <select id="courseFilterDuration" class="w-full rounded-lg border border-black/15 px-3 py-2 text-sm"><option value="">Select</option></select>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button id="courseResetFilters" class="btn-outline !rounded-lg !text-sm flex-1">Reset</button>
+            <button id="courseApplyFilters" class="btn-primary !rounded-lg !text-sm flex-1 justify-center">Apply</button>
+          </div>
+
+        </div>
+      </aside>
+
+      <div>
+        <div id="courseDirectoryList" class="space-y-4"></div>
+
+        <div id="courseEmptyState" class="hidden text-center py-16">
+          <p class="font-display font-bold text-bridge-900 text-lg">No courses match your filters</p>
+          <p class="mt-1 text-sm text-ink/60">Try clearing a filter to see more results.</p>
+          <button id="courseEmptyClear" class="btn-outline mt-4">Clear all filters</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</Layout>

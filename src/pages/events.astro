@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+const title = "Events | CloudBridge Study Abroad";
+const description = "Upcoming CloudBridge education fairs, webinars, and campus events for students planning to study abroad.";
+---
+<Layout title={title} description={description}>
+
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a href="/">Home</a> / Events</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Events</h1>
+    <p class="mt-4 max-w-xl text-white/75">Join our expos, seminars, and info sessions to get expert guidance in person.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+        <div class="h-36" style="background:linear-gradient(160deg,#2e4a7a,#4d70a8)"></div>
+        <div class="p-5"><p class="text-xs text-ink/50">3 May 2026 · 2PM–5PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">UK Open Assessment Day — Dhaka</h3><p class="mt-2 text-sm text-ink/60">Meet UK university representatives and get on-the-spot conditional offers.</p></div>
+      </div>
+      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+        <div class="h-36" style="background:linear-gradient(160deg,#1e786e,#22a396)"></div>
+        <div class="p-5"><p class="text-xs text-ink/50">17 May 2026 · 10AM–6PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">Multi-Destination Education Expo — Dhaka</h3><p class="mt-2 text-sm text-ink/60">Explore UK, Malaysia, and USA options under one roof.</p></div>
+      </div>
+      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+        <div class="h-36" style="background:linear-gradient(160deg,#963c3c,#c25a5a)"></div>
+        <div class="p-5"><p class="text-xs text-ink/50">9 May 2026 · 11AM–5PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">Study Abroad Expo — Sylhet</h3><p class="mt-2 text-sm text-ink/60">One-on-one counselling sessions, no appointment needed.</p></div>
+      </div>
+    </div>
+    <p class="mt-8 text-sm text-ink/50">More events added regularly — check back soon.</p>
+    <div class="mt-8"><a href="/#lead-form" class="btn-primary nav-link inline-flex">Reserve Your Seat</a></div>
+  </div>
+</section>
+
+</Layout>

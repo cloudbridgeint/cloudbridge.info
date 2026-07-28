@@ -1,0 +1,123 @@
+---
+import Layout from '../layouts/Layout.astro';
+const title = "Apply Now | CloudBridge Study Abroad";
+const description = "Submit your study abroad application to CloudBridge in four simple steps — personal details, education, course preference, and documents.";
+---
+<Layout title={title} description={description}>
+
+<section class="bg-dusk-gradient text-white py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a href="/">Home</a> / Apply Now</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Apply Now</h1>
+    <p class="mt-4 max-w-xl text-white/75">Submit your study abroad application in four simple steps — our counsellors review every submission personally.</p>
+  </div>
+</section>
+<section class="py-16">
+  <div class="max-w-container mx-auto px-4 md:px-8 max-w-3xl">
+
+    <div class="rounded-t-2xl py-8 px-6 text-center text-white" style="background-image:linear-gradient(90deg,#e12d38 0%,#1c3255 100%)">
+      <h2 class="text-2xl md:text-3xl font-extrabold">Complete all steps to submit your application</h2>
+    </div>
+
+    <div class="bg-white rounded-b-2xl shadow-sm ring-1 ring-black/5 p-6 md:p-10">
+
+      <div class="relative mb-10">
+        <div class="absolute top-4 h-0.5 bg-black/10" style="left:12.5%;right:12.5%"></div>
+        <div id="applyLine1" class="absolute top-4 h-0.5 bg-sunrise-600" style="left:12.5%;width:25%;transform:scaleX(0);transform-origin:left;transition:transform .35s ease"></div>
+        <div id="applyLine2" class="absolute top-4 h-0.5 bg-sunrise-600" style="left:37.5%;width:25%;transform:scaleX(0);transform-origin:left;transition:transform .35s ease"></div>
+        <div id="applyLine3" class="absolute top-4 h-0.5 bg-sunrise-600" style="left:62.5%;width:25%;transform:scaleX(0);transform-origin:left;transition:transform .35s ease"></div>
+        <div class="relative grid grid-cols-4">
+          <div class="flex flex-col items-center gap-2"><div id="applyDot1" class="apply-dot active">1</div><p id="applyLabel1" class="apply-label active">PERSONAL</p></div>
+          <div class="flex flex-col items-center gap-2"><div id="applyDot2" class="apply-dot">2</div><p id="applyLabel2" class="apply-label">EDUCATION</p></div>
+          <div class="flex flex-col items-center gap-2"><div id="applyDot3" class="apply-dot">3</div><p id="applyLabel3" class="apply-label">COURSE</p></div>
+          <div class="flex flex-col items-center gap-2"><div id="applyDot4" class="apply-dot">4</div><p id="applyLabel4" class="apply-label">DOCUMENTS</p></div>
+        </div>
+      </div>
+
+      <div id="applyFormBody">
+
+        <div id="applyStep1" class="apply-step">
+          <h2 class="flex items-center gap-2 font-display font-bold text-bridge-900 text-lg pb-3 border-b border-black/10">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Personal Information
+          </h2>
+          <div class="mt-6 grid sm:grid-cols-2 gap-5">
+            <div><label class="apply-label-field">First Name <span class="text-sunrise-600">*</span></label><input required placeholder="e.g. Arafat" class="apply-input"></div>
+            <div><label class="apply-label-field">Last Name <span class="text-sunrise-600">*</span></label><input required placeholder="e.g. Sunny" class="apply-input"></div>
+            <div><label class="apply-label-field">Phone Number <span class="text-sunrise-600">*</span></label><input required placeholder="+880 1XXXXXXXXX" class="apply-input"></div>
+            <div><label class="apply-label-field">Email Address <span class="text-sunrise-600">*</span></label><input required type="email" placeholder="name@email.com" class="apply-input"></div>
+            <div><label class="apply-label-field">Date of Birth <span class="text-sunrise-600">*</span></label><input required type="date" class="apply-input"></div>
+            <div><label class="apply-label-field">Gender <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+            <div><label class="apply-label-field">Nationality <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>Bangladeshi</option><option>Indian</option><option>Other</option></select></div>
+            <div><label class="apply-label-field">Country of Residence <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>Bangladesh</option><option>India</option><option>UAE</option><option>Saudi Arabia</option><option>Other</option></select></div>
+            <div class="sm:col-span-2"><label class="apply-label-field">Full Address <span class="text-sunrise-600">*</span></label><input required placeholder="House, Road, Area, City" class="apply-input"></div>
+          </div>
+        </div>
+
+        <div id="applyStep2" class="apply-step hidden">
+          <h2 class="flex items-center gap-2 font-display font-bold text-bridge-900 text-lg pb-3 border-b border-black/10">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 4 3 8.5 12 13l9-4.5L12 4Z"/><path d="M6.5 10.6V15c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3v-4.4"/></svg>
+            Education Background
+          </h2>
+          <div class="mt-6 grid sm:grid-cols-2 gap-5">
+            <div class="sm:col-span-2"><label class="apply-label-field">Highest Qualification <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>SSC / O Levels</option><option>HSC / A Levels</option><option>Diploma</option><option>Bachelor's</option><option>Master's</option></select></div>
+            <div class="sm:col-span-2"><label class="apply-label-field">Name of Institute <span class="text-sunrise-600">*</span></label><input required placeholder="University / College name" class="apply-input"></div>
+            <div class="sm:col-span-2"><label class="apply-label-field">Course / Subject Studied <span class="text-sunrise-600">*</span></label><input required placeholder="e.g. Computer Science" class="apply-input"></div>
+            <div><label class="apply-label-field">Graduation / Passing Year <span class="text-sunrise-600">*</span></label><input required type="date" class="apply-input"></div>
+            <div><label class="apply-label-field">English Proficiency Test <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>IELTS</option><option>TOEFL</option><option>PTE Academic</option><option>Duolingo English Test</option><option>MOI Certificate</option><option>Not yet taken</option></select></div>
+          </div>
+        </div>
+
+        <div id="applyStep3" class="apply-step hidden">
+          <h2 class="flex items-center gap-2 font-display font-bold text-bridge-900 text-lg pb-3 border-b border-black/10">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.8L12 3Z"/></svg>
+            Course Preference
+          </h2>
+          <div class="mt-6 grid sm:grid-cols-2 gap-5">
+            <div><label class="apply-label-field">Preferred Study Level <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>Foundation</option><option>Undergraduate</option><option>Postgraduate</option><option>PHD</option></select></div>
+            <div><label class="apply-label-field">Preferred Subject <span class="text-sunrise-600">*</span></label><select required id="applySubjectSelect" class="apply-input"><option value="">— Select —</option></select></div>
+            <div><label class="apply-label-field">Intake Month <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select></div>
+            <div><label class="apply-label-field">Intake Year <span class="text-sunrise-600">*</span></label><select required class="apply-input"><option value="">— Select —</option><option>2026</option><option>2027</option><option>2028</option></select></div>
+          </div>
+        </div>
+
+        <div id="applyStep4" class="apply-step hidden">
+          <h2 class="flex items-center gap-2 font-display font-bold text-bridge-900 text-lg pb-3 border-b border-black/10">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v4h4"/></svg>
+            Upload Documents
+          </h2>
+          <div class="mt-6 space-y-5">
+            <div><label class="apply-label-field">Academic Certificate <span class="text-sunrise-600">*</span></label><div class="apply-file"><input required type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-badge required">Required</span></div></div>
+            <div><label class="apply-label-field">Mark Sheet / Transcript <span class="text-sunrise-600">*</span></label><div class="apply-file"><input required type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-badge required">Required</span></div></div>
+            <div><label class="apply-label-field">English Test Certificate</label><div class="apply-file"><input type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-badge">Optional</span></div></div>
+            <div><label class="apply-label-field">CV / Resume</label><div class="apply-file"><input type="file" accept=".pdf,.doc,.docx" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/DOC)</span><span class="apply-file-badge">Optional</span></div></div>
+            <div><label class="apply-label-field">Personal Statement</label><div class="apply-file"><input type="file" accept=".pdf,.doc,.docx" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/DOC)</span><span class="apply-file-badge">Optional</span></div></div>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-black/10 flex justify-between">
+          <button type="button" id="applyBackBtn" onclick="applyBack()" class="hidden rounded-xl px-6 py-3 font-display font-semibold text-bridge-900 bg-bridge-50 hover:bg-bridge-100 transition inline-flex items-center gap-1.5">
+            <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 010 1.06L9.06 10l3.73 3.71a.75.75 0 11-1.06 1.06l-4.25-4.25a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 0z" clip-rule="evenodd"/></svg>
+            Back
+          </button>
+          <span></span>
+          <button type="button" id="applyNextBtn" onclick="applyNext()" class="rounded-xl px-6 py-3 font-display font-semibold text-white shadow-sm transition hover:brightness-110 inline-flex items-center gap-1.5" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%)">
+            Next Step
+            <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 010-1.06L10.94 10 7.21 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0z" clip-rule="evenodd"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="applyThanks" class="hidden text-center py-10">
+        <div class="w-16 h-16 mx-auto rounded-full bg-harbor-500/10 flex items-center justify-center text-harbor-600">
+          <svg viewBox="0 0 24 24" class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h2 class="mt-4 font-display font-bold text-xl text-bridge-900">Application Submitted!</h2>
+        <p class="mt-2 text-ink/60 max-w-sm mx-auto">Thanks — a CloudBridge counsellor will review your application and get back to you shortly. <span class="block text-xs text-ink/40 mt-1">(demo only — nothing was actually sent)</span></p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</Layout>

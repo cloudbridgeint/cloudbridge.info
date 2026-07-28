@@ -1,0 +1,406 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonicalURL}>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CloudBridge">
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:url" content={canonicalURL}>
+<meta property="og:image" content="https://cloudbridge.info/assets/logo.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content={title}>
+<meta name="twitter:description" content={description}>
+<link rel="icon" type="image/png" href="/assets/logo.png">
+<link rel="shortcut icon" type="image/png" href="/assets/logo.png">
+<link rel="apple-touch-icon" href="/assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          bridge: {50:'#eef2f9',100:'#d7e0ef',200:'#b0c1df',300:'#7f9bc9',400:'#4d70a8',500:'#2f5182',600:'#233f68',700:'#1c3255',800:'#162743',900:'#0f1c30',950:'#0a1220'},
+          sunrise: {50:'#fcedee',100:'#f9d2d5',200:'#f2a6aa',300:'#eb7077',400:'#e12d38',500:'#ce1d27',600:'#aa1821',700:'#86131a'},
+          harbor: {500:'#1c9c82',600:'#157e69'},
+          ink: '#1e2430',
+          cloud: '#f7f9fc',
+        },
+        fontFamily: {
+          display: ['Inter','ui-sans-serif','system-ui','sans-serif'],
+          body: ['Lato','ui-sans-serif','system-ui','sans-serif'],
+        },
+        backgroundImage: {
+          'dusk-gradient': 'linear-gradient(160deg, #0f1c30 0%, #1c3255 45%, #2f5182 100%)',
+        },
+        maxWidth: { container: '1240px' },
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Lato', sans-serif; }
+  h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Inter', sans-serif; }
+  .btn-primary { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; background:#e12d38; padding:0.75rem 1.5rem; font-weight:600; color:#fff; transition:.15s; cursor:pointer; border:none; }
+  .btn-primary:hover { background:#eb7077; }
+  .btn-secondary { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; border:1px solid rgba(255,255,255,.3); padding:0.75rem 1.5rem; font-weight:600; color:#fff; transition:.15s; cursor:pointer; background:transparent; }
+  .btn-secondary:hover { background:rgba(255,255,255,.1); }
+  .btn-outline { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; border:1px solid #0f1c30; padding:0.65rem 1.3rem; font-weight:600; color:#0f1c30; transition:.15s; cursor:pointer; background:transparent; font-size:.875rem; }
+  .btn-outline:hover { background:#0f1c30; color:#fff; }
+  .footer-btn-red { display:inline-flex; align-items:center; justify-content:center; background:#c0201f; transition:.15s; cursor:pointer; border:none; }
+  .footer-btn-red:hover { background:#a11d1d; }
+  .section-heading { font-family:'Times New Roman', Times, serif; font-size:2rem; font-weight:800; letter-spacing:-0.01em; background:linear-gradient(90deg, #050a31 0%, #c90f14 35%, #c90f14 100%); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; width:fit-content; max-width:100%; }
+  .section-heading.text-center { margin-left:auto; margin-right:auto; }
+  @media (min-width:768px){ .section-heading{ font-size:2.5rem; } }
+  .path-line { stroke-dasharray:1000; stroke-dashoffset:1000; animation: draw 2.2s ease-out forwards; }
+  @keyframes draw { to { stroke-dashoffset:0; } }
+  @keyframes floaty { 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-8px);} }
+  .float-slow { animation: floaty 6s ease-in-out infinite; }
+  .card-photo { background-size:cover; background-position:center; }
+  :focus-visible { outline: 2px solid #e12d38; outline-offset: 2px; }
+  .nav-link { cursor:pointer; }
+  header nav.font-display { font-family:'Times New Roman', Times, serif; }
+  .nav-link.active { color:#ce1d27 !important; }
+  .nav-drop { position:relative; }
+  .nav-drop-panel { display:none; position:absolute; left:0; top:100%; min-width:190px; background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:.6rem; box-shadow:0 10px 30px rgba(0,0,0,.08); padding:.4rem 0; }
+  .nav-drop:hover .nav-drop-panel { display:block; }
+  .university-card { transition:.2s; }
+  .university-card:hover { transform:translateY(-3px); box-shadow:0 12px 28px rgba(15,28,48,.1); }
+  .uni-filter-check { accent-color:#e12d38; width:1rem; height:1rem; cursor:pointer; }
+  .uni-filter-check-label { display:flex; align-items:center; gap:.5rem; font-size:.8rem; color:#3d4451; cursor:pointer; }
+  .uni-intake-badge { font-size:.65rem; font-weight:600; padding:.2rem .55rem; border-radius:9999px; background:#eef2f9; color:#233f68; }
+  .uni-card-btn { border-radius:0.5rem; }
+  .uni-card-btn:hover { background:#e12d38 !important; border-color:#e12d38 !important; color:#fff !important; }
+  .uni-filter-chip { display:inline-flex; align-items:center; gap:.4rem; background:#0f1c30; color:#fff; font-size:.78rem; font-weight:600; padding:.4rem .5rem .4rem .85rem; border-radius:9999px; }
+  .uni-filter-chip button { display:flex; align-items:center; justify-content:center; width:1.1rem; height:1.1rem; border-radius:9999px; background:rgba(255,255,255,.15); cursor:pointer; border:none; color:#fff; flex-shrink:0; }
+  .uni-filter-chip button:hover { background:rgba(255,255,255,.3); }
+  .course-badge { display:inline-flex; align-items:center; gap:.3rem; font-size:.75rem; font-weight:600; padding:.3rem .65rem; border-radius:9999px; background:#eef2f9; color:#162743; }
+  .course-detail-btn { display:inline-flex; align-items:center; justify-content:center; background:#e12d38; color:#fff; font-weight:600; padding:.65rem 1.25rem; border-radius:.5rem; font-size:.85rem; transition:.15s; cursor:pointer; border:none; white-space:nowrap; }
+  .course-detail-btn:hover { background:#c01822; }
+  .timeline-wrap { position:relative; }
+  .timeline-line { position:absolute; left:1.25rem; top:0; bottom:0; width:2px; background:#e12d38; }
+  @media (min-width:768px){ .timeline-line{ left:50%; margin-left:-1px; } }
+  .timeline-dot { position:absolute; left:1.25rem; width:14px; height:14px; margin-left:-7px; border-radius:9999px; background:#fff; border:3px solid #0f1c30; z-index:2; }
+  @media (min-width:768px){ .timeline-dot{ left:50%; } }
+  .timeline-card { background:#fff; border-radius:1rem; padding:1.1rem 1.3rem; box-shadow:0 4px 14px rgba(15,28,48,.08); }
+  .timeline-year { display:inline-block; font-family:'Inter',sans-serif; font-weight:800; color:#e12d38; font-size:.8rem; margin-bottom:.25rem; }
+  .team-slide { display:none; }
+  .team-slide.active { display:flex; }
+  .team-dot { width:.5rem; height:.5rem; border-radius:9999px; background:#d7e0ef; cursor:pointer; border:none; transition:.15s; }
+  .team-dot.active { background:#e12d38; width:1.5rem; border-radius:9999px; }
+  .partner-logo-viewport { overflow:hidden; }
+  .partner-logo-item { flex-shrink:0; }
+  .uni-accordion-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:.8rem 1rem; border:1px solid rgba(0,0,0,.12); border-radius:.75rem; font-family:'Inter',sans-serif; font-weight:600; font-size:.9rem; color:#162743; background:#fff; cursor:pointer; transition:.15s; }
+  .uni-accordion-btn:hover { border-color:rgba(0,0,0,.28); }
+  .uni-accordion-chevron { transition:transform .2s; width:1rem; height:1rem; color:#162743; flex-shrink:0; }
+  .uni-accordion.open .uni-accordion-chevron { transform:rotate(180deg); }
+  .uni-accordion-panel { padding:.75rem .25rem .25rem; }
+  .uni-accordion-count { display:inline-flex; align-items:center; justify-content:center; min-width:1.1rem; height:1.1rem; padding:0 .3rem; border-radius:9999px; background:#e12d38; color:#fff; font-size:.65rem; font-weight:700; margin-left:.4rem; }
+  .crumb { font-size:.8rem; color:rgba(255,255,255,.6); }
+  .crumb a { cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
+  .form-input { transition:border-color .15s, box-shadow .15s; }
+  .form-input:focus { outline:none; border-color:#2f5182; box-shadow:0 0 0 3px rgba(47,81,130,.15); }
+  .apply-dot { width:2rem; height:2rem; border-radius:9999px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.8rem; background:#d1d5db; color:#fff; transition:background .2s; }
+  .apply-dot.active { background:#1c3255; }
+  .apply-dot.completed { background:#e12d38; }
+  .apply-label { font-size:.65rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9ca3af; }
+  .apply-label.active { color:#1c3255; }
+  .apply-label.completed { color:#e12d38; }
+  .apply-label-field { display:block; font-size:.7rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#374151; margin-bottom:.4rem; }
+  .apply-input { width:100%; border-radius:.75rem; border:1px solid rgba(0,0,0,.12); padding:.7rem 1rem; font-size:.875rem; transition:border-color .15s, box-shadow .15s; }
+  .apply-input:focus { outline:none; border-color:#2f5182; box-shadow:0 0 0 3px rgba(47,81,130,.15); }
+  .apply-file { position:relative; display:flex; align-items:center; justify-content:space-between; gap:.75rem; border:1.5px dashed rgba(0,0,0,.15); border-radius:.75rem; padding:.75rem 1rem; background:#fafbff; }
+  .apply-file-input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .apply-file-label { display:flex; align-items:center; gap:.5rem; font-size:.8rem; font-weight:600; color:#2f5182; }
+  .apply-file-badge { font-size:.65rem; font-weight:700; text-transform:uppercase; color:#9ca3af; background:#f1f2f6; padding:.2rem .6rem; border-radius:9999px; white-space:nowrap; }
+  .apply-file-badge.required { color:#7a1c22; background:#fbe4e4; }
+  #heroSlider .slider-arrow { position:absolute; bottom:1.35rem; width:2.5rem; height:2.5rem; border-radius:9999px; background:#fff; border:none; color:#1c3255; font-size:1.5rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:20; transition:.15s; box-shadow:0 2px 10px rgba(15,28,48,.18); }
+  #heroSlider .slider-arrow:hover { background:#f1f4fa; }
+  .slider-dot { transition:.2s; cursor:pointer; border:none; }
+  .course-tab-btn.active { background:#e12d38; color:#fff; border-color:#e12d38; }
+  .course-tab-btn { border-radius:0.75rem; }
+  .course-tab-btn:hover { background:#e12d38; color:#fff; border-color:#e12d38; }
+  .uni-tab-btn.active { background:#db1f2a; color:#fff; border-color:#db1f2a; }
+  .uni-tab-btn { border-radius:0.5rem; }
+  @media (max-width:767px){ #heroSlider .slider-arrow { display:none; } }
+  .mobile-menu-item { display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.9rem 1.1rem; border-radius:.85rem; background:#f4f5f9; color:#0f1c30; font-weight:600; font-size:.95rem; }
+  .mobile-menu-item.mobile-menu-apply { color:#e12d38; }
+  .mobile-accordion-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:.9rem 1.1rem; border-radius:.85rem; background:#f4f5f9; color:#0f1c30; font-weight:600; font-size:.95rem; border:none; cursor:pointer; text-align:left; }
+  .mobile-accordion-icon { font-size:1.15rem; line-height:1; transition:transform .2s; }
+  .mobile-accordion-panel { padding:.5rem .25rem .25rem 1.35rem; }
+  .mobile-accordion-panel a { display:block; padding:.65rem .75rem; color:#2f5182; font-weight:500; font-size:.9rem; }
+  .hero-img-1 { object-position: 68% center; }
+  .hero-img-3 { object-position: 70% center; }
+  @media (min-width:768px){
+    .hero-img-1 { object-position: 68% 5%; }
+    .hero-img-3 { object-position: 70% 15%; }
+  }
+</style>
+
+</head>
+<body class="bg-cloud text-ink antialiased">
+
+
+
+<!-- Header (static across all pages) -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-black/5">
+  <div class="w-full px-4 md:px-8 lg:px-[198px] py-3 flex items-center justify-between gap-4">
+    <a href="/" class="flex items-center nav-link shrink-0">
+      <img src="/assets/logo.png" alt="CloudBridge — Study Abroad Consultants" class="h-16 md:h-20 lg:h-24 w-auto object-contain">
+    </a>
+    <nav class="hidden md:flex items-center gap-1 text-[21px] font-medium font-display">
+      <a href="/" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="home">Home</a>
+      <div class="nav-drop">
+        <span class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block" data-page="about">About ▾</span>
+        <div class="nav-drop-panel">
+          <a href="/about" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">About Us</a>
+          <a href="/our-team" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Our Team</a>
+        </div>
+      </div>
+      <a href="/university-college" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="university-college">University &amp; College</a>
+      <a href="/programs" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Course</a>
+      <a href="/scholarship" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="scholarship">Scholarship</a>
+      <a href="/events" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="events">Events</a>
+      <a href="/apply-now" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50">Apply Now</a>
+      <a href="/blogs" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="blogs">Blogs</a>
+      <a href="/contact" class="nav-link px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="contact">Contact</a>
+    </nav>
+    <div class="hidden md:flex items-center shrink-0">
+      <a href="/free-consultation" class="btn-primary !px-5 !py-2 text-[16px] inline-flex items-center gap-1.5 !rounded-lg !text-white transition hover:brightness-110" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%);font-weight:700;font-family:'Times New Roman', Times, serif">
+        Free Consultation
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4" aria-hidden="true"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
+      </a>
+    </div>
+    <button id="mobileToggle" class="md:hidden w-10 h-10 flex items-center justify-center shrink-0">
+      <div class="space-y-1.5">
+        <span class="block w-6 h-0.5 bg-bridge-900"></span>
+        <span class="block w-6 h-0.5 bg-bridge-900"></span>
+        <span class="block w-6 h-0.5 bg-bridge-900"></span>
+      </div>
+    </button>
+  </div>
+  <nav id="mobileMenu" class="hidden md:hidden border-t border-black/5">
+    <div class="px-4 py-4 space-y-2.5">
+      <a href="/" class="mobile-menu-item nav-link">Home</a>
+      <div>
+        <button type="button" class="mobile-accordion-btn" onclick="toggleMobileAccordion(this)">
+          <span>About</span>
+          <span class="mobile-accordion-icon">+</span>
+        </button>
+        <div class="mobile-accordion-panel hidden">
+          <a href="/about" class="nav-link">About Us</a>
+          <a href="/our-team" class="nav-link">Our Team</a>
+        </div>
+      </div>
+      <a href="/university-college" class="mobile-menu-item nav-link">University &amp; College</a>
+      <a href="/programs" class="mobile-menu-item nav-link">Course</a>
+      <a href="/scholarship" class="mobile-menu-item nav-link">Scholarship</a>
+      <a href="/events" class="mobile-menu-item nav-link">Events</a>
+      <a href="/blogs" class="mobile-menu-item nav-link">Blogs</a>
+      <a href="/contact" class="mobile-menu-item nav-link">Contact</a>
+      <a href="/apply-now" class="mobile-menu-item mobile-menu-apply nav-link">
+        Apply Now
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 010-1.06L10.94 10 7.21 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0z" clip-rule="evenodd" /></svg>
+      </a>
+    </div>
+    <a href="/free-consultation" class="nav-link block w-full text-center py-4 text-white font-display font-bold text-base" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%)">Free Consultation</a>
+  </nav>
+</header>
+
+<!-- Page content swaps here -->
+
+<main id="pageRoot">
+<slot />
+</main>
+
+<footer class="text-white/70" style="background-image:radial-gradient(130% 70% at 18% -15%, rgba(255,255,255,0.14), transparent 55%), radial-gradient(90% 60% at 100% 0%, rgba(255,255,255,0.06), transparent 60%), linear-gradient(165deg, #060d1e 0%, #0d1f45 45%, #14316b 100%)">
+
+  <!-- Contact strip -->
+  <div class="max-w-container mx-auto px-4 md:px-8 pt-24 relative z-10">
+    <div class="rounded-2xl p-6 md:p-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6 shadow-xl" style="background-image:linear-gradient(120deg,#e5302e,#a11d1d)">
+      <div class="flex items-start gap-4">
+        <span class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="#a11d1d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/></svg>
+        </span>
+        <div>
+          <p class="font-display font-semibold text-white">Call Us Anytime</p>
+          <p class="text-sm text-white/90 mt-1">+880 1686 007004 <span class="text-white/60">(Dhaka)</span></p>
+          <p class="text-sm text-white/90">+880 1619 130469 <span class="text-white/60">(Sylhet)</span></p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4">
+        <span class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="#a11d1d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/></svg>
+        </span>
+        <div>
+          <p class="font-display font-semibold text-white">Send Mail</p>
+          <p class="text-sm text-white/90 mt-1">apply@cloudbridge.info</p>
+          <p class="text-sm text-white/90">info@cloudbridge.info</p>
+        </div>
+      </div>
+      <div class="flex items-start gap-4">
+        <span class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="#a11d1d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        </span>
+        <div>
+          <p class="font-display font-semibold text-white">Our Address</p>
+          <p class="text-sm text-white/90 mt-1"><span class="font-semibold">Dhaka —</span> Lift 3, House 27, Road 21, Nikunjo-2, Dhaka 1229</p>
+          <p class="text-sm text-white/90"><span class="font-semibold">Sylhet —</span> 405-406 Manru Shopping City, 4th Floor, Chowhatta, Sylhet 3100</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-container mx-auto px-4 md:px-8 pt-20 md:pt-24 pb-16">
+    <div class="grid md:grid-cols-4 gap-10 lg:gap-16">
+      <div>
+        <a href="/" onclick="return spaNav(event,'home')" class="nav-link inline-flex items-center">
+          <img src="/assets/logo-white.png" alt="CloudBridge — Study Abroad Consultants" class="h-20 md:h-24 w-auto object-contain">
+        </a>
+        <p class="mt-4 max-w-xs text-sm text-white/60">Your trusted partner for studying abroad — from university shortlisting to visa approval.</p>
+        <a href="/about" onclick="return spaNav(event,'about')" class="nav-link footer-btn-red inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold text-white mt-6">Read More</a>
+      </div>
+
+      <div class="text-sm">
+        <p class="font-display font-semibold text-white mb-6">Study Destinations</p>
+        <p class="mt-4"><a href="/dest-uk" onclick="return spaNav(event,'dest-uk')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Study in UK</a></p>
+        <p class="mt-4"><a href="/dest-usa" onclick="return spaNav(event,'dest-usa')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Study in USA</a></p>
+        <p class="mt-4"><a href="/dest-malaysia" onclick="return spaNav(event,'dest-malaysia')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Study in Malaysia</a></p>
+        <p class="mt-4"><a href="/student-visa" onclick="return spaNav(event,'student-visa')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Student Visa</a></p>
+        <p class="mt-4"><a href="/spouse-visa" onclick="return spaNav(event,'spouse-visa')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Spouse Visa</a></p>
+      </div>
+
+      <div class="text-sm">
+        <p class="font-display font-semibold text-white mb-6">Useful Links</p>
+        <p class="mt-4"><a href="/" onclick="return spaNav(event,'home')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Home</a></p>
+        <p class="mt-4"><a href="/about" onclick="return spaNav(event,'about')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> About Us</a></p>
+        <p class="mt-4"><a href="/programs" onclick="return spaNav(event,'programs')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Programs</a></p>
+        <p class="mt-4"><a href="/blogs" onclick="return spaNav(event,'blogs')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Blogs</a></p>
+        <p class="mt-4"><a href="/contact" onclick="return spaNav(event,'contact')" class="nav-link hover:text-red-300"><span class="text-red-500">»</span> Contact Us</a></p>
+      </div>
+
+      <div class="text-sm">
+        <p class="font-display font-semibold text-white mb-6">Newsletter</p>
+        <p class="text-white/60 mb-5">Sign up for alerts, our latest blogs, thoughts, and insights.</p>
+        <form class="demo-form flex flex-col gap-3">
+          <input type="email" required placeholder="Your email address" class="rounded-lg px-4 py-2.5 text-sm text-ink w-full border-none">
+          <button type="submit" class="footer-btn-red w-full !py-2.5 text-sm rounded-full font-semibold">Subscribe Now</button>
+        </form>
+        <p class="demo-form-thanks hidden text-sm text-harbor-500 mt-2 font-medium">Thanks! You're subscribed. <span class="block text-xs text-white/40 font-normal">(demo only)</span></p>
+      </div>
+    </div>
+
+    <div class="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
+      <p>© 2026 CloudBridge. All rights reserved.</p>
+      <div class="flex gap-3">
+        <a href="#" class="w-9 h-9 rounded-full bg-white/10 hover:bg-red-600 hover:text-white flex items-center justify-center transition font-display font-bold text-sm" aria-label="Facebook">f</a>
+        <a href="#" class="w-9 h-9 rounded-full bg-white/10 hover:bg-red-600 hover:text-white flex items-center justify-center transition font-display font-bold text-[11px]" aria-label="Instagram">IG</a>
+        <a href="#" class="w-9 h-9 rounded-full bg-white/10 hover:bg-red-600 hover:text-white flex items-center justify-center transition font-display font-bold text-[11px]" aria-label="TikTok">TT</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<div id="cbAdminRoot" class="hidden fixed inset-0 z-[9999] bg-cloud overflow-y-auto" style="font-family:'Lato',ui-sans-serif,system-ui,sans-serif;">
+
+  <div id="cbAdminLoginGate" class="min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-black/5 p-8">
+      <div class="font-bold text-xl text-bridge-900" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">CloudBridge Admin</div>
+      <p class="mt-1 text-sm text-ink/60">Sign in to continue</p>
+      <label class="block mt-5 text-sm font-semibold text-ink/70">Email</label>
+      <input id="cbAdminEmailInput" type="email" placeholder="you@example.com" autocomplete="off"
+        class="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
+      <label class="block mt-3 text-sm font-semibold text-ink/70">Password</label>
+      <input id="cbAdminPasswordInput" type="password" placeholder="Password" autocomplete="off"
+        class="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
+      <button id="cbAdminLoginBtn" class="mt-4 w-full bg-bridge-800 hover:bg-bridge-900 text-white font-semibold rounded-lg py-2.5 text-sm transition">Sign in</button>
+      <p id="cbAdminLoginError" class="mt-3 text-sm text-sunrise-600 hidden"></p>
+    </div>
+  </div>
+
+  <div id="cbAdminGate" class="hidden min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-black/5 p-8">
+      <div class="font-bold text-xl text-bridge-900" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">CloudBridge Admin</div>
+      <p class="mt-1 text-sm text-ink/60">Featured Universities manager</p>
+      <div class="mt-6 rounded-lg bg-bridge-50 border border-bridge-100 p-3 text-xs text-bridge-700 leading-relaxed">
+        Paste a GitHub personal access token with <strong>Contents: read and write</strong> access to
+        <code class="bg-white px-1 rounded">cloudbridgeint/cloudbridge.info</code>. Kept only in this
+        browser tab's memory — never saved, never sent anywhere except api.github.com.
+      </div>
+      <label class="block mt-5 text-sm font-semibold text-ink/70">GitHub Token</label>
+      <input id="cbAdminTokenInput" type="password" placeholder="ghp_..." autocomplete="off"
+        class="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
+      <button id="cbAdminConnectBtn" class="mt-4 w-full bg-sunrise-500 hover:bg-sunrise-600 text-white font-semibold rounded-lg py-2.5 text-sm transition">Connect</button>
+      <p id="cbAdminGateError" class="mt-3 text-sm text-sunrise-600 hidden"></p>
+    </div>
+  </div>
+
+  <div id="cbAdminDashboard" class="hidden min-h-screen">
+    <header class="bg-bridge-900 text-white">
+      <div class="max-w-6xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
+        <div>
+          <div class="font-bold" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">CloudBridge Admin</div>
+          <p class="text-xs text-white/50">Featured Universities manager</p>
+        </div>
+        <button id="cbAdminDisconnectBtn" class="text-xs text-white/70 hover:text-white border border-white/20 rounded-lg px-3 py-1.5">Disconnect</button>
+      </div>
+    </header>
+    <main class="max-w-6xl mx-auto px-4 md:px-8 py-8">
+      <div id="cbAdminCountryTabs" class="flex flex-wrap gap-2 mb-6"></div>
+      <div class="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-lg" id="cbAdminPanelTitle" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">UK — current logos</h2>
+          <span id="cbAdminItemCount" class="text-xs text-ink/50"></span>
+        </div>
+        <div id="cbAdminLogoGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+      </div>
+      <div class="bg-white rounded-2xl border border-black/5 shadow-sm p-6 mt-6">
+        <h2 class="font-bold text-lg mb-4" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">Add a logo</h2>
+        <div class="grid sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+          <div>
+            <label class="block text-xs font-semibold text-ink/60 mb-1">Institution name</label>
+            <input id="cbAdminNewName" type="text" placeholder="e.g. Example University"
+              class="w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-ink/60 mb-1">Logo image (PNG/JPG)</label>
+            <input id="cbAdminNewFile" type="file" accept="image/png,image/jpeg" class="w-full text-sm">
+          </div>
+          <button id="cbAdminAddBtn" class="bg-bridge-800 hover:bg-bridge-900 text-white font-semibold rounded-lg px-5 py-2.5 text-sm transition">Stage</button>
+        </div>
+        <p class="mt-2 text-xs text-ink/40">Staged additions/removals aren't live until you click "Save changes" below.</p>
+      </div>
+      <div class="sticky bottom-4 mt-6">
+        <div class="bg-white rounded-2xl border border-black/10 shadow-lg p-4 flex items-center justify-between">
+          <div id="cbAdminStageStatus" class="text-sm text-ink/60">No pending changes.</div>
+          <button id="cbAdminSaveBtn" disabled
+            class="bg-sunrise-500 hover:bg-sunrise-600 disabled:bg-ink/20 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-6 py-2.5 text-sm transition">Save changes</button>
+        </div>
+      </div>
+      <div id="cbAdminLogBox" class="mt-6 bg-bridge-950 text-white/80 rounded-2xl p-4 text-xs font-mono hidden max-h-64 overflow-y-auto"></div>
+    </main>
+  </div>
+</div>
+
+
+
+<script src="/scripts/main.js" is:inline></script>
+<script src="/scripts/admin.js" is:inline></script>
+</body>
+</html>
