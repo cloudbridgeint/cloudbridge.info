@@ -49,9 +49,9 @@ const navItemsBottom = [
     @keyframes slideIn { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
     .app-canvas {
-      min-height: 100vh;
-      position: relative;
+      height: 100vh;
       overflow: hidden;
+      position: relative;
       background: linear-gradient(160deg, #1c3255 0%, #2f5182 45%, #3d6099 75%, #6f8fb8 100%);
     }
     .app-canvas::before {
@@ -70,14 +70,13 @@ const navItemsBottom = [
   </style>
 </head>
 <body class="app-canvas">
-  <div class="relative z-10 max-w-[1360px] mx-auto p-4 md:p-8">
-    <div class="flex bg-white/95 backdrop-blur rounded-[28px] shadow-2xl ring-1 ring-black/5 overflow-hidden min-h-[calc(100vh-4rem)]">
+  <div class="relative z-10 max-w-[1360px] mx-auto p-4 md:p-8 h-screen box-border">
+    <div class="flex bg-white/95 backdrop-blur rounded-[28px] shadow-2xl ring-1 ring-black/5 overflow-hidden h-full">
 
       <!-- Sidebar -->
-      <aside class="hidden md:flex w-60 shrink-0 flex-col border-r border-slate-100 px-4 py-6">
-        <div class="px-2 flex items-center gap-2 mb-8">
-          <img src={logo.src} alt="" class="w-8 h-8 rounded-lg object-cover">
-          <p class="font-extrabold text-lg tracking-tight"><span class="text-bridge-950">Cloud</span><span class="text-sunrise-600">Bridge</span></p>
+      <aside class="hidden md:flex w-60 shrink-0 flex-col border-r border-slate-100 px-4 py-6 overflow-y-auto">
+        <div class="flex items-center justify-center mb-8">
+          <img src={logo.src} alt="CloudBridge" class="w-16 h-16 rounded-xl object-cover">
         </div>
 
         <nav class="space-y-1">
@@ -111,7 +110,7 @@ const navItemsBottom = [
       </aside>
 
       <!-- Main -->
-      <main class="flex-1 min-w-0 px-5 md:px-9 py-6 md:py-8">
+      <main class="flex-1 min-w-0 px-5 md:px-9 py-6 md:py-8 overflow-y-auto">
         <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
         <!-- Top bar -->
