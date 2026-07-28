@@ -4185,10 +4185,25 @@ window.toggleMobileAccordion = toggleMobileAccordion;
 })();
 </script>
 
-<!-- ===================== ADMIN OVERLAY (hidden unless ?cbadmin=manage) ===================== -->
+<!-- ===================== ADMIN OVERLAY (hidden unless /cbc-admin) ===================== -->
 <div id="cbAdminRoot" class="hidden fixed inset-0 z-[9999] bg-cloud overflow-y-auto" style="font-family:'Lato',ui-sans-serif,system-ui,sans-serif;">
 
-  <div id="cbAdminGate" class="min-h-screen flex items-center justify-center px-4">
+  <div id="cbAdminLoginGate" class="min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-black/5 p-8">
+      <h1 class="font-bold text-xl text-bridge-900" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">CloudBridge Admin</h1>
+      <p class="mt-1 text-sm text-ink/60">Sign in to continue</p>
+      <label class="block mt-5 text-sm font-semibold text-ink/70">Email</label>
+      <input id="cbAdminEmailInput" type="email" placeholder="you@example.com" autocomplete="off"
+        class="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
+      <label class="block mt-3 text-sm font-semibold text-ink/70">Password</label>
+      <input id="cbAdminPasswordInput" type="password" placeholder="Password" autocomplete="off"
+        class="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-bridge-400">
+      <button id="cbAdminLoginBtn" class="mt-4 w-full bg-bridge-800 hover:bg-bridge-900 text-white font-semibold rounded-lg py-2.5 text-sm transition">Sign in</button>
+      <p id="cbAdminLoginError" class="mt-3 text-sm text-sunrise-600 hidden"></p>
+    </div>
+  </div>
+
+  <div id="cbAdminGate" class="hidden min-h-screen flex items-center justify-center px-4">
     <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-black/5 p-8">
       <h1 class="font-bold text-xl text-bridge-900" style="font-family:'Inter',ui-sans-serif,system-ui,sans-serif;">CloudBridge Admin</h1>
       <p class="mt-1 text-sm text-ink/60">Featured Universities manager</p>
@@ -4254,13 +4269,33 @@ window.toggleMobileAccordion = toggleMobileAccordion;
 
 <script>
 (function () {
-  // Only activate for the secret admin route -- everything else on the page
-  // (including all other scripts) runs completely untouched either way.
+  // Activate for the clean /cbc-admin path, or the old query param as a fallback.
+  // Everything else on the page (including all other scripts) runs untouched either way.
   var params = new URLSearchParams(window.location.search);
-  if (params.get('cbadmin') !== 'manage') return;
+  var pathMatch = window.location.pathname.replace(/\/$/, '') === '/cbc-admin';
+  var queryMatch = params.get('cbadmin') === 'manage';
+  if (!pathMatch && !queryMatch) return;
 
   document.getElementById('cbAdminRoot').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
+
+  // -------- login gate (basic front-door check, not real security --------
+  // -------- the GitHub token step below is the actual access control) ----
+  var ADMIN_EMAIL = 'cloudb.global@gmail.com';
+  var ADMIN_PASSWORD = 'cbc@1234';
+  document.getElementById('cbAdminLoginBtn').onclick = function () {
+    var email = document.getElementById('cbAdminEmailInput').value.trim();
+    var pass = document.getElementById('cbAdminPasswordInput').value;
+    var err = document.getElementById('cbAdminLoginError');
+    if (email === ADMIN_EMAIL && pass === ADMIN_PASSWORD) {
+      err.classList.add('hidden');
+      document.getElementById('cbAdminLoginGate').classList.add('hidden');
+      document.getElementById('cbAdminGate').classList.remove('hidden');
+    } else {
+      err.textContent = 'Incorrect email or password.';
+      err.classList.remove('hidden');
+    }
+  };
 
   var COUNTRY_PANELS = ['uk','usa','canada','malta','france','spain','finland','newzealand','netherlands','malaysia'];
   var COUNTRY_LABELS = {uk:'UK',usa:'USA',canada:'Canada',malta:'Malta',france:'France',spain:'Spain',finland:'Finland',newzealand:'New Zealand',netherlands:'Netherlands',malaysia:'Malaysia'};
