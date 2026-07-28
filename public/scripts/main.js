@@ -1054,3 +1054,21 @@ window.toggleMobileAccordion = toggleMobileAccordion;
 // before this fix) to the new clean URL.
 // Page is already server-rendered by Astro -- just init this page's interactive widgets.
 initPageScripts();
+
+// Hide header on scroll down, show it again on scroll up.
+(function () {
+  var header = document.getElementById('siteHeader');
+  if (!header) return;
+  var lastScrollY = window.scrollY;
+  var headerHeight = header.offsetHeight;
+
+  window.addEventListener('scroll', function () {
+    var currentScrollY = window.scrollY;
+    if (currentScrollY > lastScrollY && currentScrollY > headerHeight) {
+      header.style.transform = 'translateY(-100%)';
+    } else {
+      header.style.transform = 'translateY(0)';
+    }
+    lastScrollY = currentScrollY;
+  }, { passive: true });
+})();

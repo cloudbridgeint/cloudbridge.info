@@ -159,8 +159,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 
 <!-- Header (static across all pages) -->
-<header class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-black/5 shadow-md">
-  <div class="w-full px-4 md:px-8 lg:px-[198px] py-[9.5px] flex items-center justify-between gap-4">
+<header id="siteHeader" class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-black/5 shadow-md transition-transform duration-300">
+  <div class="w-full px-4 md:px-8 lg:px-[198px] py-[7px] flex items-center justify-between gap-4">
     <a href="/" class="flex items-center nav-link shrink-0">
       <img src="/assets/logo.png" alt="CloudBridge — Study Abroad Consultants" class="h-16 md:h-20 lg:h-24 w-auto object-contain">
     </a>
