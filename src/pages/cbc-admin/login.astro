@@ -30,12 +30,24 @@ export const prerender = false;
     .pill-input:focus { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.7); outline: none; }
     .btn-red-gradient { background-image: linear-gradient(90deg, #c0201f 0%, #aa1821 100%); }
     .btn-red-gradient:hover { filter: brightness(1.1); }
+
+    .bg-kenburns {
+      animation: kenburns 26s ease-in-out infinite alternate;
+      transform-origin: 60% 40%;
+    }
+    @keyframes kenburns {
+      0%   { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.12) translate(-1.5%, -1.5%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .bg-kenburns { animation: none; }
+    }
   </style>
 </head>
 <body class="min-h-screen relative flex items-center justify-center px-4 overflow-hidden">
 
-  <!-- Background image -->
-  <img src={bgImage.src} alt="" class="absolute inset-0 w-full h-full object-cover">
+  <!-- Background image with slow cinematic zoom/pan (Ken Burns effect) -->
+  <img src={bgImage.src} alt="" class="bg-kenburns absolute inset-0 w-full h-full object-cover">
   <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(6,13,30,0.5) 0%, rgba(6,13,30,0.7) 100%)"></div>
 
   <!-- Top-left brand mark -->
