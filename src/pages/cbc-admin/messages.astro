@@ -17,11 +17,11 @@ const formMessages = results as any[];
     <div class="flex h-[600px]">
 
       <!-- Conversation list -->
-      <div class="w-72 sm:w-80 shrink-0 border-r border-slate-100 flex flex-col bg-white/60">
-        <div class="p-3 border-b border-slate-100 shrink-0">
+      <div class="w-72 sm:w-80 shrink-0 flex flex-col" style="background:#f4f5fd">
+        <div class="p-3 shrink-0">
           <div class="relative">
             <input id="chatSearch" type="text" placeholder="Search"
-              class="w-full bg-slate-100 border border-transparent rounded-full pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition">
+              class="w-full bg-white/70 border border-transparent rounded-full pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition">
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
           </div>
           <div class="flex items-center gap-1 mt-2.5">
@@ -45,7 +45,14 @@ const formMessages = results as any[];
               <p id="threadSub" class="text-xs text-slate-400">No conversation selected</p>
             </div>
           </div>
-          <button id="archiveBtn" type="button" disabled class="text-xs font-semibold text-slate-400 hover:text-sunrise-600 disabled:opacity-40 disabled:pointer-events-none px-3 py-1.5 rounded-full hover:bg-slate-50 transition">Archive</button>
+          <div class="relative">
+            <button id="threadMenuBtn" type="button" disabled class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition" aria-label="More options">
+              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+            </button>
+            <div id="threadMenuDropdown" class="hidden absolute right-0 top-10 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-1.5 w-40 z-10">
+              <button id="archiveBtn" type="button" class="w-full text-left px-3.5 py-2 text-sm text-slate-600 hover:bg-slate-50 transition">Archive</button>
+            </div>
+          </div>
         </div>
 
         <div id="threadMessages" class="flex-1 overflow-y-auto px-4 py-4 space-y-2.5">
@@ -159,17 +166,15 @@ const formMessages = results as any[];
     }
     el.innerHTML = list.map(s => `
       <button type="button" data-session="${s.session_id}"
-        class="session-item w-full text-left px-3 py-3 border-b border-slate-50 hover:bg-slate-50 transition flex items-center gap-3 ${s.session_id === activeSessionId ? 'bg-iris-50' : ''}">
-        <div class="w-10 h-10 rounded-full ${avatarColor(s.session_id)} flex items-center justify-center text-white text-xs font-bold shrink-0">${initials(sessionLabel(s))}</div>
+        class="session-item w-full text-left px-3 py-3 hover:bg-white/70 transition flex items-center gap-3 ${s.session_id === activeSessionId ? 'bg-white' : ''}">
+        <div class="w-11 h-11 rounded-full ${avatarColor(s.session_id)} flex items-center justify-center text-white text-xs font-bold shrink-0">${initials(sessionLabel(s))}</div>
         <div class="min-w-0 flex-1">
-          <div class="flex items-center justify-between gap-2">
-            <p class="text-sm font-semibold text-bridge-950 truncate">${escapeHtml(sessionLabel(s))}</p>
-            <span class="text-[10px] text-slate-300 shrink-0">${timeAgo(s.updated_at)}</span>
-          </div>
-          <div class="flex items-center justify-between gap-2">
-            <p class="text-xs text-slate-400 truncate">${s.last_sender === 'admin' ? 'You: ' : ''}${escapeHtml(s.last_message || '')}</p>
-            ${s.unread_admin ? '<span class="w-2 h-2 rounded-full bg-sunrise-600 shrink-0"></span>' : ''}
-          </div>
+          <p class="text-sm font-semibold text-bridge-950 truncate">${escapeHtml(sessionLabel(s))}</p>
+          <p class="text-xs text-slate-400 truncate">${s.last_sender === 'admin' ? 'You: ' : ''}${escapeHtml(s.last_message || '')}</p>
+        </div>
+        <div class="flex flex-col items-end gap-1.5 shrink-0 self-stretch justify-center">
+          <span class="text-[10px] text-slate-300 whitespace-nowrap">${timeAgo(s.updated_at)}</span>
+          <span class="w-2 h-2 rounded-full ${s.unread_admin ? 'bg-sunrise-600' : 'bg-transparent'}"></span>
         </div>
       </button>
     `).join('');
@@ -211,10 +216,27 @@ const formMessages = results as any[];
     return `<a href="${m.attachment_url}" target="_blank" rel="noopener" class="flex items-center gap-2 mt-1.5 bg-black/5 rounded-lg px-3 py-2 text-xs font-medium underline">📎 ${escapeHtml(m.attachment_name || 'Download file')}</a>`;
   }
 
+  let lastBubbleTime = null;
+  function formatClock(iso) {
+    if (!iso) return '';
+    const d = new Date(iso.replace(' ', 'T') + 'Z');
+    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+
   function addBubble(m) {
     const wrap = document.getElementById('threadMessages');
     const empty = wrap.querySelector('.text-center');
     if (empty) empty.remove();
+
+    const t = m.created_at ? new Date(m.created_at.replace(' ', 'T') + 'Z').getTime() : Date.now();
+    if (m.created_at && (lastBubbleTime === null || t - lastBubbleTime > 5 * 60000)) {
+      const cap = document.createElement('p');
+      cap.className = 'text-center text-[11px] text-slate-400 py-1';
+      cap.textContent = formatClock(m.created_at);
+      wrap.appendChild(cap);
+    }
+    lastBubbleTime = t;
+
     const div = document.createElement('div');
     const isUser = m.sender === 'user';
     div.className = isUser
@@ -229,10 +251,11 @@ const formMessages = results as any[];
   async function openSession(sessionId) {
     activeSessionId = sessionId;
     renderedIds = {};
+    lastBubbleTime = null;
     renderSessionList();
 
     document.getElementById('threadMessages').innerHTML = '<p class="text-slate-400 text-sm text-center mt-10">Loading…</p>';
-    ['replyInput','replySendBtn','replyAttachBtn','replyMicBtn','archiveBtn'].forEach(id => document.getElementById(id).disabled = false);
+    ['replyInput','replySendBtn','replyAttachBtn','replyMicBtn','threadMenuBtn'].forEach(id => document.getElementById(id).disabled = false);
 
     try {
       const data = await apiFetch('/api/chat/thread?session_id=' + encodeURIComponent(sessionId));
@@ -289,8 +312,19 @@ const formMessages = results as any[];
     await sendReply({ message: msg });
   });
 
+  document.getElementById('threadMenuBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('threadMenuDropdown').classList.toggle('hidden');
+  });
+  document.addEventListener('click', (e) => {
+    const dd = document.getElementById('threadMenuDropdown');
+    const btn = document.getElementById('threadMenuBtn');
+    if (!dd.contains(e.target) && e.target !== btn) dd.classList.add('hidden');
+  });
+
   document.getElementById('archiveBtn').addEventListener('click', async () => {
     if (!activeSessionId) return;
+    document.getElementById('threadMenuDropdown').classList.add('hidden');
     const btn = document.getElementById('archiveBtn');
     const archiving = btn.textContent === 'Archive';
     try {
