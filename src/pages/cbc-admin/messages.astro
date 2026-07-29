@@ -139,9 +139,9 @@ export const prerender = false;
       el.innerHTML = '<p class="text-slate-400 text-xs p-4">No conversations here yet.</p>';
       return;
     }
-    el.innerHTML = list.map(s => `
+    el.innerHTML = '<div class="space-y-2.5 p-2.5">' + list.map(s => `
       <button type="button" data-session="${s.session_id}"
-        class="session-item w-full text-left px-3 py-3 hover:bg-white/70 transition flex items-center gap-3 ${s.session_id === activeSessionId ? 'bg-white' : ''}">
+        class="session-item w-full text-left px-3 py-3 rounded-xl transition flex items-center gap-3 shadow-sm ring-1 ${s.session_id === activeSessionId ? 'bg-white ring-iris-200' : 'bg-white/80 ring-black/5 hover:bg-white'}">
         <div class="w-11 h-11 rounded-full ${avatarColor(s.session_id)} flex items-center justify-center text-white text-xs font-bold shrink-0">${initials(sessionLabel(s))}</div>
         <div class="min-w-0 flex-1">
           <p class="text-sm font-semibold text-bridge-950 truncate">${escapeHtml(sessionLabel(s))}</p>
@@ -152,7 +152,7 @@ export const prerender = false;
           <span class="w-2 h-2 rounded-full ${s.unread_admin ? 'bg-sunrise-600' : 'bg-transparent'}"></span>
         </div>
       </button>
-    `).join('');
+    `).join('') + '</div>';
 
     el.querySelectorAll('.session-item').forEach(btn => {
       btn.addEventListener('click', () => openSession(btn.getAttribute('data-session')));
