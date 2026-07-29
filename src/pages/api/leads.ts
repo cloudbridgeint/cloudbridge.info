@@ -8,6 +8,10 @@ export const POST: APIRoute = async (context) => {
   const {
     name, email, phone, message, source_page,
     utm_source, utm_medium, utm_campaign,
+    residence_country, destination_country, degree_level, subject_interested, english_test, test_score,
+    dob, gender, nationality, address, institute_name, course_studied, graduation_year,
+    preferred_study_level, intake_month, intake_year,
+    doc_academic_cert, doc_transcript, doc_english_cert, doc_cv, doc_personal_statement,
   } = body || {};
 
   const cf = (context.request as any).cf || {};
@@ -16,12 +20,20 @@ export const POST: APIRoute = async (context) => {
 
   await db.prepare(
     `INSERT INTO leads
-      (name, email, phone, message, source_page, utm_source, utm_medium, utm_campaign, referrer, country, city, ip, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new')`
+      (name, email, phone, message, source_page, utm_source, utm_medium, utm_campaign, referrer, country, city, ip, status,
+       residence_country, destination_country, degree_level, subject_interested, english_test, test_score,
+       dob, gender, nationality, address, institute_name, course_studied, graduation_year,
+       preferred_study_level, intake_month, intake_year,
+       doc_academic_cert, doc_transcript, doc_english_cert, doc_cv, doc_personal_statement)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     name || '', email || '', phone || '', message || '', source_page || '',
     utm_source || '', utm_medium || '', utm_campaign || '', referrer,
-    cf.country || '', cf.city || '', ip
+    cf.country || '', cf.city || '', ip,
+    residence_country || '', destination_country || '', degree_level || '', subject_interested || '', english_test || '', test_score || '',
+    dob || '', gender || '', nationality || '', address || '', institute_name || '', course_studied || '', graduation_year || '',
+    preferred_study_level || '', intake_month || '', intake_year || '',
+    doc_academic_cert || '', doc_transcript || '', doc_english_cert || '', doc_cv || '', doc_personal_statement || ''
   ).run();
 
   return new Response(JSON.stringify({ success: true }), {

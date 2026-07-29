@@ -287,7 +287,7 @@ function applyNext() {
 function applyBack() {
   if (applyStep > 1) applyShowStep(applyStep - 1);
 }
-function applySubmitForm() {
+async function applySubmitForm() {
   const body = document.getElementById('applyFormBody');
   const thanks = document.getElementById('applyThanks');
   if (body) body.classList.add('hidden');
@@ -297,12 +297,55 @@ function applySubmitForm() {
     const val = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
     const firstName = val('applyFirstName');
     const lastName = val('applyLastName');
+
+    async function uploadIfPresent(inputId) {
+      const el = document.getElementById(inputId);
+      const file = el && el.files && el.files[0];
+      if (!file) return '';
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await fetch('/api/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        return res.ok ? data.url : '';
+      } catch (err) {
+        return '';
+      }
+    }
+
+    const [docCert, docTranscript, docEnglishCert, docCV, docPersonalStatement] = await Promise.all([
+      uploadIfPresent('applyFileCert'),
+      uploadIfPresent('applyFileTranscript'),
+      uploadIfPresent('applyFileEnglishCert'),
+      uploadIfPresent('applyFileCV'),
+      uploadIfPresent('applyFilePersonalStatement'),
+    ]);
+
     const payload = {
       name: `${firstName} ${lastName}`.trim(),
       email: val('applyEmail'),
       phone: val('applyPhone'),
       message: '',
       source_page: 'apply-now',
+      dob: val('applyDob'),
+      gender: val('applyGender'),
+      nationality: val('applyNationality'),
+      residence_country: val('applyResidenceCountry'),
+      address: val('applyAddress'),
+      degree_level: val('applyQualification'),
+      institute_name: val('applyInstitute'),
+      course_studied: val('applyCourseStudied'),
+      graduation_year: val('applyGradYear'),
+      english_test: val('applyEnglishTest'),
+      preferred_study_level: val('applyStudyLevel'),
+      subject_interested: val('applySubjectSelect'),
+      intake_month: val('applyIntakeMonth'),
+      intake_year: val('applyIntakeYear'),
+      doc_academic_cert: docCert,
+      doc_transcript: docTranscript,
+      doc_english_cert: docEnglishCert,
+      doc_cv: docCV,
+      doc_personal_statement: docPersonalStatement,
     };
     fetch('/api/leads', {
       method: 'POST',
@@ -1052,16 +1095,42 @@ function initPageScripts() {
       try {
         const source = form.dataset.source || 'website';
         const get = (n) => { const el = form.querySelector(`[name="${n}"]`); return el ? el.value : ''; };
+        const getById = (...ids) => {
+          for (const id of ids) {
+            const el = form.querySelector('#' + id);
+            if (el) return el.value;
+          }
+          return '';
+        };
         const firstName = get('firstName');
         const lastName = get('lastName');
         const plainName = get('name');
         const name = plainName || `${firstName} ${lastName}`.trim();
+
+        // Preferred destination: custom select widget, with an "Other" free-text fallback
+        const destinationRaw = getById('destinationSelect', 'destinationSelect2');
+        const destinationOther = getById('otherDestinationInput', 'otherDestinationInput2');
+        const destination = destinationRaw === 'Other' ? (destinationOther || 'Other') : destinationRaw;
+
+        // Subject interested: custom searchable-dropdown widget (value lives on the display input)
+        const subjectInterested = getById('subjectDisplay', 'subjectDisplay2');
+
+        // English test(s): checkboxes, possibly multiple selected
+        const engTestBoxes = Array.from(form.querySelectorAll('[name="engTest"]:checked, [name="engTest2"]:checked'));
+        const englishTest = engTestBoxes.map(b => b.value).join(', ');
+
         const payload = {
           name,
           email: get('email'),
           phone: get('phone'),
           message: get('message'),
           source_page: source,
+          residence_country: get('residenceCountry'),
+          destination_country: destination,
+          degree_level: get('degreeLevel'),
+          subject_interested: subjectInterested,
+          english_test: englishTest,
+          test_score: get('testScore'),
         };
         fetch('/api/leads', {
           method: 'POST',

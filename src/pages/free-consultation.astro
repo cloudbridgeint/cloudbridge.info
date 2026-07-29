@@ -24,7 +24,7 @@ const description = "Get personalised guidance on courses, universities, and sch
       <input name="lastName" required placeholder="Last name" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm">
       <input name="phone" required placeholder="Phone number (WhatsApp)" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm">
       <input name="email" type="email" required placeholder="Email address" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm">
-      <select class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm text-ink/70"><option value="">Country of residence</option><option>Bangladesh</option><option>India</option><option>UAE</option><option>Saudi Arabia</option><option>Other</option></select>
+      <select name="residenceCountry" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm text-ink/70"><option value="">Country of residence</option><option>Bangladesh</option><option>India</option><option>UAE</option><option>Saudi Arabia</option><option>Other</option></select>
       <div>
         <select id="destinationSelect" onchange="toggleOtherDestination()" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm text-ink/70 w-full">
           <option value="">Preferred destination</option>
@@ -42,7 +42,7 @@ const description = "Get personalised guidance on courses, universities, and sch
         </select>
         <input type="text" id="otherDestinationInput" placeholder="Please specify your preferred country" class="form-input hidden mt-3 rounded-xl border border-black/10 px-4 py-3.5 text-sm w-full">
       </div>
-      <select class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm text-ink/70"><option value="">Most recently completed degree</option><option>SSC / O Levels</option><option>HSC / A Levels</option><option>Diploma</option><option>Bachelor's</option><option>Master's</option></select>
+      <select name="degreeLevel" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm text-ink/70"><option value="">Most recently completed degree</option><option>SSC / O Levels</option><option>HSC / A Levels</option><option>Diploma</option><option>Bachelor's</option><option>Master's</option></select>
       <div class="relative" id="subjectCombo">
         <input type="text" readonly id="subjectDisplay" placeholder="Subject interested" onclick="toggleSubjectDropdown()" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm w-full cursor-pointer bg-white">
         <svg viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-ink/40 pointer-events-none"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
@@ -62,7 +62,7 @@ const description = "Get personalised guidance on courses, universities, and sch
           <label class="flex items-center gap-1.5 text-sm text-ink/70"><input type="checkbox" class="uni-filter-check" name="engTest" value="Not yet taken"> Not yet taken</label>
         </div>
       </div>
-      <input placeholder="Test result(s) — e.g. IELTS 6.5, Duolingo 115" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm sm:col-span-2">
+      <input name="testScore" placeholder="Test result(s) — e.g. IELTS 6.5, Duolingo 115" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm sm:col-span-2">
       <label class="sm:col-span-2 flex items-start gap-2 text-xs text-ink/50">
         <input type="checkbox" required class="mt-0.5 uni-filter-check">
         <span>We will not share your details with anyone without your permission. I agree to CloudBridge's terms and privacy policy.</span>

@@ -13,7 +13,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     (pathname.startsWith('/api/media/') && context.request.method === 'GET') || // public image serving
     (pathname === '/api/chat/send' && context.request.method === 'POST') || // public chat widget: send message
     (pathname === '/api/chat/poll' && context.request.method === 'GET') || // public chat widget: poll for replies
-    (pathname === '/api/chat/upload' && context.request.method === 'POST'); // public chat widget: attachment/voice upload
+    (pathname === '/api/chat/upload' && context.request.method === 'POST') || // public chat widget: attachment/voice upload
+    (pathname === '/api/upload' && context.request.method === 'POST'); // public form uploads: application documents
 
   if (isPublic) return next();
 

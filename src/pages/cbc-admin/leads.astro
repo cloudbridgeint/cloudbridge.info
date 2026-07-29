@@ -12,27 +12,33 @@ const leads = results as any[];
   <h1 class="text-2xl font-bold text-bridge-950">Leads</h1>
   <p class="text-slate-500 mt-1 text-sm">Submissions from the Free Consultation form.</p>
 
-  <div class="mt-8 card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead>
-        <tr class="text-left text-xs text-slate-500 border-b border-slate-100">
-          <th class="px-4 py-3 font-medium">Name</th>
-          <th class="px-4 py-3 font-medium">Contact</th>
-          <th class="px-4 py-3 font-medium">Location</th>
-          <th class="px-4 py-3 font-medium">Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        {leads.map((l: any) => (
-          <tr class="border-b border-slate-50 hover:bg-slate-50/50">
-            <td class="px-4 py-3 font-medium text-bridge-950">{l.name || '—'}</td>
-            <td class="px-4 py-3 text-slate-600">{l.email}<br/><span class="text-xs text-slate-400">{l.phone}</span></td>
-            <td class="px-4 py-3 text-slate-500 text-xs">{l.city}{l.city && l.country ? ', ' : ''}{l.country}</td>
-            <td class="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{l.created_at}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-    {leads.length === 0 && <p class="text-slate-500 text-sm p-6">No leads yet — they'll show up here once someone submits the Free Consultation form.</p>}
+  <div class="mt-8 space-y-3">
+    {leads.length === 0 ? (
+      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-8 text-center">
+        <p class="text-slate-400 text-sm">No leads yet — they'll show up here once someone submits the Free Consultation form.</p>
+      </div>
+    ) : leads.map((l: any) => (
+      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
+        <div class="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <p class="font-semibold text-bridge-950 text-sm">{l.name || 'Anonymous'}</p>
+            <p class="text-xs text-slate-400 mt-0.5">{l.email} {l.phone ? `· ${l.phone}` : ''}</p>
+          </div>
+          <p class="text-xs text-slate-400 whitespace-nowrap">{l.created_at}</p>
+        </div>
+
+        <div class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2 text-xs">
+          {l.residence_country && <p><span class="text-slate-400">Residence:</span> <span class="text-slate-700 font-medium">{l.residence_country}</span></p>}
+          {l.destination_country && <p><span class="text-slate-400">Preferred destination:</span> <span class="text-slate-700 font-medium">{l.destination_country}</span></p>}
+          {l.degree_level && <p><span class="text-slate-400">Completed degree:</span> <span class="text-slate-700 font-medium">{l.degree_level}</span></p>}
+          {l.subject_interested && <p><span class="text-slate-400">Subject interested:</span> <span class="text-slate-700 font-medium">{l.subject_interested}</span></p>}
+          {l.english_test && <p><span class="text-slate-400">English test:</span> <span class="text-slate-700 font-medium">{l.english_test}</span></p>}
+          {l.test_score && <p><span class="text-slate-400">Test score:</span> <span class="text-slate-700 font-medium">{l.test_score}</span></p>}
+          {(l.city || l.country) && <p><span class="text-slate-400">Location (detected):</span> <span class="text-slate-700 font-medium">{l.city}{l.city && l.country ? ', ' : ''}{l.country}</span></p>}
+        </div>
+
+        {l.message && <p class="text-sm text-slate-600 mt-3 leading-relaxed border-t border-slate-50 pt-3">{l.message}</p>}
+      </div>
+    ))}
   </div>
 </AdminLayout>
