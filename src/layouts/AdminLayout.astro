@@ -58,7 +58,7 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
       height: 100vh;
       overflow: hidden;
       position: relative;
-      background: radial-gradient(120% 140% at 100% 0%, #6d70d6 0%, #4d51b0 45%, #363a86 100%);
+      background: #fff;
     }
     .sidebar-solid {
       background: linear-gradient(190deg, #5b5fc7 0%, #4a4eb3 55%, #3d4096 100%);
@@ -78,8 +78,8 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
   </style>
 </head>
 <body class="app-canvas">
-  <div class="relative z-10 p-3 sm:p-5 md:p-7 h-screen box-border">
-    <div class="flex bg-white rounded-[28px] shadow-2xl ring-1 ring-black/5 overflow-hidden h-full">
+  <div class="relative z-10 h-screen box-border">
+    <div class="flex bg-white overflow-hidden h-full">
 
       <!-- Mobile sidebar backdrop -->
       <div id="mobileSidebarBackdrop" class="hidden fixed inset-0 bg-black/40 z-30 md:hidden"></div>
