@@ -109,3 +109,23 @@ export async function getTopCountries(db: D1Like, limit = 8) {
   ).bind(limit).all();
   return results as any[];
 }
+
+/** Events from today onward, soonest first — for the admin dashboard calendar widget. */
+export async function getUpcomingEvents(db: D1Like, limit = 5) {
+  const { results } = await db.prepare(
+    `SELECT id, title, event_date, location FROM events
+     WHERE date(event_date) >= date('now')
+     ORDER BY event_date ASC LIMIT ?`
+  ).bind(limit).all();
+  return results as any[];
+}
+
+/** Top lead source pages as percentages, for the dashboard's ring charts. */
+export async function getLeadSourceBreakdown(db: D1Like, limit = 4) {
+  const { results } = await db.prepare(
+    `SELECT COALESCE(NULLIF(source_page,''), 'Direct') as source, COUNT(*) as n FROM leads GROUP BY source ORDER BY n DESC LIMIT ?`
+  ).bind(limit).all();
+  const rows = results as any[];
+  const total = rows.reduce((s, r) => s + r.n, 0);
+  return { rows, total };
+}

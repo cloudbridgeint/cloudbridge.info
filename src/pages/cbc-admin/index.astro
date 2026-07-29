@@ -1,18 +1,20 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import { getVisitSummary, getVisitsByDay, getTopCountries } from '../../lib/content';
+import { getVisitSummary, getVisitsByDay, getTopCountries, getUpcomingEvents, getLeadSourceBreakdown } from '../../lib/content';
 export const prerender = false;
 
 const db = (Astro.locals as any).runtime.env.DB;
-const [leadsCount, uniCount, blogCount, eventCount, visits, byDay, topCountries, recentLeads] = await Promise.all([
+const [leadsCount, uniCount, blogCount, eventCount, visits, byDay, topCountries, recentLeads, upcomingEvents, sourceBreakdown] = await Promise.all([
   db.prepare('SELECT COUNT(*) as n FROM leads').first(),
   db.prepare('SELECT COUNT(*) as n FROM universities WHERE active = 1').first(),
   db.prepare('SELECT COUNT(*) as n FROM blog_posts').first(),
   db.prepare('SELECT COUNT(*) as n FROM events').first(),
   getVisitSummary(db),
-  getVisitsByDay(db, 14),
+  getVisitsByDay(db, 7),
   getTopCountries(db, 3),
-  db.prepare("SELECT name, email, source_page, status, created_at FROM leads WHERE source_page = 'free-consultation' ORDER BY created_at DESC LIMIT 6").all(),
+  db.prepare("SELECT name, email, phone, source_page, status, created_at FROM leads ORDER BY created_at DESC LIMIT 5").all(),
+  getUpcomingEvents(db, 4),
+  getLeadSourceBreakdown(db, 4),
 ]);
 
 const maxDay = Math.max(1, ...byDay.map((r: any) => r.n));
@@ -22,7 +24,7 @@ const totalCountryVisits = topCountries.reduce((s: number, r: any) => s + r.n, 0
 const segments = topCountries.map((r: any, i: number) => ({
   label: r.country,
   pct: Math.round((r.n / totalCountryVisits) * 100),
-  color: ['bg-blue-600', 'bg-slate-200', 'bg-pink-500'][i] || 'bg-slate-300',
+  color: ['bg-iris-500', 'bg-slate-200', 'bg-sunrise-500'][i] || 'bg-slate-300',
 }));
 
 const statCards = [
@@ -31,37 +33,200 @@ const statCards = [
   { label: 'Total Leads', value: leadsCount?.n ?? 0, badge: 'badge-pink', icon: 'M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z' },
   { label: 'Blog Posts', value: blogCount?.n ?? 0, badge: 'badge-purple', icon: 'M4 4h11a2 2 0 012 2v13a1 1 0 01-1.55.84L11 17l-4.45 2.84A1 1 0 015 19V6a2 2 0 012-2z' },
 ];
+
+// Lead-source rings (top up to 4 source pages, as percentages)
+const ringColors = ['#5b5fc7', '#22c55e', '#f59e0b', '#ec4899'];
+const CIRC = 2 * Math.PI * 32; // r=32
+const sourceRings = sourceBreakdown.rows.map((r: any, i: number) => {
+  const pct = sourceBreakdown.total > 0 ? Math.round((r.n / sourceBreakdown.total) * 100) : 0;
+  return {
+    label: (r.source || 'Direct').replace(/-/g, ' '),
+    pct,
+    color: ringColors[i] || '#94a3b8',
+    dash: `${(pct / 100) * CIRC} ${CIRC}`,
+  };
+});
+
+function initials(name: string) {
+  const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase();
+}
+
+function dateChip(dateStr: string) {
+  const d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return { day: '--', mon: '' };
+  return {
+    day: d.getDate().toString().padStart(2, '0'),
+    mon: d.toLocaleString('en-US', { month: 'short' }).toUpperCase(),
+  };
+}
+
+const avatarBg = ['bg-iris-500', 'bg-sunrise-500', 'bg-emerald-500', 'bg-amber-500', 'bg-sky-500'];
 ---
 <AdminLayout title="Dashboard" active="dashboard">
 
-  <div class="grid lg:grid-cols-2 gap-5">
-    <!-- Recent Activity (Next Game equivalent) -->
+  <!-- Hero row: greeting + upcoming events -->
+  <div class="grid lg:grid-cols-3 gap-5">
+    <div class="lg:col-span-2 rounded-2xl ring-1 ring-black/5 shadow-sm p-6 md:p-7 relative overflow-hidden"
+         style="background: linear-gradient(135deg, #f1f1fc 0%, #e3e4f9 100%);">
+      <div class="relative z-10 max-w-md">
+        <h2 class="text-xl md:text-2xl font-bold text-iris-900">Hello, Admin!</h2>
+        <p class="text-sm text-iris-700/80 mt-2 leading-relaxed">
+          {(leadsCount?.n ?? 0) > 0
+            ? `You have ${leadsCount.n} ${leadsCount.n === 1 ? 'inquiry' : 'inquiries'} in the pipeline. Let's follow up before they go cold!`
+            : `No inquiries yet — once the contact forms start getting submissions, they'll show up here.`}
+        </p>
+        <a href="/cbc-admin/leads" class="inline-flex items-center gap-1.5 text-sm font-semibold text-iris-700 hover:text-iris-900 mt-4">
+          Review leads
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        </a>
+      </div>
+      <svg class="absolute right-0 bottom-0 w-48 h-48 md:w-56 md:h-56 opacity-90" viewBox="0 0 200 200" fill="none">
+        <circle cx="140" cy="130" r="55" fill="#c5c7f3" opacity="0.5"/>
+        <circle cx="150" cy="60" r="8" fill="#5b5fc7"/>
+        <path d="M60 95 L110 70 L160 95 L110 120 Z" fill="#5b5fc7"/>
+        <path d="M85 105 V128 C85 136 96 142 110 142 C124 142 135 136 135 128 V105" stroke="#4d51b0" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <line x1="60" y1="95" x2="60" y2="118" stroke="#4d51b0" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="60" cy="122" r="3.5" fill="#4d51b0"/>
+      </svg>
+    </div>
+
+    <div class="rounded-2xl ring-1 ring-black/5 shadow-sm p-6 card-soft">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-bridge-950">Upcoming Events</h2>
+        <a href="/cbc-admin/events" class="text-xs font-medium text-iris-600 hover:underline">See all</a>
+      </div>
+      {upcomingEvents.length > 0 ? (
+        <div class="space-y-4">
+          {upcomingEvents.map((ev: any, i: number) => {
+            const chip = dateChip(ev.event_date);
+            return (
+              <div class="flex items-start gap-3">
+                <div class="shrink-0 w-11 h-11 rounded-xl bg-iris-50 flex flex-col items-center justify-center leading-none">
+                  <span class="text-[13px] font-bold text-iris-700">{chip.day}</span>
+                  <span class="text-[9px] font-semibold text-iris-400 tracking-wide">{chip.mon}</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold text-bridge-950 truncate">{ev.title}</p>
+                  <p class="text-xs text-slate-400 truncate">{ev.location || 'Location TBA'}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p class="text-slate-400 text-sm py-8 text-center">No upcoming events scheduled.</p>
+      )}
+    </div>
+  </div>
+
+  <!-- KPI mini cards -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5">
+    {statCards.map(c => (
+      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
+        <div class={`w-10 h-10 rounded-xl ${c.badge} flex items-center justify-center mb-3`}>
+          <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={c.icon}/></svg>
+        </div>
+        <p class="text-xs text-slate-400 uppercase tracking-wide font-medium">{c.label}</p>
+        <p class="text-2xl font-extrabold text-bridge-950 mt-1">{c.value}</p>
+      </div>
+    ))}
+  </div>
+
+  <!-- Visitors chart + lead source rings -->
+  <div class="grid lg:grid-cols-3 gap-5 mt-5">
+    <div class="lg:col-span-2 card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="font-semibold text-bridge-950">Visitors — Last 7 Days</h2>
+        <a href="/cbc-admin/analytics" class="text-xs font-medium text-iris-600 hover:underline">Full analytics &rarr;</a>
+      </div>
+      {byDay.length === 0 ? (
+        <p class="text-slate-400 text-sm">No visit data yet.</p>
+      ) : (
+        <div class="flex items-end gap-3 md:gap-5 h-36">
+          {byDay.map((r: any) => (
+            <div class="flex-1 flex flex-col items-center justify-end h-full gap-1.5">
+              <span class="text-xs font-semibold text-slate-400">{r.n}</span>
+              <div class="w-full rounded-t-lg bg-gradient-to-t from-iris-700 to-iris-400" style={`height:${Math.max((r.n / maxDay) * 100, 6)}%`}></div>
+              <span class="text-[11px] text-slate-400 mt-1">{r.label?.slice(5)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="font-semibold text-bridge-950">Leads by Source</h2>
+      </div>
+      {sourceRings.length > 0 ? (
+        <div class="grid grid-cols-2 gap-4">
+          {sourceRings.map((r: any) => (
+            <div class="flex flex-col items-center">
+              <div class="relative w-20 h-20">
+                <svg class="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke-width="7" class="ring-track"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke-width="7" stroke={r.color} stroke-linecap="round" stroke-dasharray={r.dash}/>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <span class="text-sm font-bold text-bridge-950">{r.pct}%</span>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-2 text-center capitalize truncate w-full">{r.label}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="text-slate-400 text-sm py-10 text-center">No lead data yet.</p>
+      )}
+    </div>
+  </div>
+
+  <!-- Recent leads + traffic by country -->
+  <div class="grid lg:grid-cols-2 gap-5 mt-5">
     <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="font-semibold text-bridge-950">Latest Lead</h2>
-        <a href="/cbc-admin/leads" class="text-xs font-medium text-bridge-600 hover:underline">View All</a>
+        <h2 class="font-semibold text-bridge-950">Recent Leads</h2>
+        <a href="/cbc-admin/leads" class="text-xs font-medium text-iris-600 hover:underline">View All</a>
       </div>
       {leadsList.length > 0 ? (
-        <div>
-          <p class="text-xs text-slate-400">{leadsList[0].source_page || 'Website form'} &middot; {leadsList[0].created_at}</p>
-          <div class="mt-3 flex items-center justify-between">
-            <div>
-              <p class="font-display font-bold text-lg text-bridge-950">{leadsList[0].name || 'Anonymous'}</p>
-              <p class="text-sm text-slate-500">{leadsList[0].email}</p>
+        <div class="space-y-1">
+          {leadsList.map((l: any, i: number) => (
+            <div class="flex items-center justify-between gap-3 py-2.5 border-b border-slate-50 last:border-0">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class={`w-9 h-9 rounded-full ${avatarBg[i % avatarBg.length]} flex items-center justify-center text-white text-xs font-bold shrink-0`}>
+                  {initials(l.name)}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-bridge-950 truncate">{l.name || 'Anonymous'}</p>
+                  <p class="text-xs text-slate-400 truncate capitalize">{(l.source_page || 'website').replace(/-/g, ' ')}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                {l.email && (
+                  <a href={`mailto:${l.email}`} class="w-8 h-8 rounded-full bg-iris-50 hover:bg-iris-100 flex items-center justify-center text-iris-600 transition" title={l.email}>
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m4 4 8 8 8-8"/></svg>
+                  </a>
+                )}
+                {l.phone && (
+                  <a href={`tel:${l.phone}`} class="w-8 h-8 rounded-full bg-iris-50 hover:bg-iris-100 flex items-center justify-center text-iris-600 transition" title={l.phone}>
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                  </a>
+                )}
+              </div>
             </div>
-            <span class="text-xs font-semibold px-3 py-1.5 rounded-full bg-bridge-50 text-bridge-700 capitalize">{leadsList[0].status}</span>
-          </div>
+          ))}
         </div>
       ) : (
         <p class="text-slate-400 text-sm py-6">No leads yet — they'll show up here once the contact forms start getting submissions.</p>
       )}
     </div>
 
-    <!-- Traffic split (Games Statistic equivalent) -->
     <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-semibold text-bridge-950">Traffic by Country</h2>
-        <a href="/cbc-admin/analytics" class="text-xs font-medium text-bridge-600 hover:underline">View All Statistic</a>
+        <a href="/cbc-admin/analytics" class="text-xs font-medium text-iris-600 hover:underline">View All Statistic</a>
       </div>
       {segments.length > 0 ? (
         <>
@@ -83,76 +248,12 @@ const statCards = [
     </div>
   </div>
 
-  <div class="grid lg:grid-cols-2 gap-5 mt-5">
-    <!-- Recent leads table (Standings equivalent) -->
-    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="font-semibold text-bridge-950">Recent Leads</h2>
-        <a href="/cbc-admin/leads" class="text-xs font-medium text-bridge-600 hover:underline">View All</a>
-      </div>
-      {leadsList.length > 0 ? (
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="text-left text-xs text-slate-400">
-              <th class="font-medium pb-2">Name</th>
-              <th class="font-medium pb-2">Source</th>
-              <th class="font-medium pb-2 text-right">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leadsList.map((l: any) => (
-              <tr class="border-t border-slate-50">
-                <td class="py-2.5 font-medium text-bridge-950">{l.name || 'Anonymous'}</td>
-                <td class="py-2.5 text-slate-500">{l.source_page || '—'}</td>
-                <td class="py-2.5 text-right"><span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-bridge-50 text-bridge-700 capitalize">{l.status}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p class="text-slate-400 text-sm py-6">No leads yet.</p>
-      )}
-    </div>
-
-    <!-- 2x2 stat badge cards -->
-    <div class="grid grid-cols-2 gap-4">
-      {statCards.map(c => (
-        <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
-          <div class={`w-10 h-10 rounded-xl ${c.badge} flex items-center justify-center mb-3`}>
-            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={c.icon}/></svg>
-          </div>
-          <p class="text-xs text-slate-400 uppercase tracking-wide font-medium">{c.label}</p>
-          <p class="text-2xl font-extrabold text-bridge-950 mt-1">{c.value}</p>
-        </div>
-      ))}
-    </div>
-  </div>
-
-  <!-- Mini 14-day chart -->
-  <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6 mt-5">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="font-semibold text-bridge-950">Visitors — Last 14 Days</h2>
-      <a href="/cbc-admin/analytics" class="text-xs font-medium text-bridge-600 hover:underline">Full analytics &rarr;</a>
-    </div>
-    {byDay.length === 0 ? (
-      <p class="text-slate-400 text-sm">No visit data yet.</p>
-    ) : (
-      <div class="flex items-end gap-2 h-28">
-        {byDay.map((r: any) => (
-          <div class="flex-1 flex flex-col items-center justify-end h-full">
-            <div class="w-full rounded-t-md bg-gradient-to-t from-bridge-800 to-bridge-500" style={`height:${Math.max((r.n / maxDay) * 100, 4)}%`}></div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-
   <!-- CTA banner -->
-  <div class="mt-5 rounded-2xl overflow-hidden relative bg-gradient-to-br from-bridge-900 to-bridge-950 p-8 flex items-center justify-between gap-6">
+  <div class="mt-5 rounded-2xl overflow-hidden relative p-8 flex items-center justify-between gap-6" style="background: linear-gradient(135deg, #3f4293, #282a57);">
     <div>
-      <p class="text-sunrise-400 text-xs font-bold uppercase tracking-wide mb-2">Reminder</p>
-      <p class="text-white text-xl md:text-2xl font-display font-bold leading-snug">Review your latest leads<br class="hidden md:block"> before they go cold</p>
+      <p class="text-sunrise-500 text-xs font-bold uppercase tracking-wide mb-2">Reminder</p>
+      <p class="text-white text-xl md:text-2xl font-bold leading-snug">Review your latest leads<br class="hidden md:block"> before they go cold</p>
     </div>
-    <a href="/cbc-admin/leads" class="shrink-0 bg-white text-bridge-950 font-semibold text-sm rounded-full px-6 py-3 hover:bg-slate-100 transition whitespace-nowrap">Review Leads</a>
+    <a href="/cbc-admin/leads" class="shrink-0 bg-white text-iris-900 font-semibold text-sm rounded-full px-6 py-3 hover:bg-slate-100 transition whitespace-nowrap">Review Leads</a>
   </div>
 </AdminLayout>
