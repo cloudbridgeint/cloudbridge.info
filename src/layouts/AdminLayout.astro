@@ -63,7 +63,17 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
     .sidebar-solid {
       background: linear-gradient(190deg, #5b5fc7 0%, #4a4eb3 55%, #3d4096 100%);
     }
-    .nav-active { background: #ffffff; color: #4d51b0; box-shadow: 0 10px 20px -8px rgba(15,15,50,0.35); }
+    .nav-active { position: relative; background: #ffffff; color: #4d51b0; box-shadow: 0 10px 20px -8px rgba(15,15,50,0.35); }
+    .nav-active::before, .nav-active::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+    }
+    .nav-active::before { top: -16px; background: radial-gradient(circle at bottom right, #ffffff 16px, transparent 16px); }
+    .nav-active::after { bottom: -16px; background: radial-gradient(circle at top right, #ffffff 16px, transparent 16px); }
     .nav-idle { color: rgba(255,255,255,0.78); }
     .nav-idle:hover { background: rgba(255,255,255,0.12); color: #fff; }
     .sub-active { background: rgba(255,255,255,0.16); color: #fff; }
