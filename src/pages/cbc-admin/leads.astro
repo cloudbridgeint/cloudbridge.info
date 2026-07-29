@@ -70,8 +70,8 @@ function timeOnly(ts: string) {
             <th class="px-5 py-3 font-medium whitespace-nowrap">Phone</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap">Email</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap">Completed Degree</th>
-            <th class="px-5 py-3 font-medium whitespace-nowrap">Test Score</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap">English Test</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Test Score</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap">Subject Interested</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap">Destination</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap">Date</th>
@@ -86,8 +86,8 @@ function timeOnly(ts: string) {
               <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.phone || '—'}</td>
               <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.email || '—'}</td>
               <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.degree_level || '—'}</td>
-              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.test_score || '—'}</td>
               <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.english_test || '—'}</td>
+              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.test_score || '—'}</td>
               <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.subject_interested || '—'}</td>
               <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.destination_country || '—'}</td>
               <td class="px-5 py-3.5 text-slate-400 text-xs whitespace-nowrap">{dateOnly(l.created_at)}</td>
@@ -132,8 +132,8 @@ function timeOnly(ts: string) {
         <div><p class="text-xs text-slate-400">Email</p><p id="mEmail" class="font-medium text-slate-700 mt-0.5"></p></div>
         <div><p class="text-xs text-slate-400">Residence</p><p id="mResidence" class="font-medium text-slate-700 mt-0.5"></p></div>
         <div><p class="text-xs text-slate-400">Completed Degree</p><p id="mDegree" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">Test Score</p><p id="mScore" class="font-medium text-slate-700 mt-0.5"></p></div>
         <div><p class="text-xs text-slate-400">English Test</p><p id="mEnglish" class="font-medium text-slate-700 mt-0.5"></p></div>
+        <div><p class="text-xs text-slate-400">Test Score</p><p id="mScore" class="font-medium text-slate-700 mt-0.5"></p></div>
         <div><p class="text-xs text-slate-400">Subject Interested</p><p id="mSubject" class="font-medium text-slate-700 mt-0.5"></p></div>
         <div><p class="text-xs text-slate-400">Destination</p><p id="mDestination" class="font-medium text-slate-700 mt-0.5"></p></div>
         <div><p class="text-xs text-slate-400">Date</p><p id="mDate" class="font-medium text-slate-700 mt-0.5"></p></div>
