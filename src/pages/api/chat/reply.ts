@@ -18,7 +18,7 @@ export const POST: APIRoute = async (context) => {
     ? String(message)
     : (attachment_type === 'audio' ? '🎤 Voice message' : attachment_type === 'image' ? '📷 Photo' : '📎 Attachment');
 
-  await db.prepare(
+  const insertResult = await db.prepare(
     `INSERT INTO chat_messages (session_id, sender, message, attachment_url, attachment_type, attachment_name) VALUES (?, 'admin', ?, ?, ?, ?)`
   ).bind(session_id, message || '', attachment_url || '', attachment_type || '', attachment_name || '').run();
 
@@ -26,7 +26,9 @@ export const POST: APIRoute = async (context) => {
     `UPDATE chat_sessions SET last_message = ?, last_sender = 'admin', unread_user = 1, unread_admin = 0, updated_at = CURRENT_TIMESTAMP WHERE session_id = ?`
   ).bind(displayText.slice(0, 200), session_id).run();
 
-  return new Response(JSON.stringify({ success: true }), {
+  const newId = insertResult?.meta?.last_row_id;
+
+  return new Response(JSON.stringify({ success: true, id: newId }), {
     status: 201,
     headers: { 'Content-Type': 'application/json' },
   });

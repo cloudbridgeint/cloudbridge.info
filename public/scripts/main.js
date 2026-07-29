@@ -1232,11 +1232,13 @@ initPageScripts();
     if (!text && !attachment.attachment_url) return;
     addBubble('user', text, attachment);
     try {
-      await fetch('/api/chat/send', {
+      var res = await fetch('/api/chat/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(Object.assign({ session_id: sessionId, message: text || '' }, attachment)),
       });
+      var data = await res.json();
+      if (data && data.id) renderedIds[data.id] = true;
     } catch (err) {
       // still shown locally even if send fails
     }

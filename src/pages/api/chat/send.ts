@@ -46,11 +46,13 @@ export const POST: APIRoute = async (context) => {
     ).run();
   }
 
-  await db.prepare(
+  const insertResult = await db.prepare(
     `INSERT INTO chat_messages (session_id, sender, message, attachment_url, attachment_type, attachment_name) VALUES (?, 'user', ?, ?, ?, ?)`
   ).bind(session_id, message || '', attachment_url || '', attachment_type || '', attachment_name || '').run();
 
-  return new Response(JSON.stringify({ success: true }), {
+  const newId = insertResult?.meta?.last_row_id;
+
+  return new Response(JSON.stringify({ success: true, id: newId }), {
     status: 201,
     headers: { 'Content-Type': 'application/json' },
   });

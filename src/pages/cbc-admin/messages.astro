@@ -293,10 +293,11 @@ const formMessages = results as any[];
     if (!activeSessionId) return;
     addBubble({ sender: 'admin', message: message || '', attachment_url, attachment_type, attachment_name });
     try {
-      await apiFetch('/api/chat/reply', {
+      const data = await apiFetch('/api/chat/reply', {
         method: 'POST',
         body: JSON.stringify({ session_id: activeSessionId, message: message || '', attachment_url, attachment_type, attachment_name }),
       });
+      if (data && data.id) renderedIds[data.id] = true;
     } catch (err) {
       showToast('Could not send reply', 'error');
     }
