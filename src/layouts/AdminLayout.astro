@@ -61,9 +61,9 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
       background: #fff;
     }
     .sidebar-solid {
-      background: linear-gradient(190deg, #5b5fc7 0%, #4a4eb3 55%, #3d4096 100%);
+      background: linear-gradient(190deg, #1a2456 0%, #0f1642 55%, #050a31 100%);
     }
-    .nav-active { background: #ffffff; color: #4d51b0; box-shadow: 0 10px 20px -8px rgba(15,15,50,0.35); }
+    .nav-active { background: #ffffff; color: #0f1642; box-shadow: 0 10px 20px -8px rgba(5,10,49,0.4); }
     .nav-idle { color: rgba(255,255,255,0.78); }
     .nav-idle:hover { background: rgba(255,255,255,0.12); color: #fff; }
     .sub-active { background: rgba(255,255,255,0.16); color: #fff; }
@@ -86,11 +86,11 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
 
       <!-- Sidebar -->
       <aside id="sidebar" class="sidebar-solid fixed md:static inset-y-0 left-0 z-40 w-64 md:w-60 shrink-0 flex-col px-4 py-6 overflow-y-auto -translate-x-full md:translate-x-0 transition-transform duration-200 flex">
-        <div class="flex items-center gap-2.5 mb-8 px-1.5">
-          <div class="w-10 h-10 rounded-xl bg-white/15 ring-1 ring-white/25 flex items-center justify-center shrink-0">
-            <img src={logo.src} alt="" class="w-7 h-7 rounded-md object-cover">
+        <div class="flex flex-col items-center gap-3 mb-8 pt-2">
+          <div class="w-20 h-20 rounded-2xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center shrink-0">
+            <img src={logo.src} alt="CloudBridge" class="w-16 h-16 rounded-xl object-cover">
           </div>
-          <span class="font-bold text-white text-[15px] leading-tight tracking-wide">CloudBridge<br/><span class="font-medium text-white/60 text-[11px] tracking-widest uppercase">Admin</span></span>
+          <span class="font-semibold text-white/60 text-xs tracking-[0.2em] uppercase">Admin</span>
         </div>
 
         <nav class="space-y-1">
