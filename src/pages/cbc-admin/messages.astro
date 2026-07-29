@@ -56,7 +56,7 @@ const formMessages = results as any[];
         </div>
 
         <div id="threadMessages" class="flex-1 overflow-y-auto px-4 py-4 space-y-2.5">
-          <p class="text-slate-400 text-sm text-center mt-10">Pick a conversation on the left to view messages.</p>
+          <p class="chat-placeholder text-slate-400 text-sm text-center mt-10">Pick a conversation on the left to view messages.</p>
         </div>
 
         <form id="replyForm" class="flex items-center gap-2.5 px-3 py-3 border-t border-slate-100 shrink-0 bg-white">
@@ -225,7 +225,7 @@ const formMessages = results as any[];
 
   function addBubble(m) {
     const wrap = document.getElementById('threadMessages');
-    const empty = wrap.querySelector('.text-center');
+    const empty = wrap.querySelector('.chat-placeholder');
     if (empty) empty.remove();
 
     const t = m.created_at ? new Date(m.created_at.replace(' ', 'T') + 'Z').getTime() : Date.now();
