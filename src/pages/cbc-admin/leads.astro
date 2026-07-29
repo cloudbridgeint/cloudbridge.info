@@ -7,38 +7,94 @@ const { results } = await db.prepare(
   "SELECT * FROM leads WHERE source_page = 'free-consultation' ORDER BY created_at DESC LIMIT 200"
 ).all();
 const leads = results as any[];
+
+// City-wise lead counts (from detected visitor location)
+const cityCounts = new Map<string, number>();
+for (const l of leads) {
+  const city = (l.city || '').trim();
+  if (!city) continue;
+  cityCounts.set(city, (cityCounts.get(city) || 0) + 1);
+}
+const cityStats = Array.from(cityCounts.entries())
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 8);
+
+const cardColors = ['bg-iris-500', 'bg-sunrise-500', 'bg-emerald-500', 'bg-amber-500', 'bg-sky-500', 'bg-pink-500', 'bg-teal-500', 'bg-violet-500'];
 ---
 <AdminLayout title="Leads" active="leads">
   <h1 class="text-2xl font-bold text-bridge-950">Leads</h1>
   <p class="text-slate-500 mt-1 text-sm">Submissions from the Free Consultation form.</p>
 
-  <div class="mt-8 space-y-3">
-    {leads.length === 0 ? (
-      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-8 text-center">
-        <p class="text-slate-400 text-sm">No leads yet — they'll show up here once someone submits the Free Consultation form.</p>
-      </div>
-    ) : leads.map((l: any) => (
-      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
-        <div class="flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <p class="font-semibold text-bridge-950 text-sm">{l.name || 'Anonymous'}</p>
-            <p class="text-xs text-slate-400 mt-0.5">{l.email} {l.phone ? `· ${l.phone}` : ''}</p>
+  <!-- City-wise lead count blocks -->
+  {cityStats.length > 0 && (
+    <div class="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-3">
+      {cityStats.map(([city, count], i) => (
+        <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-4">
+          <div class="flex items-start justify-between">
+            <p class="text-xs text-slate-400 font-medium">{city}</p>
+            <span class={`w-7 h-7 rounded-lg ${cardColors[i % cardColors.length]} flex items-center justify-center shrink-0`}>
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            </span>
           </div>
-          <p class="text-xs text-slate-400 whitespace-nowrap">{l.created_at}</p>
+          <p class="text-2xl font-bold text-bridge-950 mt-2">{count}</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">lead{count !== 1 ? 's' : ''}</p>
         </div>
+      ))}
+    </div>
+  )}
 
-        <div class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2 text-xs">
-          {l.residence_country && <p><span class="text-slate-400">Residence:</span> <span class="text-slate-700 font-medium">{l.residence_country}</span></p>}
-          {l.destination_country && <p><span class="text-slate-400">Preferred destination:</span> <span class="text-slate-700 font-medium">{l.destination_country}</span></p>}
-          {l.degree_level && <p><span class="text-slate-400">Completed degree:</span> <span class="text-slate-700 font-medium">{l.degree_level}</span></p>}
-          {l.subject_interested && <p><span class="text-slate-400">Subject interested:</span> <span class="text-slate-700 font-medium">{l.subject_interested}</span></p>}
-          {l.english_test && <p><span class="text-slate-400">English test:</span> <span class="text-slate-700 font-medium">{l.english_test}</span></p>}
-          {l.test_score && <p><span class="text-slate-400">Test score:</span> <span class="text-slate-700 font-medium">{l.test_score}</span></p>}
-          {(l.city || l.country) && <p><span class="text-slate-400">Location (detected):</span> <span class="text-slate-700 font-medium">{l.city}{l.city && l.country ? ', ' : ''}{l.country}</span></p>}
-        </div>
-
-        {l.message && <p class="text-sm text-slate-600 mt-3 leading-relaxed border-t border-slate-50 pt-3">{l.message}</p>}
+  <!-- Leads table -->
+  <div class="mt-6 card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+      <p class="font-semibold text-bridge-950 text-sm">All Leads <span class="text-slate-400 font-normal">({leads.length})</span></p>
+      <div class="relative">
+        <input id="leadsSearch" type="text" placeholder="Search leads"
+          class="w-56 bg-slate-50 border border-transparent rounded-full pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
       </div>
-    ))}
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-xs text-slate-500 border-b border-slate-100 bg-slate-50/50">
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Name</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Phone</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Email</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Completed Degree</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Test Score</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">English Test</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Subject Interested</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Destination</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Date</th>
+          </tr>
+        </thead>
+        <tbody id="leadsTableBody">
+          {leads.map((l: any) => (
+            <tr class="lead-row border-b border-slate-50 hover:bg-slate-50/50 transition" data-search={`${l.name} ${l.email} ${l.phone}`.toLowerCase()}>
+              <td class="px-5 py-3.5 font-semibold text-bridge-950 whitespace-nowrap">{l.name || '—'}</td>
+              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.phone || '—'}</td>
+              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.email || '—'}</td>
+              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.degree_level || '—'}</td>
+              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.test_score || '—'}</td>
+              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.english_test || '—'}</td>
+              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.subject_interested || '—'}</td>
+              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{l.destination_country || '—'}</td>
+              <td class="px-5 py-3.5 text-slate-400 text-xs whitespace-nowrap">{l.created_at}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {leads.length === 0 && <p class="text-slate-400 text-sm p-8 text-center">No leads yet — they'll show up here once someone submits the Free Consultation form.</p>}
+    </div>
   </div>
 </AdminLayout>
+
+<script is:inline>
+  document.getElementById('leadsSearch')?.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('.lead-row').forEach(row => {
+      row.style.display = row.dataset.search.includes(q) ? '' : 'none';
+    });
+  });
+</script>
