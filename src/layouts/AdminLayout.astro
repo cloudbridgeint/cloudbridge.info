@@ -233,27 +233,34 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
       const sound = document.getElementById('chatNotifySound');
       const badge = document.getElementById('topbarMsgBadge');
 
-      // Browsers require a user gesture before audio can play reliably (including in
-      // background tabs later on). Prime it on the very first click/keypress anywhere.
+      // Browsers block audio.play() until this page has seen a genuine user gesture —
+      // and that "unlocked" state resets on every fresh navigation/login. Prime it on
+      // the first interaction of ANY kind on whichever admin page loads.
       function unlockAudio() {
         if (audioUnlocked || !sound) return;
-        sound.volume = 0;
+        sound.muted = true;
         sound.play().then(() => {
           sound.pause();
           sound.currentTime = 0;
-          sound.volume = 1;
+          sound.muted = false;
           audioUnlocked = true;
-        }).catch(() => {});
+        }).catch(() => {
+          // Some browsers reject even a muted priming play(); try again on the next gesture.
+        });
       }
-      document.addEventListener('click', unlockAudio, { once: true });
-      document.addEventListener('keydown', unlockAudio, { once: true });
+      ['click', 'keydown', 'mousedown', 'touchstart', 'pointerdown'].forEach(evt =>
+        document.addEventListener(evt, unlockAudio, { passive: true })
+      );
 
       function playNotifySound() {
         if (!sound) return;
         try {
           sound.currentTime = 0;
         } catch (e) {}
-        sound.play().catch(() => {});
+        sound.play().catch(() => {
+          // Autoplay was rejected (no gesture registered yet on this page load).
+          // It will start working from the next user interaction onward via unlockAudio().
+        });
       }
 
       async function checkUnread() {
