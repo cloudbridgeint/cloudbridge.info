@@ -64,6 +64,16 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
       background: linear-gradient(190deg, #5b5fc7 0%, #4a4eb3 55%, #3d4096 100%);
     }
     .nav-active { position: relative; background: #ffffff; color: #4d51b0; box-shadow: 0 10px 20px -8px rgba(15,15,50,0.35); }
+    .nav-active::before, .nav-active::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+    }
+    .nav-active::before { top: -10px; background: radial-gradient(circle at bottom right, #ffffff 10px, transparent 10px); }
+    .nav-active::after { bottom: -10px; background: radial-gradient(circle at top right, #ffffff 10px, transparent 10px); }
     .nav-idle { color: rgba(255,255,255,0.78); }
     .nav-idle:hover { background: rgba(255,255,255,0.12); color: #fff; }
     .sub-active { background: rgba(255,255,255,0.16); color: #fff; }
@@ -96,7 +106,7 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
         <nav class="space-y-1">
           {navItemsMain.map(item => (
             <a href={item.href}
-               class={`flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium transition ${active === item.key ? 'nav-active rounded-l-2xl rounded-r-lg -mr-4 pr-4' : 'nav-idle rounded-xl'}`}>
+               class={`flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium transition ${active === item.key ? 'nav-active rounded-l-2xl -mr-4 pr-4' : 'nav-idle rounded-xl'}`}>
               <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={item.icon}/></svg>
               {item.label}
             </a>
@@ -107,7 +117,7 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
 
         <nav class="space-y-1">
           <button id="settingsToggle" type="button"
-             class={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium transition ${settingsActive ? 'nav-active rounded-l-2xl rounded-r-lg -mr-4 pr-4' : 'nav-idle rounded-xl'}`}>
+             class={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium transition ${settingsActive ? 'nav-active rounded-l-2xl -mr-4 pr-4' : 'nav-idle rounded-xl'}`}>
             <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
             <span class="flex-1 text-left">Settings</span>
             <svg id="settingsChevron" class={`w-4 h-4 transition-transform ${settingsActive ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -115,7 +125,7 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
           <div id="settingsPanel" class={`${settingsActive ? '' : 'hidden'} pl-4 space-y-1`}>
             {settingsSubItems.map(item => (
               <a href={item.href}
-                 class={`flex items-center gap-3 px-3.5 py-2 text-sm font-medium transition ${active === item.key ? 'sub-active rounded-l-xl rounded-r-md -mr-4 pr-4' : 'nav-idle rounded-xl'}`}>
+                 class={`flex items-center gap-3 px-3.5 py-2 text-sm font-medium transition ${active === item.key ? 'sub-active rounded-l-xl -mr-4 pr-4' : 'nav-idle rounded-xl'}`}>
                 <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={item.icon}/></svg>
                 {item.label}
               </a>
