@@ -1111,3 +1111,74 @@ initPageScripts();
     lastScrollY = currentScrollY;
   }, { passive: true });
 })();
+
+// Floating Call/Chat widget
+(function () {
+  var callBtn = document.getElementById('fabCallBtn');
+  var chatBtn = document.getElementById('fabChatBtn');
+  var contactPanel = document.getElementById('contactPanel');
+  var chatPanel = document.getElementById('chatPanel');
+  var chatCloseBtn = document.getElementById('chatCloseBtn');
+  var chatForm = document.getElementById('chatForm');
+  var chatInput = document.getElementById('chatInput');
+  var chatMessages = document.getElementById('chatMessages');
+  if (!callBtn || !chatBtn) return;
+
+  function closeAll() {
+    contactPanel.classList.add('hidden');
+    chatPanel.classList.add('hidden');
+  }
+
+  callBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var willOpen = contactPanel.classList.contains('hidden');
+    closeAll();
+    if (willOpen) contactPanel.classList.remove('hidden');
+  });
+
+  chatBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var willOpen = chatPanel.classList.contains('hidden');
+    closeAll();
+    if (willOpen) chatPanel.classList.remove('hidden');
+  });
+
+  chatCloseBtn?.addEventListener('click', function (e) {
+    e.stopPropagation();
+    chatPanel.classList.add('hidden');
+  });
+
+  document.addEventListener('click', function (e) {
+    var widget = document.getElementById('fabWidget');
+    if (widget && !widget.contains(e.target)) closeAll();
+  });
+
+  chatForm?.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var msg = chatInput.value.trim();
+    if (!msg) return;
+
+    var userBubble = document.createElement('div');
+    userBubble.className = 'fab-user-bubble';
+    userBubble.textContent = msg;
+    chatMessages.appendChild(userBubble);
+    chatInput.value = '';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: '', email: '', phone: '', message: msg, source_page: 'chat-widget' }),
+      });
+    } catch (err) {
+      // best-effort, still show a reply either way
+    }
+
+    var reply = document.createElement('div');
+    reply.className = 'fab-chat-bubble';
+    reply.innerHTML = 'Thanks for reaching out! One of our counselors will get back to you shortly. In the meantime, feel free to explore the options above. 😊';
+    chatMessages.appendChild(reply);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+})();
