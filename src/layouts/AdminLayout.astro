@@ -225,11 +225,36 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
     }
     window.apiFetch = apiFetch;
 
-    // Global new-message notification (sound + badge), active on every admin page
+    // Global new-message notification (sound + badge), active on every admin page —
+    // works even when this tab isn't focused, as long as the admin panel is open somewhere.
     (function () {
       let lastSeenMsgId = null;
+      let audioUnlocked = false;
       const sound = document.getElementById('chatNotifySound');
       const badge = document.getElementById('topbarMsgBadge');
+
+      // Browsers require a user gesture before audio can play reliably (including in
+      // background tabs later on). Prime it on the very first click/keypress anywhere.
+      function unlockAudio() {
+        if (audioUnlocked || !sound) return;
+        sound.volume = 0;
+        sound.play().then(() => {
+          sound.pause();
+          sound.currentTime = 0;
+          sound.volume = 1;
+          audioUnlocked = true;
+        }).catch(() => {});
+      }
+      document.addEventListener('click', unlockAudio, { once: true });
+      document.addEventListener('keydown', unlockAudio, { once: true });
+
+      function playNotifySound() {
+        if (!sound) return;
+        try {
+          sound.currentTime = 0;
+        } catch (e) {}
+        sound.play().catch(() => {});
+      }
 
       async function checkUnread() {
         try {
@@ -249,7 +274,7 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
           }
           if (data.latest_user_message_id > lastSeenMsgId) {
             lastSeenMsgId = data.latest_user_message_id;
-            sound?.play().catch(() => {});
+            playNotifySound();
           }
         } catch (err) {
           // best-effort; ignore if not authenticated or offline
@@ -258,6 +283,9 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
 
       checkUnread();
       setInterval(checkUnread, 6000);
+      // Also re-check immediately whenever the tab regains focus/visibility,
+      // so a backgrounded tab catches up right away instead of waiting for the next tick.
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUnread(); });
     })();
   </script>
 </body>
