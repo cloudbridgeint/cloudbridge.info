@@ -10,7 +10,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   const isPublic = PUBLIC_ADMIN_PATHS.some(p => pathname === p) ||
     (pathname === '/api/leads' && context.request.method === 'POST') || // public lead form submission
-    (pathname.startsWith('/api/media/') && context.request.method === 'GET'); // public image serving
+    (pathname.startsWith('/api/media/') && context.request.method === 'GET') || // public image serving
+    (pathname === '/api/chat/send' && context.request.method === 'POST') || // public chat widget: send message
+    (pathname === '/api/chat/poll' && context.request.method === 'GET'); // public chat widget: poll for replies
 
   if (isPublic) return next();
 

@@ -1112,7 +1112,7 @@ initPageScripts();
   }, { passive: true });
 })();
 
-// Floating Call/Chat widget
+// Floating Call/Chat widget with live two-way chat
 (function () {
   var callBtn = document.getElementById('fabCallBtn');
   var chatBtn = document.getElementById('fabChatBtn');
@@ -1123,6 +1123,19 @@ initPageScripts();
   var chatInput = document.getElementById('chatInput');
   var chatMessages = document.getElementById('chatMessages');
   if (!callBtn || !chatBtn) return;
+
+  // --- Session handling ---
+  function getSessionId() {
+    var id = localStorage.getItem('cb_chat_session');
+    if (!id) {
+      id = (crypto.randomUUID ? crypto.randomUUID() : 'sess-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+      localStorage.setItem('cb_chat_session', id);
+    }
+    return id;
+  }
+  var sessionId = getSessionId();
+  var renderedIds = {};
+  var pollTimer = null;
 
   function closeAll() {
     contactPanel.classList.add('hidden');
@@ -1140,12 +1153,19 @@ initPageScripts();
     e.stopPropagation();
     var willOpen = chatPanel.classList.contains('hidden');
     closeAll();
-    if (willOpen) chatPanel.classList.remove('hidden');
+    if (willOpen) {
+      chatPanel.classList.remove('hidden');
+      loadThread();
+      startPolling();
+    } else {
+      stopPolling();
+    }
   });
 
   chatCloseBtn?.addEventListener('click', function (e) {
     e.stopPropagation();
     chatPanel.classList.add('hidden');
+    stopPolling();
   });
 
   document.addEventListener('click', function (e) {
@@ -1153,32 +1173,81 @@ initPageScripts();
     if (widget && !widget.contains(e.target)) closeAll();
   });
 
+  function addBubble(sender, text) {
+    var el = document.createElement('div');
+    el.className = sender === 'user' ? 'fab-user-bubble' : 'fab-chat-bubble';
+    el.textContent = text;
+    chatMessages.appendChild(el);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Render any message from the server we haven't shown yet (used by both initial load and polling)
+  function renderNewMessages(list) {
+    (list || []).forEach(function (m) {
+      if (renderedIds[m.id]) return;
+      renderedIds[m.id] = true;
+      addBubble(m.sender, m.message);
+    });
+  }
+
+  async function loadThread() {
+    try {
+      var res = await fetch('/api/chat/poll?session_id=' + encodeURIComponent(sessionId));
+      var data = await res.json();
+      renderNewMessages(data.messages);
+    } catch (err) {
+      // best-effort
+    }
+  }
+
+  function startPolling() {
+    stopPolling();
+    pollTimer = setInterval(loadThread, 4000);
+  }
+  function stopPolling() {
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = null;
+  }
+
+  async function sendMessage(text) {
+    if (!text || !text.trim()) return;
+    addBubble('user', text);
+    try {
+      var res = await fetch('/api/chat/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, message: text }),
+      });
+      var data = await res.json();
+    } catch (err) {
+      // still shown locally even if send fails
+    }
+  }
+
+  var quickReplyCopy = {
+    course: { label: '🎓 Find a Course/University', reply: "Great choice! You can explore our full list of partner universities and courses here: " + location.origin + "/university-college" },
+    eligibility: { label: '✅ Check My Eligibility', reply: "Happy to help you check your eligibility! Please fill out this quick form and a counselor will review it: " + location.origin + "/free-consultation" },
+    scholarship: { label: '🏆 Scholarship Information', reply: "We have scholarship opportunities across the UK, USA, Malaysia and more — see the details here: " + location.origin + "/scholarship" },
+    counselor: { label: '🧑\u200d💼 Talk to a Counselor', reply: "Thanks for reaching out! One of our counselors has been notified and will join this chat shortly. If it's outside our office hours, we'll reply as soon as we're back. 😊" },
+  };
+
+  document.querySelectorAll('.fab-quick-btn[data-quick]').forEach(function (btn) {
+    btn.addEventListener('click', async function () {
+      var key = btn.getAttribute('data-quick');
+      var info = quickReplyCopy[key];
+      if (!info) return;
+      await sendMessage(info.label);
+      setTimeout(function () {
+        addBubble('admin', info.reply);
+      }, 500);
+    });
+  });
+
   chatForm?.addEventListener('submit', async function (e) {
     e.preventDefault();
     var msg = chatInput.value.trim();
     if (!msg) return;
-
-    var userBubble = document.createElement('div');
-    userBubble.className = 'fab-user-bubble';
-    userBubble.textContent = msg;
-    chatMessages.appendChild(userBubble);
     chatInput.value = '';
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    try {
-      await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: '', email: '', phone: '', message: msg, source_page: 'chat-widget' }),
-      });
-    } catch (err) {
-      // best-effort, still show a reply either way
-    }
-
-    var reply = document.createElement('div');
-    reply.className = 'fab-chat-bubble';
-    reply.innerHTML = 'Thanks for reaching out! One of our counselors will get back to you shortly. In the meantime, feel free to explore the options above. 😊';
-    chatMessages.appendChild(reply);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    await sendMessage(msg);
   });
 })();

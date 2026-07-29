@@ -4,20 +4,57 @@ export const prerender = false;
 
 const db = (Astro.locals as any).runtime.env.DB;
 const { results } = await db.prepare(
-  "SELECT * FROM leads WHERE message IS NOT NULL AND message != '' ORDER BY created_at DESC LIMIT 100"
+  "SELECT * FROM leads WHERE message IS NOT NULL AND message != '' AND (source_page IS NULL OR source_page != 'chat-widget') ORDER BY created_at DESC LIMIT 100"
 ).all();
-const messages = results as any[];
+const formMessages = results as any[];
 ---
 <AdminLayout title="Messages" active="messages">
   <h1 class="text-2xl font-bold text-bridge-950 mb-1">Messages</h1>
-  <p class="text-slate-500 text-sm mb-6">Messages submitted through the site's contact and inquiry forms.</p>
+  <p class="text-slate-500 text-sm mb-6">Live chat with visitors from the site widget, plus messages submitted through contact forms.</p>
 
+  <!-- Live chat -->
+  <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden mb-8">
+    <div class="flex h-[560px]">
+      <!-- Conversation list -->
+      <div class="w-64 sm:w-72 shrink-0 border-r border-slate-100 flex flex-col">
+        <div class="px-4 py-3 border-b border-slate-100 shrink-0">
+          <p class="font-semibold text-bridge-950 text-sm">Live Chat</p>
+          <p class="text-xs text-slate-400">Conversations from the site widget</p>
+        </div>
+        <div id="sessionList" class="flex-1 overflow-y-auto">
+          <p class="text-slate-400 text-xs p-4">Loading…</p>
+        </div>
+      </div>
+
+      <!-- Thread -->
+      <div class="flex-1 min-w-0 flex flex-col">
+        <div id="threadHeader" class="px-4 py-3 border-b border-slate-100 shrink-0">
+          <p class="font-semibold text-bridge-950 text-sm">Select a conversation</p>
+          <p class="text-xs text-slate-400">No conversation selected</p>
+        </div>
+        <div id="threadMessages" class="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-slate-50">
+          <p class="text-slate-400 text-sm text-center mt-10">Pick a conversation on the left to view messages.</p>
+        </div>
+        <form id="replyForm" class="flex items-center gap-2 px-3 py-3 border-t border-slate-100 shrink-0 bg-white">
+          <input id="replyInput" type="text" placeholder="Write a reply…" disabled
+            class="flex-1 min-w-0 rounded-full bg-slate-100 border border-transparent px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition disabled:opacity-50">
+          <button type="submit" disabled id="replySendBtn"
+            class="w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0 transition hover:brightness-110 bg-iris-600 disabled:opacity-50" aria-label="Send">
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form submissions -->
+  <h2 class="font-semibold text-bridge-950 mb-3">Form Submissions</h2>
   <div class="space-y-3">
-    {messages.length === 0 ? (
+    {formMessages.length === 0 ? (
       <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-8 text-center">
         <p class="text-slate-400 text-sm">No messages yet — they'll show up here once someone submits a form on the site.</p>
       </div>
-    ) : messages.map((m: any) => (
+    ) : formMessages.map((m: any) => (
       <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
         <div class="flex items-center justify-between">
           <div>
@@ -32,3 +69,135 @@ const messages = results as any[];
     ))}
   </div>
 </AdminLayout>
+
+<script is:inline>
+  let sessions = [];
+  let activeSessionId = null;
+  let renderedIds = {};
+  let pollTimer = null;
+
+  function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+  function timeAgo(iso) {
+    if (!iso) return '';
+    const diffMs = Date.now() - new Date(iso.replace(' ', 'T') + 'Z').getTime();
+    const mins = Math.round(diffMs / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    const hrs = Math.round(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    return Math.round(hrs / 24) + 'd ago';
+  }
+
+  function sessionLabel(s) {
+    return s.name || s.email || s.phone || ('Visitor ' + s.session_id.slice(0, 6));
+  }
+
+  function renderSessionList() {
+    const el = document.getElementById('sessionList');
+    if (sessions.length === 0) {
+      el.innerHTML = '<p class="text-slate-400 text-xs p-4">No conversations yet — they will appear here once a visitor uses the chat widget.</p>';
+      return;
+    }
+    el.innerHTML = sessions.map(s => `
+      <button type="button" data-session="${s.session_id}"
+        class="session-item w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition ${s.session_id === activeSessionId ? 'bg-iris-50' : ''}">
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-sm font-semibold text-bridge-950 truncate">${escapeHtml(sessionLabel(s))}</p>
+          ${s.unread_admin ? '<span class="w-2 h-2 rounded-full bg-sunrise-600 shrink-0"></span>' : ''}
+        </div>
+        <p class="text-xs text-slate-400 truncate mt-0.5">${s.last_sender === 'admin' ? 'You: ' : ''}${escapeHtml(s.last_message || '')}</p>
+        <p class="text-[11px] text-slate-300 mt-0.5">${timeAgo(s.updated_at)}</p>
+      </button>
+    `).join('');
+
+    el.querySelectorAll('.session-item').forEach(btn => {
+      btn.addEventListener('click', () => openSession(btn.getAttribute('data-session')));
+    });
+  }
+
+  async function loadSessions() {
+    try {
+      const data = await apiFetch('/api/chat/sessions');
+      sessions = data.sessions || [];
+      renderSessionList();
+    } catch (err) {
+      // best-effort
+    }
+  }
+
+  function addBubble(sender, text, when) {
+    const wrap = document.getElementById('threadMessages');
+    const empty = wrap.querySelector('.text-center');
+    if (empty) empty.remove();
+    const div = document.createElement('div');
+    if (sender === 'user') {
+      div.className = 'bg-white rounded-2xl rounded-tl-sm shadow-sm px-4 py-2.5 text-sm text-bridge-900 max-w-[80%] leading-relaxed';
+    } else {
+      div.className = 'ml-auto rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white max-w-[80%] leading-relaxed';
+      div.style.backgroundImage = 'linear-gradient(90deg,#4d51b0,#3f4293)';
+    }
+    div.textContent = text;
+    wrap.appendChild(div);
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  async function openSession(sessionId) {
+    activeSessionId = sessionId;
+    renderedIds = {};
+    renderSessionList();
+
+    document.getElementById('threadMessages').innerHTML = '<p class="text-slate-400 text-sm text-center mt-10">Loading…</p>';
+    document.getElementById('replyInput').disabled = false;
+    document.getElementById('replySendBtn').disabled = false;
+
+    try {
+      const data = await apiFetch('/api/chat/thread?session_id=' + encodeURIComponent(sessionId));
+      const s = data.session || {};
+      document.getElementById('threadHeader').innerHTML = `
+        <p class="font-semibold text-bridge-950 text-sm">${escapeHtml(sessionLabel(s))}</p>
+        <p class="text-xs text-slate-400">${escapeHtml(s.email || '')} ${s.phone ? '· ' + escapeHtml(s.phone) : ''} ${s.source_page ? '· via ' + escapeHtml(s.source_page) : ''}</p>
+      `;
+      document.getElementById('threadMessages').innerHTML = '';
+      (data.messages || []).forEach(m => { renderedIds[m.id] = true; addBubble(m.sender, m.message); });
+    } catch (err) {
+      document.getElementById('threadMessages').innerHTML = '<p class="text-slate-400 text-sm text-center mt-10">Could not load this conversation.</p>';
+    }
+
+    loadSessions();
+  }
+
+  async function pollActiveThread() {
+    if (!activeSessionId) return;
+    try {
+      const data = await apiFetch('/api/chat/thread?session_id=' + encodeURIComponent(activeSessionId));
+      (data.messages || []).forEach(m => {
+        if (renderedIds[m.id]) return;
+        renderedIds[m.id] = true;
+        addBubble(m.sender, m.message);
+      });
+    } catch (err) {
+      // best-effort
+    }
+  }
+
+  document.getElementById('replyForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('replyInput');
+    const msg = input.value.trim();
+    if (!msg || !activeSessionId) return;
+    input.value = '';
+    addBubble('admin', msg);
+    try {
+      await apiFetch('/api/chat/reply', {
+        method: 'POST',
+        body: JSON.stringify({ session_id: activeSessionId, message: msg }),
+      });
+    } catch (err) {
+      showToast('Could not send reply', 'error');
+    }
+    loadSessions();
+  });
+
+  loadSessions();
+  pollTimer = setInterval(() => { loadSessions(); pollActiveThread(); }, 4000);
+</script>
