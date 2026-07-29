@@ -1,5 +1,6 @@
 ---
 import logo from '../assets/logo.png';
+import logoWhite from '../assets/logo-white.png';
 export const prerender = false;
 export interface Props {
   title: string;
@@ -88,7 +89,7 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
       <aside id="sidebar" class="sidebar-solid fixed md:static inset-y-0 left-0 z-40 w-64 md:w-60 shrink-0 flex-col px-4 py-6 overflow-y-auto -translate-x-full md:translate-x-0 transition-transform duration-200 flex">
         <div class="flex flex-col items-center gap-3 mb-8 pt-2">
           <div class="w-20 h-20 rounded-2xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center shrink-0">
-            <img src={logo.src} alt="CloudBridge" class="w-16 h-16 rounded-xl object-cover">
+            <img src={logoWhite.src} alt="CloudBridge" class="w-16 h-16 rounded-xl object-cover">
           </div>
           <span class="font-semibold text-white/60 text-xs tracking-[0.2em] uppercase">Admin</span>
         </div>
