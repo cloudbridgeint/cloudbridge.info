@@ -61,10 +61,22 @@ const monthOptions = Array.from(monthSet.entries()).sort((a, b) => (a[0] < b[0] 
     </div>
   </div>
 
-  <!-- Dataset for client-side stat recomputation -->
+  <!-- Full applicant dataset — powers both the stat cards and the profile panel,
+       so opening a profile or switching applicant inside the panel never needs a refetch. -->
   <script type="application/json" id="appsData" set:html={JSON.stringify(rows.map((r: any) => ({
     id: r.id, app_id: r.app_id, has_english: r.has_english, month_key: r.month_key,
     destination_country: r.destination_country || '', status: r.status || 'new', created_at: r.created_at,
+    name: r.name || 'Anonymous', email: r.email || '', phone: r.phone || '',
+    dob: r.dob || '', gender: r.gender || '', nationality: r.nationality || '',
+    residence_country: r.residence_country || '', address: r.address || '',
+    degree_level: r.degree_level || '', institute_name: r.institute_name || '',
+    course_studied: r.course_studied || '', graduation_year: r.graduation_year || '',
+    english_test: r.english_test || '', test_score: r.test_score || '',
+    preferred_study_level: r.preferred_study_level || '', subject_interested: r.subject_interested || '',
+    intake_month: r.intake_month || '', intake_year: r.intake_year || '',
+    date_only: r.date_only, time_only: r.time_only,
+    doc_academic_cert: r.doc_academic_cert || '', doc_transcript: r.doc_transcript || '',
+    doc_english_cert: r.doc_english_cert || '', doc_cv: r.doc_cv || '', doc_personal_statement: r.doc_personal_statement || '',
   })))}></script>
 
   <!-- 4 stat cards -->
@@ -172,7 +184,7 @@ const monthOptions = Array.from(monthSet.entries()).sort((a, b) => (a[0] < b[0] 
           </tr>
         </thead>
         <tbody id="appsTableBody">
-          {rows.map((a: any) => (
+          {rows.map((a: any, idx: number) => (
             <tr
               class="app-row border-b border-slate-50 hover:bg-slate-50/50 transition"
               data-search={`${a.app_id} ${a.name} ${a.phone} ${a.destination_country}`.toLowerCase()}
@@ -199,32 +211,7 @@ const monthOptions = Array.from(monthSet.entries()).sort((a, b) => (a[0] < b[0] 
               <td class="px-5 py-3.5 text-slate-400 text-xs whitespace-nowrap">{a.date_only}</td>
               <td class="px-5 py-3.5 whitespace-nowrap">
                 <button type="button" class="view-profile-btn text-xs font-semibold text-iris-700 bg-iris-50 hover:bg-iris-100 rounded-full px-3.5 py-1.5 transition"
-                  data-id={a.app_id}
-                  data-name={a.name || '—'}
-                  data-email={a.email || '—'}
-                  data-phone={a.phone || '—'}
-                  data-dob={a.dob || '—'}
-                  data-gender={a.gender || '—'}
-                  data-nationality={a.nationality || '—'}
-                  data-residence={a.residence_country || '—'}
-                  data-address={a.address || '—'}
-                  data-degree={a.degree_level || '—'}
-                  data-institute={a.institute_name || '—'}
-                  data-course={a.course_studied || '—'}
-                  data-graduation={a.graduation_year || '—'}
-                  data-english={a.english_test || 'No test on file'}
-                  data-score={a.test_score || '—'}
-                  data-preferred-level={a.preferred_study_level || '—'}
-                  data-subject={a.subject_interested || '—'}
-                  data-destination={a.destination_country || '—'}
-                  data-intake={[a.intake_month, a.intake_year].filter(Boolean).join(' ') || '—'}
-                  data-date={a.date_only}
-                  data-time={a.time_only}
-                  data-doc-academic-cert={a.doc_academic_cert || ''}
-                  data-doc-transcript={a.doc_transcript || ''}
-                  data-doc-english-cert={a.doc_english_cert || ''}
-                  data-doc-cv={a.doc_cv || ''}
-                  data-doc-personal-statement={a.doc_personal_statement || ''}
+                  data-index={idx}
                 >View Profile</button>
               </td>
             </tr>
@@ -238,58 +225,144 @@ const monthOptions = Array.from(monthSet.entries()).sort((a, b) => (a[0] < b[0] 
     </div>
   </div>
 
-  <!-- Profile modal -->
-  <div id="profileModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4 py-8 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-auto overflow-hidden">
-      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-        <div>
-          <p class="font-semibold text-bridge-950" id="pmName">—</p>
-          <p class="text-xs text-slate-400 mt-0.5" id="pmId">—</p>
-        </div>
-        <button type="button" id="profileModalClose" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition shrink-0">
+  <!-- Profile panel: full-screen, left applicant list + right detail view -->
+  <div id="profilePanel" class="hidden fixed inset-0 bg-white z-50 flex flex-col">
+    <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 shrink-0">
+      <div class="flex items-center gap-3 min-w-0">
+        <button type="button" id="profilePanelClose" class="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 transition shrink-0">
           <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
+        <p class="text-sm font-semibold text-bridge-950 whitespace-nowrap">Applications</p>
+        <span class="text-slate-300">/</span>
+        <p id="ppBreadcrumbName" class="text-sm text-slate-500 truncate">—</p>
       </div>
+      <p id="ppPagination" class="text-xs text-slate-400 font-medium shrink-0">1 of 1</p>
+    </div>
 
-      <div class="p-6 max-h-[75vh] overflow-y-auto">
-        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Contact & Personal</p>
-        <div class="grid grid-cols-2 gap-x-5 gap-y-3.5 text-sm">
-          <div><p class="text-xs text-slate-400">Phone</p><p id="pmPhone" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Email</p><p id="pmEmail" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Date of birth</p><p id="pmDob" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Gender</p><p id="pmGender" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Nationality</p><p id="pmNationality" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Residence</p><p id="pmResidence" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div class="col-span-2"><p class="text-xs text-slate-400">Address</p><p id="pmAddress" class="font-medium text-slate-700 mt-0.5">—</p></div>
+    <div class="flex-1 flex min-h-0">
+      <!-- Left: applicant list -->
+      <aside class="w-72 shrink-0 border-r border-slate-100 flex flex-col hidden md:flex">
+        <div class="p-3.5 border-b border-slate-100 shrink-0">
+          <div class="relative">
+            <input id="ppSearch" type="text" placeholder="Search applicants"
+              class="w-full bg-slate-50 border border-transparent rounded-full pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
         </div>
+        <div id="ppList" class="flex-1 overflow-y-auto py-1.5"></div>
+      </aside>
 
-        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-5 mb-3 pt-4 border-t border-slate-100">Academic</p>
-        <div class="grid grid-cols-2 gap-x-5 gap-y-3.5 text-sm">
-          <div><p class="text-xs text-slate-400">Highest qualification</p><p id="pmDegree" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Institute</p><p id="pmInstitute" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Course studied</p><p id="pmCourse" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Graduation date</p><p id="pmGraduation" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">English test</p><p id="pmEnglish" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Test score</p><p id="pmScore" class="font-medium text-slate-700 mt-0.5">—</p></div>
-        </div>
+      <!-- Right: detail -->
+      <div class="flex-1 overflow-y-auto bg-slate-50/40">
+        <div class="max-w-5xl mx-auto px-6 md:px-8 py-6">
 
-        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-5 mb-3 pt-4 border-t border-slate-100">Study Plan</p>
-        <div class="grid grid-cols-2 gap-x-5 gap-y-3.5 text-sm">
-          <div><p class="text-xs text-slate-400">Preferred study level</p><p id="pmPreferredLevel" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Preferred subject</p><p id="pmSubject" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Interested country</p><p id="pmDestination" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Intake</p><p id="pmIntake" class="font-medium text-slate-700 mt-0.5">—</p></div>
-          <div><p class="text-xs text-slate-400">Received</p><p id="pmDate" class="font-medium text-slate-700 mt-0.5">—</p></div>
-        </div>
+          <!-- Header -->
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div class="flex items-center gap-4 min-w-0">
+              <span id="ppAvatar" class="w-14 h-14 rounded-full flex items-center justify-center text-lg font-bold text-white shrink-0">—</span>
+              <div class="min-w-0">
+                <p id="ppName" class="text-lg font-bold text-bridge-950 truncate">—</p>
+                <p id="ppAppId" class="text-xs text-slate-400 mt-0.5 font-mono">—</p>
+                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                  <span id="ppCountryTag" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-bridge-50 text-bridge-800">—</span>
+                  <span id="ppDateTag" class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-500">—</span>
+                  <span id="ppEnglishTag" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full">—</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <a id="ppCallBtn" href="#" class="w-9 h-9 rounded-full bg-white ring-1 ring-black/5 hover:bg-slate-100 flex items-center justify-center text-slate-500 transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              </a>
+              <a id="ppEmailBtn" href="#" class="inline-flex items-center gap-2 text-sm font-semibold text-white bg-iris-600 hover:bg-iris-700 rounded-xl px-4 py-2.5 transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" opacity="0"/><path d="M22 6 12 13 2 6"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                Send Email
+              </a>
+            </div>
+          </div>
 
-        <div id="pmDocsWrap" class="mt-5 pt-4 border-t border-slate-100">
-          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Documents</p>
-          <div id="pmDocs" class="flex flex-wrap gap-2"></div>
+          <!-- Tabs -->
+          <div class="flex items-center gap-1 mt-6 border-b border-slate-200">
+            <button type="button" data-tab="overview" class="pp-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 transition">Application</button>
+            <button type="button" data-tab="documents" class="pp-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 transition">Documents</button>
+          </div>
+
+          <!-- Tab: Application overview -->
+          <div id="ppTabOverview" class="pp-tab-panel mt-6 grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-5">
+            <div class="space-y-5 min-w-0">
+
+              <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
+                <p class="text-sm font-semibold text-bridge-950 mb-5">Application Status</p>
+                <div id="ppStages" class="flex items-start"></div>
+              </div>
+
+              <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm font-semibold text-bridge-950">Profile Completeness</p>
+                  <p id="ppCompletenessPct" class="text-sm font-bold text-bridge-950">0%</p>
+                </div>
+                <div class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div id="ppCompletenessBar" class="h-full rounded-full bg-emerald-500 transition-all" style="width:0%"></div>
+                </div>
+                <p class="text-xs text-slate-400 mt-2">Share of the application form this applicant filled in.</p>
+              </div>
+
+              <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
+                <p class="text-sm font-semibold text-bridge-950 mb-4">Study Plan</p>
+                <div class="grid grid-cols-2 gap-x-5 gap-y-3.5 text-sm">
+                  <div><p class="text-xs text-slate-400">Interested country</p><p id="ppDestination" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Preferred study level</p><p id="ppPreferredLevel" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Preferred subject</p><p id="ppSubject" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Intake</p><p id="ppIntake" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                </div>
+              </div>
+
+              <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
+                <p class="text-sm font-semibold text-bridge-950 mb-4">Academic Background</p>
+                <div class="grid grid-cols-2 gap-x-5 gap-y-3.5 text-sm">
+                  <div><p class="text-xs text-slate-400">Highest qualification</p><p id="ppDegree" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Institute</p><p id="ppInstitute" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Course studied</p><p id="ppCourse" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Graduation year</p><p id="ppGraduation" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">English test</p><p id="ppEnglish" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Test score</p><p id="ppScore" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right column -->
+            <div class="space-y-5">
+              <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
+                <p class="text-sm font-semibold text-bridge-950 mb-4">Personal Information</p>
+                <div class="space-y-3.5 text-sm">
+                  <div><p class="text-xs text-slate-400">Email</p><p id="ppEmail" class="font-medium text-slate-700 mt-0.5 break-all">—</p></div>
+                  <div><p class="text-xs text-slate-400">Phone</p><p id="ppPhone" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Gender</p><p id="ppGender" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Date of birth</p><p id="ppDob" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Nationality</p><p id="ppNationality" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Residence</p><p id="ppResidence" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                  <div><p class="text-xs text-slate-400">Address</p><p id="ppAddress" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Documents -->
+          <div id="ppTabDocuments" class="pp-tab-panel hidden mt-6">
+            <div id="ppDocsList" class="grid sm:grid-cols-2 gap-3"></div>
+            <p id="ppDocsEmpty" class="hidden text-sm text-slate-400 text-center py-14">No documents uploaded with this application.</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </AdminLayout>
+
+<style>
+  .pp-tab-btn { color: #94a3b8; border-color: transparent; }
+  .pp-tab-btn.pp-tab-active { color: #1c3255; border-color: #aa1821; }
+  .pp-list-item.pp-list-active { background: #eef2f9; }
+</style>
 
 <script is:inline>
   const dataset = JSON.parse(document.getElementById('appsData').textContent || '[]');
@@ -403,58 +476,193 @@ const monthOptions = Array.from(monthSet.entries()).sort((a, b) => (a[0] < b[0] 
     document.getElementById('appsTableCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
-  // Profile modal
-  const modal = document.getElementById('profileModal');
-  document.querySelectorAll('.view-profile-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const d = btn.dataset;
-      document.getElementById('pmName').textContent = d.name;
-      document.getElementById('pmId').textContent = d.id;
-      document.getElementById('pmPhone').textContent = d.phone;
-      document.getElementById('pmEmail').textContent = d.email;
-      document.getElementById('pmDob').textContent = d.dob;
-      document.getElementById('pmGender').textContent = d.gender;
-      document.getElementById('pmNationality').textContent = d.nationality;
-      document.getElementById('pmResidence').textContent = d.residence;
-      document.getElementById('pmAddress').textContent = d.address;
-      document.getElementById('pmDegree').textContent = d.degree;
-      document.getElementById('pmInstitute').textContent = d.institute;
-      document.getElementById('pmCourse').textContent = d.course;
-      document.getElementById('pmGraduation').textContent = d.graduation;
-      document.getElementById('pmEnglish').textContent = d.english;
-      document.getElementById('pmScore').textContent = d.score;
-      document.getElementById('pmPreferredLevel').textContent = d.preferredLevel;
-      document.getElementById('pmSubject').textContent = d.subject;
-      document.getElementById('pmDestination').textContent = d.destination;
-      document.getElementById('pmIntake').textContent = d.intake;
-      document.getElementById('pmDate').textContent = d.date + ' at ' + d.time;
+  // ---------------------------------------------------------------
+  // Profile panel: full-screen view opened from "View Profile"
+  // ---------------------------------------------------------------
+  (function () {
+    const AVATAR_CLASSES = ['badge-purple', 'badge-pink', 'badge-blue', 'badge-teal'];
+    const STAGES = [
+      { key: 'new', label: 'Received' },
+      { key: 'contacted', label: 'Contacted' },
+      { key: 'reviewing', label: 'Reviewing' },
+      { key: 'decision', label: 'Decision' },
+    ];
+    const COMPLETENESS_FIELDS = [
+      'phone', 'email', 'dob', 'gender', 'nationality', 'residence_country', 'address',
+      'degree_level', 'institute_name', 'course_studied', 'graduation_year',
+      'english_test', 'preferred_study_level', 'subject_interested', 'destination_country', 'intake_month',
+    ];
 
-      const docsWrap = document.getElementById('pmDocs');
-      docsWrap.innerHTML = '';
-      let anyDoc = false;
-      const docMap = [
-        ['docAcademicCert', 'Academic Certificate'],
-        ['docTranscript', 'Transcript'],
-        ['docEnglishCert', 'English Certificate'],
-        ['docCv', 'CV / Resume'],
-        ['docPersonalStatement', 'Personal Statement'],
-      ];
-      docMap.forEach(([key, label]) => {
-        const url = d[key];
-        if (url) {
-          anyDoc = true;
-          const a = document.createElement('a');
-          a.href = url; a.target = '_blank'; a.rel = 'noopener';
-          a.className = 'inline-flex items-center gap-1.5 text-xs font-semibold text-iris-700 bg-iris-50 hover:bg-iris-100 rounded-full px-3 py-1.5 transition';
-          a.textContent = '📄 ' + label;
-          docsWrap.appendChild(a);
-        }
+    const panel = document.getElementById('profilePanel');
+    const list = document.getElementById('ppList');
+    const searchInput = document.getElementById('ppSearch');
+    let currentIndex = -1;
+
+    function initials(name) {
+      const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+      if (parts.length === 0) return '?';
+      return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase();
+    }
+    function avatarClass(id) {
+      return AVATAR_CLASSES[id % AVATAR_CLASSES.length];
+    }
+
+    function buildList(filter) {
+      const q = (filter || '').toLowerCase().trim();
+      list.innerHTML = '';
+      dataset.forEach((app, i) => {
+        const hay = (app.app_id + ' ' + app.name + ' ' + app.phone + ' ' + app.destination_country).toLowerCase();
+        if (q && !hay.includes(q)) return;
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'pp-list-item w-full flex items-center gap-3 px-4 py-2.5 text-left transition hover:bg-slate-50' + (i === currentIndex ? ' pp-list-active' : '');
+        item.dataset.index = i;
+        item.innerHTML =
+          '<span class="w-9 h-9 rounded-full ' + avatarClass(app.id) + ' flex items-center justify-center text-[11px] font-bold text-white shrink-0">' + initials(app.name) + '</span>' +
+          '<span class="min-w-0 flex-1">' +
+            '<span class="block text-sm font-semibold text-bridge-950 truncate">' + app.name + '</span>' +
+            '<span class="block text-xs text-slate-400 truncate">' + app.app_id + ' · ' + app.date_only + '</span>' +
+          '</span>';
+        item.addEventListener('click', () => openProfile(i));
+        list.appendChild(item);
       });
-      document.getElementById('pmDocsWrap').classList.toggle('hidden', !anyDoc);
+    }
 
-      modal.classList.remove('hidden');
+    function renderStages(status) {
+      const activeIdx = Math.max(0, STAGES.findIndex(s => s.key === (status || 'new').toLowerCase()));
+      const wrap = document.getElementById('ppStages');
+      wrap.innerHTML = '';
+      STAGES.forEach((stage, i) => {
+        const done = i <= activeIdx;
+        const step = document.createElement('div');
+        step.className = 'flex-1 flex flex-col items-center text-center relative';
+        step.innerHTML =
+          (i > 0 ? '<span class="absolute top-3.5 right-1/2 w-full h-0.5 ' + (i <= activeIdx ? 'bg-iris-500' : 'bg-slate-100') + '" style="z-index:0;"></span>' : '') +
+          '<span class="relative w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold ' +
+            (done ? 'bg-iris-600 text-white' : 'bg-slate-100 text-slate-400') + '" style="z-index:1;">' +
+            (done ? '✓' : (i + 1)) +
+          '</span>' +
+          '<span class="mt-2 text-xs font-medium ' + (done ? 'text-bridge-950' : 'text-slate-400') + '">' + stage.label + '</span>';
+        wrap.appendChild(step);
+      });
+    }
+
+    function renderCompleteness(app) {
+      const filled = COMPLETENESS_FIELDS.filter(f => app[f] && String(app[f]).trim()).length;
+      const pct = Math.round((filled / COMPLETENESS_FIELDS.length) * 100);
+      document.getElementById('ppCompletenessPct').textContent = pct + '%';
+      document.getElementById('ppCompletenessBar').style.width = pct + '%';
+      document.getElementById('ppCompletenessBar').className =
+        'h-full rounded-full transition-all ' + (pct >= 70 ? 'bg-emerald-500' : pct >= 40 ? 'bg-amber-500' : 'bg-sunrise-600');
+    }
+
+    function set(id, value) {
+      document.getElementById(id).textContent = (value && String(value).trim()) ? value : '—';
+    }
+
+    function renderDocuments(app) {
+      const docMap = [
+        ['doc_academic_cert', 'Academic Certificate'],
+        ['doc_transcript', 'Transcript'],
+        ['doc_english_cert', 'English Certificate'],
+        ['doc_cv', 'CV / Resume'],
+        ['doc_personal_statement', 'Personal Statement'],
+      ];
+      const wrap = document.getElementById('ppDocsList');
+      wrap.innerHTML = '';
+      let any = false;
+      docMap.forEach(([key, label]) => {
+        const url = app[key];
+        if (!url) return;
+        any = true;
+        const a = document.createElement('a');
+        a.href = url; a.target = '_blank'; a.rel = 'noopener';
+        a.className = 'card-soft ring-1 ring-black/5 rounded-2xl p-4 flex items-center gap-3 hover:bg-slate-50 transition';
+        a.innerHTML =
+          '<span class="w-10 h-10 rounded-xl bg-iris-50 flex items-center justify-center shrink-0 text-lg">📄</span>' +
+          '<span class="min-w-0"><span class="block text-sm font-semibold text-bridge-950 truncate">' + label + '</span>' +
+          '<span class="block text-xs text-iris-700 mt-0.5">View file →</span></span>';
+        wrap.appendChild(a);
+      });
+      document.getElementById('ppDocsEmpty').classList.toggle('hidden', any);
+    }
+
+    function openProfile(index) {
+      const app = dataset[index];
+      if (!app) return;
+      currentIndex = index;
+
+      document.getElementById('ppAvatar').textContent = initials(app.name);
+      document.getElementById('ppAvatar').className = 'w-14 h-14 rounded-full flex items-center justify-center text-lg font-bold text-white shrink-0 ' + avatarClass(app.id);
+      set('ppName', app.name);
+      document.getElementById('ppBreadcrumbName').textContent = app.name || '—';
+      document.getElementById('ppAppId').textContent = app.app_id;
+      document.getElementById('ppPagination').textContent = (index + 1) + ' of ' + dataset.length;
+
+      document.getElementById('ppCountryTag').textContent = app.destination_country ? '🎓 ' + app.destination_country : 'Country not specified';
+      document.getElementById('ppDateTag').textContent = 'Received ' + app.date_only;
+      const englishTag = document.getElementById('ppEnglishTag');
+      englishTag.textContent = app.has_english ? 'English: Yes' : 'English: No';
+      englishTag.className = 'inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ' +
+        (app.has_english ? 'bg-emerald-50 text-emerald-700' : 'bg-sunrise-50 text-sunrise-700');
+
+      document.getElementById('ppCallBtn').href = app.phone ? ('tel:' + app.phone) : '#';
+      document.getElementById('ppEmailBtn').href = app.email ? ('mailto:' + app.email) : '#';
+
+      renderStages(app.status);
+      renderCompleteness(app);
+
+      set('ppDestination', app.destination_country);
+      set('ppPreferredLevel', app.preferred_study_level);
+      set('ppSubject', app.subject_interested);
+      set('ppIntake', [app.intake_month, app.intake_year].filter(Boolean).join(' '));
+
+      set('ppDegree', app.degree_level);
+      set('ppInstitute', app.institute_name);
+      set('ppCourse', app.course_studied);
+      set('ppGraduation', app.graduation_year);
+      set('ppEnglish', app.english_test);
+      set('ppScore', app.test_score);
+
+      set('ppEmail', app.email);
+      set('ppPhone', app.phone);
+      set('ppGender', app.gender);
+      set('ppDob', app.dob);
+      set('ppNationality', app.nationality);
+      set('ppResidence', app.residence_country);
+      set('ppAddress', app.address);
+
+      renderDocuments(app);
+
+      list.querySelectorAll('.pp-list-item').forEach(el => {
+        el.classList.toggle('pp-list-active', Number(el.dataset.index) === index);
+      });
+
+      panel.classList.remove('hidden');
+      panel.querySelector('.flex-1.overflow-y-auto')?.scrollTo(0, 0);
+    }
+
+    // Tabs
+    document.querySelectorAll('.pp-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.pp-tab-btn').forEach(b => b.classList.remove('pp-tab-active'));
+        btn.classList.add('pp-tab-active');
+        const target = btn.dataset.tab;
+        document.getElementById('ppTabOverview').classList.toggle('hidden', target !== 'overview');
+        document.getElementById('ppTabDocuments').classList.toggle('hidden', target !== 'documents');
+      });
     });
-  });
-  document.getElementById('profileModalClose').addEventListener('click', () => modal.classList.add('hidden'));
-  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+    document.querySelector('.pp-tab-btn[data-tab="overview"]')?.classList.add('pp-tab-active');
+
+    buildList('');
+    searchInput.addEventListener('input', (e) => buildList(e.target.value));
+
+    document.querySelectorAll('.view-profile-btn').forEach(btn => {
+      btn.addEventListener('click', () => openProfile(Number(btn.dataset.index)));
+    });
+    document.getElementById('profilePanelClose').addEventListener('click', () => panel.classList.add('hidden'));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.classList.contains('hidden')) panel.classList.add('hidden');
+    });
+  })();
 </script>
