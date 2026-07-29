@@ -4,59 +4,457 @@ export const prerender = false;
 
 const db = (Astro.locals as any).runtime.env.DB;
 const { results } = await db.prepare(
-  "SELECT * FROM leads WHERE source_page = 'apply-now' ORDER BY created_at DESC LIMIT 200"
+  "SELECT * FROM leads WHERE source_page = 'apply-now' ORDER BY created_at DESC LIMIT 500"
 ).all();
 const applications = results as any[];
 
-function docLink(url: string, label: string) {
-  return url ? { url, label } : null;
+const AVATAR_CLASSES = ['badge-purple', 'badge-pink', 'badge-blue', 'badge-teal'];
+
+function appId(id: number) {
+  return `APP-${String(id).padStart(5, '0')}`;
 }
+function initials(name: string) {
+  const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  return (parts[0][0] + (parts[1]?.[0] || '')).toUpperCase();
+}
+function avatarClass(id: number) {
+  return AVATAR_CLASSES[id % AVATAR_CLASSES.length];
+}
+function dateOnly(ts: string) {
+  return (ts || '').split(' ')[0] || '—';
+}
+function timeOnly(ts: string) {
+  return (ts || '').split(' ')[1] || '—';
+}
+function monthKey(ts: string) {
+  return dateOnly(ts).slice(0, 7); // "YYYY-MM"
+}
+
+// Rows enriched for both server render and the client-side JSON dataset used
+// by the stat cards (so the month/year filter can recompute without a refetch).
+const rows = applications.map((a: any) => ({
+  ...a,
+  app_id: appId(a.id),
+  has_english: !!(a.english_test && String(a.english_test).trim()),
+  month_key: monthKey(a.created_at),
+  date_only: dateOnly(a.created_at),
+  time_only: timeOnly(a.created_at),
+}));
+
+// Month options available in the data, newest first, for the Card 1 filter.
+const monthSet = new Map<string, string>();
+for (const r of rows) {
+  if (!r.month_key) continue;
+  if (!monthSet.has(r.month_key)) {
+    const d = new Date(`${r.month_key}-01T00:00:00Z`);
+    monthSet.set(r.month_key, d.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' }));
+  }
+}
+const monthOptions = Array.from(monthSet.entries()).sort((a, b) => (a[0] < b[0] ? 1 : -1));
 ---
 <AdminLayout title="Applications" active="applications">
-  <h1 class="text-2xl font-bold text-bridge-950">Applications</h1>
-  <p class="text-slate-500 mt-1 text-sm">Submissions from the Apply Now form.</p>
+  <div class="flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <h1 class="text-2xl font-bold text-bridge-950">Applications</h1>
+      <p class="text-slate-500 mt-1 text-sm">Everyone who submitted the Apply Now form, newest first.</p>
+    </div>
+  </div>
 
-  <div class="mt-8 space-y-3">
-    {applications.length === 0 ? (
-      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-8 text-center">
-        <p class="text-slate-400 text-sm">No applications yet — they'll show up here once someone submits the Apply Now form.</p>
+  <!-- Dataset for client-side stat recomputation -->
+  <script type="application/json" id="appsData" set:html={JSON.stringify(rows.map((r: any) => ({
+    id: r.id, app_id: r.app_id, has_english: r.has_english, month_key: r.month_key,
+    destination_country: r.destination_country || '', status: r.status || 'new', created_at: r.created_at,
+  })))}></script>
+
+  <!-- 4 stat cards -->
+  <div class="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+
+    <!-- Card 1: Total applications + destination breakdown, filterable by month -->
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5 flex flex-col">
+      <div class="flex items-center justify-between mb-3">
+        <span class="w-9 h-9 rounded-xl bg-sunrise-50 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4 text-sunrise-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </span>
+        <select id="cardMonthFilter" class="text-xs font-semibold text-bridge-800 bg-bridge-50 rounded-lg pl-2.5 pr-1.5 py-1.5 border-0 focus:outline-none focus:ring-2 focus:ring-iris-200">
+          <option value="">All time</option>
+          {monthOptions.map(([key, label]) => <option value={key}>{label}</option>)}
+        </select>
       </div>
-    ) : applications.map((a: any) => (
-      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
-        <div class="flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <p class="font-semibold text-bridge-950 text-sm">{a.name || 'Anonymous'}</p>
-            <p class="text-xs text-slate-400 mt-0.5">{a.email} {a.phone ? `· ${a.phone}` : ''}</p>
-          </div>
-          <p class="text-xs text-slate-400 whitespace-nowrap">{a.created_at}</p>
+      <p class="text-xs font-medium text-slate-400">Total applications</p>
+      <p id="statTotal" class="text-3xl font-bold text-bridge-950 mt-1">{applications.length}</p>
+
+      <div id="statCountryList" class="mt-4 pt-4 border-t border-slate-100 space-y-2.5"></div>
+      <p id="statCountryEmpty" class="hidden mt-4 pt-4 border-t border-slate-100 text-xs text-slate-400">No applications in this period.</p>
+    </div>
+
+    <!-- Card 2: English proficiency -->
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5 flex flex-col">
+      <div class="flex items-center justify-between mb-3">
+        <span class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14M5 8a2 2 0 01-2-2V4a2 2 0 012-2h8a2 2 0 012 2v2a2 2 0 01-2 2M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8M9 12l2 2 4-4"/></svg>
+        </span>
+      </div>
+      <p class="text-xs font-medium text-slate-400">English proficiency</p>
+      <p class="text-3xl font-bold text-bridge-950 mt-1"><span id="statEnglishPct">0</span>%</p>
+      <p class="text-xs text-slate-400 mt-0.5">of applicants have a test on file</p>
+
+      <div class="mt-4 pt-4 border-t border-slate-100 space-y-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-6 h-6 rounded-md bg-emerald-50 flex items-center justify-center shrink-0">
+            <svg class="w-3.5 h-3.5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </span>
+          <span class="text-xs text-slate-600 flex-1">Yes</span>
+          <span id="statEnglishYes" class="text-xs font-semibold text-bridge-950">0</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="w-6 h-6 rounded-md bg-sunrise-50 flex items-center justify-center shrink-0">
+            <svg class="w-3.5 h-3.5 text-sunrise-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </span>
+          <span class="text-xs text-slate-600 flex-1">No</span>
+          <span id="statEnglishNo" class="text-xs font-semibold text-bridge-950">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: New this week -->
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5 flex flex-col">
+      <div class="flex items-center justify-between mb-3">
+        <span class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </span>
+      </div>
+      <p class="text-xs font-medium text-slate-400">New this week</p>
+      <p id="statWeek" class="text-3xl font-bold text-bridge-950 mt-1">0</p>
+      <p id="statWeekTrend" class="text-xs font-semibold mt-1.5 flex items-center gap-1"></p>
+    </div>
+
+    <!-- Card 4: Pending review (highlighted) -->
+    <div class="rounded-2xl p-5 flex flex-col justify-between text-white shadow-sm" style="background: linear-gradient(150deg, #254368, #0f1c30);">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(255,255,255,0.12);">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          </span>
+        </div>
+        <p class="text-xs font-medium" style="color:#c7cee0">Pending review</p>
+        <p id="statPending" class="text-3xl font-bold mt-1">0</p>
+        <p class="text-xs mt-1" style="color:#c7cee0">not yet contacted</p>
+      </div>
+      <button type="button" id="pendingFilterBtn" class="mt-4 w-full text-sm font-semibold rounded-xl py-2.5 bg-sunrise-600 hover:bg-sunrise-700 transition">
+        View pending
+      </button>
+    </div>
+  </div>
+
+  <!-- Applications table -->
+  <div id="appsTableCard" class="mt-6 card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between flex-wrap gap-3 px-5 py-4 border-b border-slate-100">
+      <p class="font-semibold text-bridge-950 text-sm">All Applications <span id="tableCount" class="text-slate-400 font-normal">({applications.length})</span></p>
+      <div class="relative">
+        <input id="appsSearch" type="text" placeholder="Search name, ID, phone, country"
+          class="w-64 bg-slate-50 border border-transparent rounded-full pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-xs text-slate-500 border-b border-slate-100 bg-slate-50/50">
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Application ID</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Applicant</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Phone</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Interested Country</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">English</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Received</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap"></th>
+          </tr>
+        </thead>
+        <tbody id="appsTableBody">
+          {rows.map((a: any) => (
+            <tr
+              class="app-row border-b border-slate-50 hover:bg-slate-50/50 transition"
+              data-search={`${a.app_id} ${a.name} ${a.phone} ${a.destination_country}`.toLowerCase()}
+              data-status={a.status || 'new'}
+            >
+              <td class="px-5 py-3.5 font-medium text-slate-500 whitespace-nowrap">{a.app_id}</td>
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-2.5">
+                  <span class={`w-8 h-8 rounded-full ${avatarClass(a.id)} flex items-center justify-center text-[11px] font-bold text-white shrink-0`}>
+                    {initials(a.name)}
+                  </span>
+                  <span class="font-semibold text-bridge-950 whitespace-nowrap">{a.name || 'Anonymous'}</span>
+                </div>
+              </td>
+              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{a.phone || '—'}</td>
+              <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{a.destination_country || '—'}</td>
+              <td class="px-5 py-3.5">
+                {a.has_english ? (
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">Yes</span>
+                ) : (
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sunrise-50 text-sunrise-700">No</span>
+                )}
+              </td>
+              <td class="px-5 py-3.5 text-slate-400 text-xs whitespace-nowrap">{a.date_only}</td>
+              <td class="px-5 py-3.5 whitespace-nowrap">
+                <button type="button" class="view-profile-btn text-xs font-semibold text-iris-700 bg-iris-50 hover:bg-iris-100 rounded-full px-3.5 py-1.5 transition"
+                  data-id={a.app_id}
+                  data-name={a.name || '—'}
+                  data-email={a.email || '—'}
+                  data-phone={a.phone || '—'}
+                  data-dob={a.dob || '—'}
+                  data-gender={a.gender || '—'}
+                  data-nationality={a.nationality || '—'}
+                  data-residence={a.residence_country || '—'}
+                  data-address={a.address || '—'}
+                  data-degree={a.degree_level || '—'}
+                  data-institute={a.institute_name || '—'}
+                  data-course={a.course_studied || '—'}
+                  data-graduation={a.graduation_year || '—'}
+                  data-english={a.english_test || 'No test on file'}
+                  data-score={a.test_score || '—'}
+                  data-preferred-level={a.preferred_study_level || '—'}
+                  data-subject={a.subject_interested || '—'}
+                  data-destination={a.destination_country || '—'}
+                  data-intake={[a.intake_month, a.intake_year].filter(Boolean).join(' ') || '—'}
+                  data-date={a.date_only}
+                  data-time={a.time_only}
+                  data-doc-academic-cert={a.doc_academic_cert || ''}
+                  data-doc-transcript={a.doc_transcript || ''}
+                  data-doc-english-cert={a.doc_english_cert || ''}
+                  data-doc-cv={a.doc_cv || ''}
+                  data-doc-personal-statement={a.doc_personal_statement || ''}
+                >View Profile</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {applications.length === 0 && (
+        <p class="text-slate-400 text-sm p-8 text-center">No applications yet — they'll show up here once someone submits the Apply Now form.</p>
+      )}
+      <p id="appsNoMatch" class="hidden text-slate-400 text-sm p-8 text-center">No applications match your search.</p>
+    </div>
+  </div>
+
+  <!-- Profile modal -->
+  <div id="profileModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4 py-8 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-auto overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+        <div>
+          <p class="font-semibold text-bridge-950" id="pmName">—</p>
+          <p class="text-xs text-slate-400 mt-0.5" id="pmId">—</p>
+        </div>
+        <button type="button" id="profileModalClose" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition shrink-0">
+          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-6 max-h-[75vh] overflow-y-auto">
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Contact & Personal</p>
+        <div class="grid grid-cols-2 gap-x-5 gap-y-3.5 text-sm">
+          <div><p class="text-xs text-slate-400">Phone</p><p id="pmPhone" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Email</p><p id="pmEmail" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Date of birth</p><p id="pmDob" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Gender</p><p id="pmGender" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Nationality</p><p id="pmNationality" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Residence</p><p id="pmResidence" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div class="col-span-2"><p class="text-xs text-slate-400">Address</p><p id="pmAddress" class="font-medium text-slate-700 mt-0.5">—</p></div>
         </div>
 
-        <div class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2 text-xs">
-          {a.dob && <p><span class="text-slate-400">Date of birth:</span> <span class="text-slate-700 font-medium">{a.dob}</span></p>}
-          {a.gender && <p><span class="text-slate-400">Gender:</span> <span class="text-slate-700 font-medium">{a.gender}</span></p>}
-          {a.nationality && <p><span class="text-slate-400">Nationality:</span> <span class="text-slate-700 font-medium">{a.nationality}</span></p>}
-          {a.residence_country && <p><span class="text-slate-400">Residence:</span> <span class="text-slate-700 font-medium">{a.residence_country}</span></p>}
-          {a.address && <p class="sm:col-span-2 lg:col-span-3"><span class="text-slate-400">Address:</span> <span class="text-slate-700 font-medium">{a.address}</span></p>}
-          {a.degree_level && <p><span class="text-slate-400">Highest qualification:</span> <span class="text-slate-700 font-medium">{a.degree_level}</span></p>}
-          {a.institute_name && <p><span class="text-slate-400">Institute:</span> <span class="text-slate-700 font-medium">{a.institute_name}</span></p>}
-          {a.course_studied && <p><span class="text-slate-400">Course studied:</span> <span class="text-slate-700 font-medium">{a.course_studied}</span></p>}
-          {a.graduation_year && <p><span class="text-slate-400">Graduation date:</span> <span class="text-slate-700 font-medium">{a.graduation_year}</span></p>}
-          {a.english_test && <p><span class="text-slate-400">English test:</span> <span class="text-slate-700 font-medium">{a.english_test}</span></p>}
-          {a.preferred_study_level && <p><span class="text-slate-400">Preferred study level:</span> <span class="text-slate-700 font-medium">{a.preferred_study_level}</span></p>}
-          {a.subject_interested && <p><span class="text-slate-400">Preferred subject:</span> <span class="text-slate-700 font-medium">{a.subject_interested}</span></p>}
-          {(a.intake_month || a.intake_year) && <p><span class="text-slate-400">Intake:</span> <span class="text-slate-700 font-medium">{a.intake_month} {a.intake_year}</span></p>}
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-5 mb-3 pt-4 border-t border-slate-100">Academic</p>
+        <div class="grid grid-cols-2 gap-x-5 gap-y-3.5 text-sm">
+          <div><p class="text-xs text-slate-400">Highest qualification</p><p id="pmDegree" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Institute</p><p id="pmInstitute" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Course studied</p><p id="pmCourse" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Graduation date</p><p id="pmGraduation" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">English test</p><p id="pmEnglish" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Test score</p><p id="pmScore" class="font-medium text-slate-700 mt-0.5">—</p></div>
         </div>
 
-        {(a.doc_academic_cert || a.doc_transcript || a.doc_english_cert || a.doc_cv || a.doc_personal_statement) && (
-          <div class="mt-4 pt-3 border-t border-slate-50 flex flex-wrap gap-2">
-            {a.doc_academic_cert && <a href={a.doc_academic_cert} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs font-semibold text-iris-700 bg-iris-50 hover:bg-iris-100 rounded-full px-3 py-1.5 transition">📄 Academic Certificate</a>}
-            {a.doc_transcript && <a href={a.doc_transcript} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs font-semibold text-iris-700 bg-iris-50 hover:bg-iris-100 rounded-full px-3 py-1.5 transition">📄 Transcript</a>}
-            {a.doc_english_cert && <a href={a.doc_english_cert} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs font-semibold text-iris-700 bg-iris-50 hover:bg-iris-100 rounded-full px-3 py-1.5 transition">📄 English Certificate</a>}
-            {a.doc_cv && <a href={a.doc_cv} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs font-semibold text-iris-700 bg-iris-50 hover:bg-iris-100 rounded-full px-3 py-1.5 transition">📄 CV / Resume</a>}
-            {a.doc_personal_statement && <a href={a.doc_personal_statement} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-xs font-semibold text-iris-700 bg-iris-50 hover:bg-iris-100 rounded-full px-3 py-1.5 transition">📄 Personal Statement</a>}
-          </div>
-        )}
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-5 mb-3 pt-4 border-t border-slate-100">Study Plan</p>
+        <div class="grid grid-cols-2 gap-x-5 gap-y-3.5 text-sm">
+          <div><p class="text-xs text-slate-400">Preferred study level</p><p id="pmPreferredLevel" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Preferred subject</p><p id="pmSubject" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Interested country</p><p id="pmDestination" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Intake</p><p id="pmIntake" class="font-medium text-slate-700 mt-0.5">—</p></div>
+          <div><p class="text-xs text-slate-400">Received</p><p id="pmDate" class="font-medium text-slate-700 mt-0.5">—</p></div>
+        </div>
+
+        <div id="pmDocsWrap" class="mt-5 pt-4 border-t border-slate-100">
+          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">Documents</p>
+          <div id="pmDocs" class="flex flex-wrap gap-2"></div>
+        </div>
       </div>
-    ))}
+    </div>
   </div>
 </AdminLayout>
+
+<script is:inline>
+  const dataset = JSON.parse(document.getElementById('appsData').textContent || '[]');
+
+  function pctOf(part, total) {
+    return total > 0 ? Math.round((part / total) * 100) : 0;
+  }
+
+  function computeCards(monthKey) {
+    const scoped = monthKey ? dataset.filter(d => d.month_key === monthKey) : dataset;
+
+    // Card 1: total + destination breakdown
+    document.getElementById('statTotal').textContent = scoped.length;
+    const countryCounts = new Map();
+    scoped.forEach(d => {
+      const c = d.destination_country && d.destination_country.trim() ? d.destination_country.trim() : 'Not specified';
+      countryCounts.set(c, (countryCounts.get(c) || 0) + 1);
+    });
+    const countryList = document.getElementById('statCountryList');
+    const countryEmpty = document.getElementById('statCountryEmpty');
+    countryList.innerHTML = '';
+    if (scoped.length === 0) {
+      countryList.classList.add('hidden');
+      countryEmpty.classList.remove('hidden');
+    } else {
+      countryList.classList.remove('hidden');
+      countryEmpty.classList.add('hidden');
+      Array.from(countryCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .forEach(([country, count]) => {
+          const p = pctOf(count, scoped.length);
+          const row = document.createElement('div');
+          row.className = 'flex items-center gap-2';
+          row.innerHTML =
+            '<span class="text-xs text-slate-600 flex-1 truncate">' + country + '</span>' +
+            '<span class="w-16 h-1.5 rounded-full bg-slate-100 overflow-hidden shrink-0">' +
+              '<span class="block h-full rounded-full bg-sunrise-600" style="width:' + p + '%"></span>' +
+            '</span>' +
+            '<span class="text-xs font-semibold text-bridge-950 w-8 text-right shrink-0">' + p + '%</span>';
+          countryList.appendChild(row);
+        });
+    }
+
+    // Card 2: English proficiency (scoped to same filter)
+    const yes = scoped.filter(d => d.has_english).length;
+    document.getElementById('statEnglishPct').textContent = pctOf(yes, scoped.length);
+    document.getElementById('statEnglishYes').textContent = yes;
+    document.getElementById('statEnglishNo').textContent = scoped.length - yes;
+  }
+
+  function computeWeekAndPending() {
+    // These two cards always reflect "right now", independent of the Card 1 filter.
+    const now = new Date();
+    const startThis = new Date(now); startThis.setUTCDate(now.getUTCDate() - 7);
+    const startLast = new Date(now); startLast.setUTCDate(now.getUTCDate() - 14);
+    const parseDate = (s) => new Date((s || '').replace(' ', 'T') + 'Z');
+
+    const thisWeek = dataset.filter(d => parseDate(d.created_at) >= startThis).length;
+    const lastWeek = dataset.filter(d => {
+      const t = parseDate(d.created_at);
+      return t >= startLast && t < startThis;
+    }).length;
+
+    document.getElementById('statWeek').textContent = thisWeek;
+    const trendEl = document.getElementById('statWeekTrend');
+    if (lastWeek === 0) {
+      trendEl.innerHTML = thisWeek > 0
+        ? '<span class="text-emerald-600">New activity</span><span class="text-slate-400 font-normal">&nbsp;vs last week</span>'
+        : '<span class="text-slate-400 font-normal">No applications last week either</span>';
+    } else {
+      const diff = Math.round(((thisWeek - lastWeek) / lastWeek) * 100);
+      const up = diff >= 0;
+      trendEl.innerHTML =
+        '<svg class="w-3 h-3 ' + (up ? 'text-emerald-600' : 'text-sunrise-600') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' +
+          (up ? '<path d="M7 17 17 7M7 7h10v10"/>' : '<path d="m7 7 10 10M17 7v10H7"/>') +
+        '</svg>' +
+        '<span class="' + (up ? 'text-emerald-600' : 'text-sunrise-600') + '">' + Math.abs(diff) + '%</span>' +
+        '<span class="text-slate-400 font-normal">&nbsp;vs last week</span>';
+    }
+
+    const pending = dataset.filter(d => (d.status || 'new') === 'new').length;
+    document.getElementById('statPending').textContent = pending;
+  }
+
+  document.getElementById('cardMonthFilter').addEventListener('change', (e) => computeCards(e.target.value));
+  computeCards('');
+  computeWeekAndPending();
+
+  // Search
+  function refreshVisibleCount() {
+    const visible = document.querySelectorAll('.app-row:not([style*="display: none"])').length;
+    document.getElementById('tableCount').textContent = '(' + visible + ')';
+    document.getElementById('appsNoMatch').classList.toggle('hidden', visible !== 0);
+  }
+  document.getElementById('appsSearch').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase().trim();
+    document.querySelectorAll('.app-row').forEach(row => {
+      row.style.display = row.dataset.search.includes(q) ? '' : 'none';
+    });
+    refreshVisibleCount();
+  });
+
+  // "View pending" quick filter on card 4
+  document.getElementById('pendingFilterBtn').addEventListener('click', () => {
+    document.getElementById('appsSearch').value = '';
+    document.querySelectorAll('.app-row').forEach(row => {
+      row.style.display = row.dataset.status === 'new' ? '' : 'none';
+    });
+    refreshVisibleCount();
+    document.getElementById('appsTableCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Profile modal
+  const modal = document.getElementById('profileModal');
+  document.querySelectorAll('.view-profile-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const d = btn.dataset;
+      document.getElementById('pmName').textContent = d.name;
+      document.getElementById('pmId').textContent = d.id;
+      document.getElementById('pmPhone').textContent = d.phone;
+      document.getElementById('pmEmail').textContent = d.email;
+      document.getElementById('pmDob').textContent = d.dob;
+      document.getElementById('pmGender').textContent = d.gender;
+      document.getElementById('pmNationality').textContent = d.nationality;
+      document.getElementById('pmResidence').textContent = d.residence;
+      document.getElementById('pmAddress').textContent = d.address;
+      document.getElementById('pmDegree').textContent = d.degree;
+      document.getElementById('pmInstitute').textContent = d.institute;
+      document.getElementById('pmCourse').textContent = d.course;
+      document.getElementById('pmGraduation').textContent = d.graduation;
+      document.getElementById('pmEnglish').textContent = d.english;
+      document.getElementById('pmScore').textContent = d.score;
+      document.getElementById('pmPreferredLevel').textContent = d.preferredLevel;
+      document.getElementById('pmSubject').textContent = d.subject;
+      document.getElementById('pmDestination').textContent = d.destination;
+      document.getElementById('pmIntake').textContent = d.intake;
+      document.getElementById('pmDate').textContent = d.date + ' at ' + d.time;
+
+      const docsWrap = document.getElementById('pmDocs');
+      docsWrap.innerHTML = '';
+      let anyDoc = false;
+      const docMap = [
+        ['docAcademicCert', 'Academic Certificate'],
+        ['docTranscript', 'Transcript'],
+        ['docEnglishCert', 'English Certificate'],
+        ['docCv', 'CV / Resume'],
+        ['docPersonalStatement', 'Personal Statement'],
+      ];
+      docMap.forEach(([key, label]) => {
+        const url = d[key];
+        if (url) {
+          anyDoc = true;
+          const a = document.createElement('a');
+          a.href = url; a.target = '_blank'; a.rel = 'noopener';
+          a.className = 'inline-flex items-center gap-1.5 text-xs font-semibold text-iris-700 bg-iris-50 hover:bg-iris-100 rounded-full px-3 py-1.5 transition';
+          a.textContent = '📄 ' + label;
+          docsWrap.appendChild(a);
+        }
+      });
+      document.getElementById('pmDocsWrap').classList.toggle('hidden', !anyDoc);
+
+      modal.classList.remove('hidden');
+    });
+  });
+  document.getElementById('profileModalClose').addEventListener('click', () => modal.classList.add('hidden'));
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+</script>
