@@ -36,7 +36,7 @@ const formMessages = results as any[];
       </div>
 
       <!-- Thread -->
-      <div class="flex-1 min-w-0 flex flex-col bg-slate-50">
+      <div class="flex-1 min-w-0 flex flex-col" style="background:#eef0fb">
         <div id="threadHeader" class="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0 bg-white">
           <div class="flex items-center gap-3">
             <div id="threadAvatar" class="w-9 h-9 rounded-full bg-iris-500 flex items-center justify-center text-white text-xs font-bold shrink-0">·</div>
@@ -52,18 +52,22 @@ const formMessages = results as any[];
           <p class="text-slate-400 text-sm text-center mt-10">Pick a conversation on the left to view messages.</p>
         </div>
 
-        <form id="replyForm" class="flex items-center gap-2 px-3 py-3 border-t border-slate-100 shrink-0 bg-white">
+        <form id="replyForm" class="flex items-center gap-2.5 px-3 py-3 border-t border-slate-100 shrink-0 bg-white">
           <input id="replyFileInput" type="file" class="hidden" accept="image/*,audio/*,.pdf,.doc,.docx">
-          <button type="button" id="replyAttachBtn" disabled class="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-iris-600 hover:bg-slate-100 transition shrink-0 disabled:opacity-40" aria-label="Attach file">
-            <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-          </button>
-          <button type="button" id="replyMicBtn" disabled class="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-iris-600 hover:bg-slate-100 transition shrink-0 disabled:opacity-40" aria-label="Record voice message">
-            <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
-          </button>
-          <input id="replyInput" type="text" placeholder="Type your message here" disabled
-            class="flex-1 min-w-0 rounded-full bg-slate-100 border border-transparent px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition disabled:opacity-50">
+          <div class="flex-1 min-w-0 relative">
+            <input id="replyInput" type="text" placeholder="Type your message here" disabled
+              class="w-full rounded-full border border-transparent px-4 py-2.5 pr-20 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition disabled:opacity-50" style="background:#eef0fb">
+            <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+              <button type="button" id="replyAttachBtn" disabled class="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-iris-600 hover:bg-white transition shrink-0 disabled:opacity-40" aria-label="Attach file">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+              </button>
+              <button type="button" id="replyMicBtn" disabled class="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-iris-600 hover:bg-white transition shrink-0 disabled:opacity-40" aria-label="Record voice message">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+              </button>
+            </div>
+          </div>
           <button type="submit" disabled id="replySendBtn"
-            class="w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0 transition hover:brightness-110 bg-iris-600 disabled:opacity-50" aria-label="Send">
+            class="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 transition hover:brightness-110 bg-iris-600 disabled:opacity-50" aria-label="Send">
             <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg>
           </button>
         </form>
@@ -216,7 +220,7 @@ const formMessages = results as any[];
     div.className = isUser
       ? 'bg-white rounded-2xl rounded-tl-sm shadow-sm px-4 py-2.5 text-sm text-bridge-900 max-w-[75%] leading-relaxed'
       : 'ml-auto rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white max-w-[75%] leading-relaxed';
-    if (!isUser) div.style.backgroundImage = 'linear-gradient(90deg,#4d51b0,#3f4293)';
+    if (!isUser) div.style.background = '#4d6bfe';
     div.innerHTML = (m.message ? escapeHtml(m.message) : '') + attachmentHtml(m);
     wrap.appendChild(div);
     wrap.scrollTop = wrap.scrollHeight;
@@ -236,7 +240,10 @@ const formMessages = results as any[];
       document.getElementById('threadAvatar').className = `w-9 h-9 rounded-full ${avatarColor(sessionId)} flex items-center justify-center text-white text-xs font-bold shrink-0`;
       document.getElementById('threadAvatar').textContent = initials(sessionLabel(s));
       document.getElementById('threadName').textContent = sessionLabel(s);
-      document.getElementById('threadSub').textContent = [s.email, s.phone, s.source_page ? ('via ' + s.source_page) : ''].filter(Boolean).join(' · ') || 'Site visitor';
+      const activityLabel = (s.last_sender === 'user' && s.updated_at && (Date.now() - new Date(s.updated_at.replace(' ', 'T') + 'Z').getTime()) < 2 * 60000)
+        ? '<span style="color:#22c55e;">● Active now</span>'
+        : 'Last seen ' + timeAgo(s.updated_at);
+      document.getElementById('threadSub').innerHTML = activityLabel + (s.source_page ? ' · via ' + escapeHtml(s.source_page) : '');
       document.getElementById('archiveBtn').textContent = s.status === 'archived' ? 'Unarchive' : 'Archive';
 
       document.getElementById('threadMessages').innerHTML = '';
