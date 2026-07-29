@@ -1,27 +1,27 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
 export const prerender = false;
-
-const db = (Astro.locals as any).runtime.env.DB;
-const { results } = await db.prepare(
-  "SELECT * FROM leads WHERE message IS NOT NULL AND message != '' AND (source_page IS NULL OR source_page != 'chat-widget') ORDER BY created_at DESC LIMIT 100"
-).all();
-const formMessages = results as any[];
 ---
 <AdminLayout title="Messages" active="messages">
   <h1 class="text-2xl font-bold text-bridge-950 mb-1">Messages</h1>
-  <p class="text-slate-500 text-sm mb-6">Live chat with visitors from the site widget, plus messages submitted through contact forms.</p>
+  <p class="text-slate-500 text-sm mb-6">Live chat conversations from the site widget.</p>
 
-  <!-- Live chat (messenger-style) -->
-  <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden mb-8">
-    <div class="flex h-[600px]">
+  <div class="grid lg:grid-cols-3 gap-5 items-start">
+    <!-- Card style 1: each conversation is its own card, stacked -->
+    <div id="conversationCards" class="lg:col-span-2 space-y-4">
+      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-8 text-center">
+        <p class="text-slate-400 text-sm">Loading conversations…</p>
+      </div>
+    </div>
 
-      <!-- Conversation list -->
-      <div class="w-72 sm:w-80 shrink-0 flex flex-col" style="background:#f4f5fd">
-        <div class="p-3 shrink-0">
+    <!-- Card style 2: Inbox — one single card, right side -->
+    <div class="lg:col-span-1 lg:sticky lg:top-6">
+      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm flex flex-col" style="max-height: 82vh;">
+        <div class="p-3.5 border-b border-slate-100 shrink-0">
+          <p class="font-semibold text-bridge-950 px-1.5 pb-2.5">Inbox</p>
           <div class="relative">
             <input id="chatSearch" type="text" placeholder="Search"
-              class="w-full bg-white/70 border border-transparent rounded-full pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition">
+              class="w-full bg-slate-50 border border-transparent rounded-full pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition">
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
           </div>
           <div class="flex items-center gap-1 mt-2.5">
@@ -30,78 +30,11 @@ const formMessages = results as any[];
             <button type="button" data-filter="archived" class="chat-filter-tab">Archive</button>
           </div>
         </div>
-        <div id="sessionList" class="flex-1 overflow-y-auto">
+        <div id="inboxList" class="flex-1 overflow-y-auto">
           <p class="text-slate-400 text-xs p-4">Loading…</p>
         </div>
       </div>
-
-      <!-- Thread -->
-      <div class="flex-1 min-w-0 flex flex-col" style="background:#eef0fb">
-        <div id="threadHeader" class="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0 bg-white">
-          <div class="flex items-center gap-3">
-            <div id="threadAvatar" class="w-9 h-9 rounded-full bg-iris-500 flex items-center justify-center text-white text-xs font-bold shrink-0">·</div>
-            <div>
-              <p id="threadName" class="font-semibold text-bridge-950 text-sm">Select a conversation</p>
-              <p id="threadSub" class="text-xs text-slate-400">No conversation selected</p>
-            </div>
-          </div>
-          <div class="relative">
-            <button id="threadMenuBtn" type="button" disabled class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition" aria-label="More options">
-              <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-            </button>
-            <div id="threadMenuDropdown" class="hidden absolute right-0 top-10 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-1.5 w-40 z-10">
-              <button id="archiveBtn" type="button" class="w-full text-left px-3.5 py-2 text-sm text-slate-600 hover:bg-slate-50 transition">Archive</button>
-            </div>
-          </div>
-        </div>
-
-        <div id="threadMessages" class="flex-1 overflow-y-auto px-4 py-4 space-y-2.5">
-          <p class="chat-placeholder text-slate-400 text-sm text-center mt-10">Pick a conversation on the left to view messages.</p>
-        </div>
-
-        <form id="replyForm" class="flex items-center gap-2.5 px-3 py-3 border-t border-slate-100 shrink-0 bg-white">
-          <input id="replyFileInput" type="file" class="hidden" accept="image/*,audio/*,.pdf,.doc,.docx">
-          <div class="flex-1 min-w-0 relative">
-            <input id="replyInput" type="text" placeholder="Type your message here" disabled
-              class="w-full rounded-full border border-transparent px-4 py-2.5 pr-20 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition disabled:opacity-50" style="background:#eef0fb">
-            <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
-              <button type="button" id="replyAttachBtn" disabled class="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-iris-600 hover:bg-white transition shrink-0 disabled:opacity-40" aria-label="Attach file">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-              </button>
-              <button type="button" id="replyMicBtn" disabled class="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-iris-600 hover:bg-white transition shrink-0 disabled:opacity-40" aria-label="Record voice message">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
-              </button>
-            </div>
-          </div>
-          <button type="submit" disabled id="replySendBtn"
-            class="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 transition hover:brightness-110 bg-iris-600 disabled:opacity-50" aria-label="Send">
-            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg>
-          </button>
-        </form>
-      </div>
     </div>
-  </div>
-
-  <!-- Form submissions -->
-  <h2 class="font-semibold text-bridge-950 mb-3">Form Submissions</h2>
-  <div class="space-y-3">
-    {formMessages.length === 0 ? (
-      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-8 text-center">
-        <p class="text-slate-400 text-sm">No messages yet — they'll show up here once someone submits a form on the site.</p>
-      </div>
-    ) : formMessages.map((m: any) => (
-      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-5">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="font-semibold text-bridge-950 text-sm">{m.name || 'Anonymous'}</p>
-            <p class="text-xs text-slate-400">{m.email} {m.phone ? `· ${m.phone}` : ''}</p>
-          </div>
-          <p class="text-xs text-slate-400 whitespace-nowrap">{m.created_at}</p>
-        </div>
-        <p class="text-sm text-slate-600 mt-3 leading-relaxed">{m.message}</p>
-        <p class="text-xs text-slate-400 mt-3">via {m.source_page || 'website form'}</p>
-      </div>
-    ))}
   </div>
 </AdminLayout>
 
@@ -109,16 +42,20 @@ const formMessages = results as any[];
   .chat-filter-tab { font-size: 12px; font-weight: 600; color: #94a3b8; padding: 4px 12px; border-radius: 9999px; transition: .15s; }
   .chat-filter-tab:hover { background: #f1f5f9; }
   .chat-filter-tab.active { background: #eef0fd; color: #4d51b0; }
+  .conv-card-flash { animation: convFlash 1s ease; }
+  @keyframes convFlash { 0%,100% { box-shadow: none; } 30% { box-shadow: 0 0 0 3px #a2a5ec; } }
 </style>
 
 <script is:inline>
   let sessions = [];
-  let activeSessionId = null;
-  let renderedIds = {};
   let currentFilter = 'all';
   let searchTerm = '';
+  let renderedIds = {};   // { [sessionId]: { [msgId]: true } }
+  let lastBubbleTime = {}; // { [sessionId]: timestamp }
+  let renderedCardIds = new Set(); // which session cards currently exist in the DOM
   let mediaRecorder = null;
   let recordedChunks = [];
+  let recordingSessionId = null;
 
   const avatarPalette = ['bg-iris-500','bg-sunrise-500','bg-emerald-500','bg-amber-500','bg-sky-500','bg-pink-500'];
   function avatarColor(id) {
@@ -131,7 +68,6 @@ const formMessages = results as any[];
     if (!label) return '?';
     return label.slice(0, 2).toUpperCase();
   }
-
   function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
   function timeAgo(iso) {
     if (!iso) return '';
@@ -143,72 +79,21 @@ const formMessages = results as any[];
     if (hrs < 24) return hrs + 'h ago';
     return Math.round(hrs / 24) + 'd ago';
   }
+  function formatClock(iso) {
+    if (!iso) return '';
+    return new Date(iso.replace(' ', 'T') + 'Z').toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
   function sessionLabel(s) {
     return s.name || s.email || s.phone || ('Visitor ' + s.session_id.slice(0, 6));
   }
-
-  function filteredSessions() {
-    return sessions.filter(s => {
-      if (currentFilter === 'unread' && !s.unread_admin) return false;
-      if (currentFilter === 'archived' && s.status !== 'archived') return false;
-      if (currentFilter !== 'archived' && s.status === 'archived') return false;
-      if (searchTerm && !sessionLabel(s).toLowerCase().includes(searchTerm.toLowerCase())) return false;
-      return true;
-    });
+  function statusLabel(s) {
+    const active = s.last_sender === 'user' && s.updated_at && (Date.now() - new Date(s.updated_at.replace(' ', 'T') + 'Z').getTime()) < 2 * 60000;
+    return active ? '<span style="color:#22c55e;">● Active now</span>' : 'Last seen ' + timeAgo(s.updated_at);
   }
-
-  function renderSessionList() {
-    const el = document.getElementById('sessionList');
-    const list = filteredSessions();
-    if (list.length === 0) {
-      el.innerHTML = '<p class="text-slate-400 text-xs p-4">No conversations here yet.</p>';
-      return;
-    }
-    el.innerHTML = list.map(s => `
-      <button type="button" data-session="${s.session_id}"
-        class="session-item w-full text-left px-3 py-3 hover:bg-white/70 transition flex items-center gap-3 ${s.session_id === activeSessionId ? 'bg-white' : ''}">
-        <div class="w-11 h-11 rounded-full ${avatarColor(s.session_id)} flex items-center justify-center text-white text-xs font-bold shrink-0">${initials(sessionLabel(s))}</div>
-        <div class="min-w-0 flex-1">
-          <p class="text-sm font-semibold text-bridge-950 truncate">${escapeHtml(sessionLabel(s))}</p>
-          <p class="text-xs text-slate-400 truncate">${s.last_sender === 'admin' ? 'You: ' : ''}${escapeHtml(s.last_message || '')}</p>
-        </div>
-        <div class="flex flex-col items-end gap-1.5 shrink-0 self-stretch justify-center">
-          <span class="text-[10px] text-slate-300 whitespace-nowrap">${timeAgo(s.updated_at)}</span>
-          <span class="w-2 h-2 rounded-full ${s.unread_admin ? 'bg-sunrise-600' : 'bg-transparent'}"></span>
-        </div>
-      </button>
-    `).join('');
-
-    el.querySelectorAll('.session-item').forEach(btn => {
-      btn.addEventListener('click', () => openSession(btn.getAttribute('data-session')));
-    });
-  }
-
-  document.querySelectorAll('.chat-filter-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      currentFilter = tab.getAttribute('data-filter');
-      document.querySelectorAll('.chat-filter-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      renderSessionList();
-    });
-  });
-  document.getElementById('chatSearch').addEventListener('input', (e) => {
-    searchTerm = e.target.value;
-    renderSessionList();
-  });
-
-  async function loadSessions() {
-    try {
-      const data = await apiFetch('/api/chat/sessions');
-      sessions = data.sessions || [];
-      renderSessionList();
-    } catch (err) { /* best-effort */ }
-  }
-
   function attachmentHtml(m) {
     if (!m.attachment_url) return '';
     if (m.attachment_type === 'image') {
-      return `<a href="${m.attachment_url}" target="_blank" rel="noopener"><img src="${m.attachment_url}" class="max-w-[220px] rounded-xl mt-1.5 block"></a>`;
+      return `<a href="${m.attachment_url}" target="_blank" rel="noopener"><img src="${m.attachment_url}" class="max-w-[200px] rounded-xl mt-1.5 block"></a>`;
     }
     if (m.attachment_type === 'audio') {
       return `<audio controls src="${m.attachment_url}" class="mt-1.5 max-w-[220px] h-9"></audio>`;
@@ -216,186 +101,327 @@ const formMessages = results as any[];
     return `<a href="${m.attachment_url}" target="_blank" rel="noopener" class="flex items-center gap-2 mt-1.5 bg-black/5 rounded-lg px-3 py-2 text-xs font-medium underline">📎 ${escapeHtml(m.attachment_name || 'Download file')}</a>`;
   }
 
-  let lastBubbleTime = null;
-  function formatClock(iso) {
-    if (!iso) return '';
-    const d = new Date(iso.replace(' ', 'T') + 'Z');
-    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  function passesFilter(s) {
+    if (currentFilter === 'unread' && !s.unread_admin) return false;
+    if (currentFilter === 'archived' && s.status !== 'archived') return false;
+    if (currentFilter !== 'archived' && s.status === 'archived') return false;
+    if (searchTerm && !sessionLabel(s).toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    return true;
   }
 
-  function addBubble(m) {
-    const wrap = document.getElementById('threadMessages');
+  // ---------- Inbox (card style 2) ----------
+  function renderInbox() {
+    const el = document.getElementById('inboxList');
+    const list = sessions.filter(passesFilter);
+    if (list.length === 0) {
+      el.innerHTML = '<p class="text-slate-400 text-xs p-4">No conversations here yet.</p>';
+      return;
+    }
+    el.innerHTML = list.map(s => `
+      <button type="button" data-goto="${s.session_id}"
+        class="w-full text-left px-3 py-2.5 hover:bg-slate-50 transition flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-full ${avatarColor(s.session_id)} flex items-center justify-center text-white text-[11px] font-bold shrink-0">${initials(sessionLabel(s))}</div>
+        <div class="min-w-0 flex-1">
+          <p class="text-[13px] font-semibold text-bridge-950 truncate">${escapeHtml(sessionLabel(s))}</p>
+          <p class="text-[11px] text-slate-400 truncate">${s.last_sender === 'admin' ? 'You: ' : ''}${escapeHtml(s.last_message || '')}</p>
+        </div>
+        <div class="flex flex-col items-end gap-1 shrink-0">
+          <span class="text-[9px] text-slate-300 whitespace-nowrap">${timeAgo(s.updated_at)}</span>
+          <span class="w-1.5 h-1.5 rounded-full ${s.unread_admin ? 'bg-sunrise-600' : 'bg-transparent'}"></span>
+        </div>
+      </button>
+    `).join('');
+
+    el.querySelectorAll('[data-goto]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-goto');
+        const card = document.getElementById('card-' + id);
+        if (card) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.classList.add('conv-card-flash');
+          setTimeout(() => card.classList.remove('conv-card-flash'), 1000);
+        }
+      });
+    });
+  }
+
+  // ---------- Conversation cards (card style 1) ----------
+  function cardTemplate(s) {
+    const id = s.session_id;
+    return `
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden conv-card" id="card-${id}" data-session="${id}">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-full ${avatarColor(id)} flex items-center justify-center text-white text-xs font-bold shrink-0">${initials(sessionLabel(s))}</div>
+          <div class="min-w-0">
+            <p class="font-semibold text-bridge-950 text-sm truncate">${escapeHtml(sessionLabel(s))}</p>
+            <p class="text-xs text-slate-400 status-line truncate">${statusLabel(s)}${s.source_page ? ' · via ' + escapeHtml(s.source_page) : ''}</p>
+          </div>
+        </div>
+        <div class="relative shrink-0">
+          <button type="button" class="card-menu-btn w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition" aria-label="More options">
+            <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+          </button>
+          <div class="card-menu-dropdown hidden absolute right-0 top-9 bg-white rounded-xl shadow-lg ring-1 ring-black/5 py-1.5 w-40 z-10">
+            <button type="button" class="card-archive-btn w-full text-left px-3.5 py-2 text-sm text-slate-600 hover:bg-slate-50 transition">${s.status === 'archived' ? 'Unarchive' : 'Archive'}</button>
+          </div>
+        </div>
+      </div>
+      <div class="thread-messages px-5 py-4 space-y-2 max-h-72 overflow-y-auto" style="background:#eef0fb">
+        <p class="chat-placeholder text-slate-400 text-xs text-center py-6">Loading…</p>
+      </div>
+      <form class="reply-form flex items-center gap-2.5 px-3 py-3 border-t border-slate-100 bg-white">
+        <input type="file" class="reply-file-input hidden" accept="image/*,audio/*,.pdf,.doc,.docx">
+        <div class="flex-1 min-w-0 relative">
+          <input type="text" placeholder="Type your message here" class="reply-input w-full rounded-full border border-transparent px-4 py-2.5 pr-20 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition" style="background:#eef0fb">
+          <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+            <button type="button" class="reply-attach-btn w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-iris-600 hover:bg-white transition" aria-label="Attach file">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+            </button>
+            <button type="button" class="reply-mic-btn w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-iris-600 hover:bg-white transition" aria-label="Record voice message">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="reply-send-btn w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 transition hover:brightness-110 bg-iris-600" aria-label="Send">
+          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="currentColor"><path d="M3 20l18-8L3 4v6l12 2-12 2z"/></svg>
+        </button>
+      </form>
+    </div>`;
+  }
+
+  function addBubbleToCard(sessionId, m) {
+    const card = document.getElementById('card-' + sessionId);
+    if (!card) return;
+    const wrap = card.querySelector('.thread-messages');
     const empty = wrap.querySelector('.chat-placeholder');
     if (empty) empty.remove();
 
     const t = m.created_at ? new Date(m.created_at.replace(' ', 'T') + 'Z').getTime() : Date.now();
-    if (m.created_at && (lastBubbleTime === null || t - lastBubbleTime > 5 * 60000)) {
+    if (m.created_at && (lastBubbleTime[sessionId] === undefined || t - lastBubbleTime[sessionId] > 5 * 60000)) {
       const cap = document.createElement('p');
       cap.className = 'text-center text-[11px] text-slate-400 py-1';
       cap.textContent = formatClock(m.created_at);
       wrap.appendChild(cap);
     }
-    lastBubbleTime = t;
+    lastBubbleTime[sessionId] = t;
 
     const div = document.createElement('div');
     const isUser = m.sender === 'user';
     div.className = isUser
-      ? 'bg-white rounded-2xl rounded-tl-sm shadow-sm px-4 py-2.5 text-sm text-bridge-900 max-w-[75%] leading-relaxed'
-      : 'ml-auto rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white max-w-[75%] leading-relaxed';
+      ? 'bg-white rounded-2xl rounded-tl-sm shadow-sm px-4 py-2.5 text-sm text-bridge-900 max-w-[80%] leading-relaxed'
+      : 'ml-auto rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white max-w-[80%] leading-relaxed';
     if (!isUser) div.style.background = '#4d6bfe';
     div.innerHTML = (m.message ? escapeHtml(m.message) : '') + attachmentHtml(m);
     wrap.appendChild(div);
     wrap.scrollTop = wrap.scrollHeight;
   }
 
-  async function openSession(sessionId) {
-    activeSessionId = sessionId;
-    renderedIds = {};
-    lastBubbleTime = null;
-    renderSessionList();
-
-    document.getElementById('threadMessages').innerHTML = '<p class="text-slate-400 text-sm text-center mt-10">Loading…</p>';
-    ['replyInput','replySendBtn','replyAttachBtn','replyMicBtn','threadMenuBtn'].forEach(id => document.getElementById(id).disabled = false);
-
+  async function loadCardThread(sessionId, isFirstLoad) {
     try {
       const data = await apiFetch('/api/chat/thread?session_id=' + encodeURIComponent(sessionId));
-      const s = data.session || {};
-      document.getElementById('threadAvatar').className = `w-9 h-9 rounded-full ${avatarColor(sessionId)} flex items-center justify-center text-white text-xs font-bold shrink-0`;
-      document.getElementById('threadAvatar').textContent = initials(sessionLabel(s));
-      document.getElementById('threadName').textContent = sessionLabel(s);
-      const activityLabel = (s.last_sender === 'user' && s.updated_at && (Date.now() - new Date(s.updated_at.replace(' ', 'T') + 'Z').getTime()) < 2 * 60000)
-        ? '<span style="color:#22c55e;">● Active now</span>'
-        : 'Last seen ' + timeAgo(s.updated_at);
-      document.getElementById('threadSub').innerHTML = activityLabel + (s.source_page ? ' · via ' + escapeHtml(s.source_page) : '');
-      document.getElementById('archiveBtn').textContent = s.status === 'archived' ? 'Unarchive' : 'Archive';
-
-      document.getElementById('threadMessages').innerHTML = '';
-      (data.messages || []).forEach(m => { renderedIds[m.id] = true; addBubble(m); });
-    } catch (err) {
-      document.getElementById('threadMessages').innerHTML = '<p class="text-slate-400 text-sm text-center mt-10">Could not load this conversation.</p>';
-    }
-    loadSessions();
-  }
-
-  async function pollActiveThread() {
-    if (!activeSessionId) return;
-    try {
-      const data = await apiFetch('/api/chat/thread?session_id=' + encodeURIComponent(activeSessionId));
+      if (isFirstLoad) {
+        renderedIds[sessionId] = {};
+        lastBubbleTime[sessionId] = undefined;
+        const card = document.getElementById('card-' + sessionId);
+        if (card) card.querySelector('.thread-messages').innerHTML = '';
+      }
       (data.messages || []).forEach(m => {
-        if (renderedIds[m.id]) return;
-        renderedIds[m.id] = true;
-        addBubble(m);
+        if (renderedIds[sessionId][m.id]) return;
+        renderedIds[sessionId][m.id] = true;
+        addBubbleToCard(sessionId, m);
       });
     } catch (err) { /* best-effort */ }
   }
 
-  async function sendReply({ message, attachment_url, attachment_type, attachment_name }) {
-    if (!activeSessionId) return;
-    addBubble({ sender: 'admin', message: message || '', attachment_url, attachment_type, attachment_name });
+  function renderConversationCards() {
+    const container = document.getElementById('conversationCards');
+    const list = sessions.filter(passesFilter);
+    if (list.length === 0) {
+      container.innerHTML = '<div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-8 text-center"><p class="text-slate-400 text-sm">No conversations here yet — they will appear once a visitor uses the chat widget.</p></div>';
+      renderedCardIds = new Set();
+      return;
+    }
+    const wantedIds = new Set(list.map(s => s.session_id));
+
+    // Remove cards that no longer pass the filter
+    renderedCardIds.forEach(id => {
+      if (!wantedIds.has(id)) {
+        const el = document.getElementById('card-' + id);
+        if (el) el.remove();
+        renderedCardIds.delete(id);
+      }
+    });
+
+    // Clear the initial loading placeholder once we have real content
+    if (container.children.length === 1 && container.children[0].textContent.includes('Loading')) {
+      container.innerHTML = '';
+    }
+
+    list.forEach(s => {
+      const id = s.session_id;
+      let card = document.getElementById('card-' + id);
+      if (!card) {
+        container.insertAdjacentHTML('beforeend', cardTemplate(s));
+        renderedCardIds.add(id);
+        loadCardThread(id, true);
+      } else {
+        // update header info (status/unread/name) without touching the thread
+        const statusLine = card.querySelector('.status-line');
+        if (statusLine) statusLine.innerHTML = statusLabel(s) + (s.source_page ? ' · via ' + escapeHtml(s.source_page) : '');
+        const menuBtnLabel = card.querySelector('.card-archive-btn');
+        if (menuBtnLabel) menuBtnLabel.textContent = s.status === 'archived' ? 'Unarchive' : 'Archive';
+      }
+    });
+  }
+
+  async function loadSessions() {
+    try {
+      const data = await apiFetch('/api/chat/sessions');
+      sessions = data.sessions || [];
+      renderInbox();
+      renderConversationCards();
+    } catch (err) { /* best-effort */ }
+  }
+
+  function pollAllVisibleThreads() {
+    renderedCardIds.forEach(id => loadCardThread(id, false));
+  }
+
+  document.querySelectorAll('.chat-filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      currentFilter = tab.getAttribute('data-filter');
+      document.querySelectorAll('.chat-filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      renderInbox();
+      renderConversationCards();
+    });
+  });
+  document.getElementById('chatSearch').addEventListener('input', (e) => {
+    searchTerm = e.target.value;
+    renderInbox();
+    renderConversationCards();
+  });
+
+  async function sendToSession(sessionId, { message, attachment_url, attachment_type, attachment_name }) {
+    addBubbleToCard(sessionId, { sender: 'admin', message: message || '', attachment_url, attachment_type, attachment_name, created_at: null });
     try {
       const data = await apiFetch('/api/chat/reply', {
         method: 'POST',
-        body: JSON.stringify({ session_id: activeSessionId, message: message || '', attachment_url, attachment_type, attachment_name }),
+        body: JSON.stringify({ session_id: sessionId, message: message || '', attachment_url, attachment_type, attachment_name }),
       });
-      if (data && data.id) renderedIds[data.id] = true;
+      if (data && data.id) { renderedIds[sessionId] = renderedIds[sessionId] || {}; renderedIds[sessionId][data.id] = true; }
     } catch (err) {
       showToast('Could not send reply', 'error');
     }
     loadSessions();
   }
 
-  document.getElementById('replyForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const input = document.getElementById('replyInput');
-    const msg = input.value.trim();
-    if (!msg) return;
-    input.value = '';
-    await sendReply({ message: msg });
-  });
-
-  document.getElementById('threadMenuBtn').addEventListener('click', (e) => {
-    e.stopPropagation();
-    document.getElementById('threadMenuDropdown').classList.toggle('hidden');
-  });
-  document.addEventListener('click', (e) => {
-    const dd = document.getElementById('threadMenuDropdown');
-    const btn = document.getElementById('threadMenuBtn');
-    if (!dd.contains(e.target) && e.target !== btn) dd.classList.add('hidden');
-  });
-
-  document.getElementById('archiveBtn').addEventListener('click', async () => {
-    if (!activeSessionId) return;
-    document.getElementById('threadMenuDropdown').classList.add('hidden');
-    const btn = document.getElementById('archiveBtn');
-    const archiving = btn.textContent === 'Archive';
-    try {
-      await apiFetch('/api/chat/archive', {
-        method: 'POST',
-        body: JSON.stringify({ session_id: activeSessionId, status: archiving ? 'archived' : 'open' }),
-      });
-      btn.textContent = archiving ? 'Unarchive' : 'Archive';
-      showToast(archiving ? 'Conversation archived' : 'Conversation restored');
-      loadSessions();
-    } catch (err) {
-      showToast('Could not update conversation', 'error');
+  // Event delegation for all cards (they're created dynamically)
+  document.getElementById('conversationCards').addEventListener('click', (e) => {
+    const menuBtn = e.target.closest('.card-menu-btn');
+    if (menuBtn) {
+      e.stopPropagation();
+      const dd = menuBtn.parentElement.querySelector('.card-menu-dropdown');
+      document.querySelectorAll('.card-menu-dropdown').forEach(d => { if (d !== dd) d.classList.add('hidden'); });
+      dd.classList.toggle('hidden');
+      return;
+    }
+    const archiveBtn = e.target.closest('.card-archive-btn');
+    if (archiveBtn) {
+      const card = archiveBtn.closest('.conv-card');
+      const sessionId = card.dataset.session;
+      const archiving = archiveBtn.textContent === 'Archive';
+      archiveBtn.closest('.card-menu-dropdown').classList.add('hidden');
+      apiFetch('/api/chat/archive', { method: 'POST', body: JSON.stringify({ session_id: sessionId, status: archiving ? 'archived' : 'open' }) })
+        .then(() => { showToast(archiving ? 'Conversation archived' : 'Conversation restored'); loadSessions(); })
+        .catch(() => showToast('Could not update conversation', 'error'));
+      return;
+    }
+    const attachBtn = e.target.closest('.reply-attach-btn');
+    if (attachBtn) {
+      attachBtn.closest('.reply-form').querySelector('.reply-file-input').click();
+      return;
+    }
+    const micBtn = e.target.closest('.reply-mic-btn');
+    if (micBtn) {
+      toggleMicRecording(micBtn);
+      return;
     }
   });
 
-  // --- Attachment upload ---
-  document.getElementById('replyAttachBtn').addEventListener('click', () => {
-    document.getElementById('replyFileInput').click();
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.card-menu-btn')) {
+      document.querySelectorAll('.card-menu-dropdown').forEach(d => d.classList.add('hidden'));
+    }
   });
-  document.getElementById('replyFileInput').addEventListener('change', async (e) => {
+
+  document.getElementById('conversationCards').addEventListener('submit', (e) => {
+    if (!e.target.classList.contains('reply-form')) return;
+    e.preventDefault();
+    const form = e.target;
+    const card = form.closest('.conv-card');
+    const sessionId = card.dataset.session;
+    const input = form.querySelector('.reply-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    sendToSession(sessionId, { message: msg });
+  });
+
+  document.getElementById('conversationCards').addEventListener('change', async (e) => {
+    if (!e.target.classList.contains('reply-file-input')) return;
     const file = e.target.files[0];
     e.target.value = '';
-    if (!file || !activeSessionId) return;
+    if (!file) return;
+    const card = e.target.closest('.conv-card');
+    const sessionId = card.dataset.session;
     const fd = new FormData();
     fd.append('file', file);
     try {
       const res = await fetch('/api/chat/upload', { method: 'POST', body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload failed');
-      await sendReply({ message: '', attachment_url: data.url, attachment_type: data.type, attachment_name: data.name });
+      await sendToSession(sessionId, { message: '', attachment_url: data.url, attachment_type: data.type, attachment_name: data.name });
     } catch (err) {
       showToast('Could not upload file', 'error');
     }
   });
 
-  // --- Voice recording ---
-  const micBtn = document.getElementById('replyMicBtn');
-  micBtn.addEventListener('click', async () => {
+  function toggleMicRecording(micBtn) {
+    const card = micBtn.closest('.conv-card');
+    const sessionId = card.dataset.session;
+
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       mediaRecorder.stop();
       return;
     }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
       recordedChunks = [];
+      recordingSessionId = sessionId;
       mediaRecorder = new MediaRecorder(stream);
       mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
       mediaRecorder.onstop = async () => {
         stream.getTracks().forEach(t => t.stop());
         micBtn.classList.remove('text-sunrise-600', 'bg-sunrise-50');
         const blob = new Blob(recordedChunks, { type: 'audio/webm' });
-        if (blob.size === 0 || !activeSessionId) return;
+        if (blob.size === 0) return;
         const fd = new FormData();
         fd.append('file', blob, 'voice-message.webm');
         try {
           const res = await fetch('/api/chat/upload', { method: 'POST', body: fd });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Upload failed');
-          await sendReply({ message: '', attachment_url: data.url, attachment_type: 'audio', attachment_name: 'Voice message' });
+          await sendToSession(recordingSessionId, { message: '', attachment_url: data.url, attachment_type: 'audio', attachment_name: 'Voice message' });
         } catch (err) {
           showToast('Could not send voice message', 'error');
         }
       };
       mediaRecorder.start();
       micBtn.classList.add('text-sunrise-600', 'bg-sunrise-50');
-    } catch (err) {
-      showToast('Microphone access denied', 'error');
-    }
-  });
+    }).catch(() => showToast('Microphone access denied', 'error'));
+  }
 
   loadSessions();
-  setInterval(() => { loadSessions(); pollActiveThread(); }, 4000);
+  setInterval(() => { loadSessions(); pollAllVisibleThreads(); }, 4000);
 </script>
