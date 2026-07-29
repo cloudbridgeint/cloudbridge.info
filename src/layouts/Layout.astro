@@ -406,7 +406,14 @@ if (db) {
       </div>
     </div>
 
-    <form id="chatForm" class="flex items-center gap-2 px-3 py-3 border-t border-black/5 shrink-0 bg-white">
+    <form id="chatForm" class="flex items-center gap-1.5 px-3 py-3 border-t border-black/5 shrink-0 bg-white">
+      <input id="chatFileInput" type="file" class="hidden" accept="image/*,audio/*,.pdf,.doc,.docx">
+      <button type="button" id="chatAttachBtn" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-bridge-800 hover:bg-slate-100 transition shrink-0" aria-label="Attach a file">
+        <svg class="w-[17px] h-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+      </button>
+      <button type="button" id="chatMicBtn" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-bridge-800 hover:bg-slate-100 transition shrink-0" aria-label="Record a voice message">
+        <svg class="w-[17px] h-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+      </button>
       <input id="chatInput" type="text" placeholder="Write a message…" required
         class="flex-1 min-w-0 rounded-full bg-slate-100 border border-transparent px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-sunrise-300 focus:bg-white transition">
       <button type="submit" class="w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0 transition hover:brightness-110" style="background-image:linear-gradient(90deg,#1c3255 0%,#e12d38 100%)" aria-label="Send">

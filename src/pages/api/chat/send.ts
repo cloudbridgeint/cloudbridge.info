@@ -5,16 +5,20 @@ export const prerender = false;
 export const POST: APIRoute = async (context) => {
   const db = (context.locals as any).runtime.env.DB;
   const body = await context.request.json().catch(() => ({}));
-  const { session_id, message, name, email, phone } = body || {};
+  const { session_id, message, name, email, phone, attachment_url, attachment_type, attachment_name } = body || {};
 
-  if (!session_id || !message || !String(message).trim()) {
-    return new Response(JSON.stringify({ error: 'session_id and message are required' }), { status: 400 });
+  if (!session_id || (!message || !String(message).trim()) && !attachment_url) {
+    return new Response(JSON.stringify({ error: 'session_id and message (or attachment) are required' }), { status: 400 });
   }
 
   const cf = (context.request as any).cf || {};
   const referrer = context.request.headers.get('referer') || '';
   let sourcePage = '';
   try { sourcePage = new URL(referrer).pathname; } catch { sourcePage = ''; }
+
+  const displayText = (message && String(message).trim())
+    ? String(message)
+    : (attachment_type === 'audio' ? '🎤 Voice message' : attachment_type === 'image' ? '📷 Photo' : '📎 Attachment');
 
   // Upsert the session
   const existing = await db.prepare('SELECT session_id FROM chat_sessions WHERE session_id = ?').bind(session_id).first();
@@ -26,7 +30,7 @@ export const POST: APIRoute = async (context) => {
         phone = CASE WHEN ? != '' THEN ? ELSE phone END
        WHERE session_id = ?`
     ).bind(
-      String(message).slice(0, 200),
+      displayText.slice(0, 200),
       name || '', name || '',
       email || '', email || '',
       phone || '', phone || '',
@@ -38,13 +42,13 @@ export const POST: APIRoute = async (context) => {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'user', 1)`
     ).bind(
       session_id, name || '', email || '', phone || '', sourcePage, cf.country || '', cf.city || '',
-      String(message).slice(0, 200)
+      displayText.slice(0, 200)
     ).run();
   }
 
   await db.prepare(
-    `INSERT INTO chat_messages (session_id, sender, message) VALUES (?, 'user', ?)`
-  ).bind(session_id, message).run();
+    `INSERT INTO chat_messages (session_id, sender, message, attachment_url, attachment_type, attachment_name) VALUES (?, 'user', ?, ?, ?, ?)`
+  ).bind(session_id, message || '', attachment_url || '', attachment_type || '', attachment_name || '').run();
 
   return new Response(JSON.stringify({ success: true }), {
     status: 201,

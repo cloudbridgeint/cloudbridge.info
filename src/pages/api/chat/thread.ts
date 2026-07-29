@@ -13,7 +13,7 @@ export const GET: APIRoute = async (context) => {
   }
 
   const [{ results: messages }, session] = await Promise.all([
-    db.prepare('SELECT id, sender, message, created_at FROM chat_messages WHERE session_id = ? ORDER BY id ASC LIMIT 300').bind(sessionId).all(),
+    db.prepare('SELECT id, sender, message, attachment_url, attachment_type, attachment_name, created_at FROM chat_messages WHERE session_id = ? ORDER BY id ASC LIMIT 300').bind(sessionId).all(),
     db.prepare('SELECT * FROM chat_sessions WHERE session_id = ?').bind(sessionId).first(),
   ]);
 

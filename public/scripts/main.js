@@ -1112,7 +1112,8 @@ initPageScripts();
   }, { passive: true });
 })();
 
-// Floating Call/Chat widget with live two-way chat
+
+// Floating Call/Chat widget with live two-way chat (text, attachments, voice notes)
 (function () {
   var callBtn = document.getElementById('fabCallBtn');
   var chatBtn = document.getElementById('fabChatBtn');
@@ -1122,9 +1123,11 @@ initPageScripts();
   var chatForm = document.getElementById('chatForm');
   var chatInput = document.getElementById('chatInput');
   var chatMessages = document.getElementById('chatMessages');
+  var chatAttachBtn = document.getElementById('chatAttachBtn');
+  var chatFileInput = document.getElementById('chatFileInput');
+  var chatMicBtn = document.getElementById('chatMicBtn');
   if (!callBtn || !chatBtn) return;
 
-  // --- Session handling ---
   function getSessionId() {
     var id = localStorage.getItem('cb_chat_session');
     if (!id) {
@@ -1136,6 +1139,8 @@ initPageScripts();
   var sessionId = getSessionId();
   var renderedIds = {};
   var pollTimer = null;
+  var mediaRecorder = null;
+  var recordedChunks = [];
 
   function closeAll() {
     contactPanel.classList.add('hidden');
@@ -1173,20 +1178,33 @@ initPageScripts();
     if (widget && !widget.contains(e.target)) closeAll();
   });
 
-  function addBubble(sender, text) {
+  function attachmentHtml(m) {
+    if (!m.attachment_url) return '';
+    if (m.attachment_type === 'image') {
+      return '<a href="' + m.attachment_url + '" target="_blank" rel="noopener"><img src="' + m.attachment_url + '" style="max-width:180px;border-radius:12px;margin-top:6px;display:block;"></a>';
+    }
+    if (m.attachment_type === 'audio') {
+      return '<audio controls src="' + m.attachment_url + '" style="margin-top:6px;max-width:200px;height:36px;"></audio>';
+    }
+    var name = (m.attachment_name || 'Download file').replace(/</g, '&lt;');
+    return '<a href="' + m.attachment_url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;margin-top:6px;background:rgba(0,0,0,0.05);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;text-decoration:underline;">📎 ' + name + '</a>';
+  }
+
+  function addBubble(sender, text, attachment) {
     var el = document.createElement('div');
     el.className = sender === 'user' ? 'fab-user-bubble' : 'fab-chat-bubble';
-    el.textContent = text;
+    var safeText = document.createElement('div');
+    safeText.textContent = text || '';
+    el.innerHTML = safeText.innerHTML + attachmentHtml(attachment || {});
     chatMessages.appendChild(el);
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // Render any message from the server we haven't shown yet (used by both initial load and polling)
   function renderNewMessages(list) {
     (list || []).forEach(function (m) {
       if (renderedIds[m.id]) return;
       renderedIds[m.id] = true;
-      addBubble(m.sender, m.message);
+      addBubble(m.sender, m.message, m);
     });
   }
 
@@ -1209,16 +1227,16 @@ initPageScripts();
     pollTimer = null;
   }
 
-  async function sendMessage(text) {
-    if (!text || !text.trim()) return;
-    addBubble('user', text);
+  async function sendMessage(text, attachment) {
+    attachment = attachment || {};
+    if (!text && !attachment.attachment_url) return;
+    addBubble('user', text, attachment);
     try {
-      var res = await fetch('/api/chat/send', {
+      await fetch('/api/chat/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId, message: text }),
+        body: JSON.stringify(Object.assign({ session_id: sessionId, message: text || '' }, attachment)),
       });
-      var data = await res.json();
     } catch (err) {
       // still shown locally even if send fails
     }
@@ -1249,5 +1267,57 @@ initPageScripts();
     if (!msg) return;
     chatInput.value = '';
     await sendMessage(msg);
+  });
+
+  // --- Attachment upload ---
+  chatAttachBtn?.addEventListener('click', function () { chatFileInput.click(); });
+  chatFileInput?.addEventListener('change', async function (e) {
+    var file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    var fd = new FormData();
+    fd.append('file', file);
+    try {
+      var res = await fetch('/api/chat/upload', { method: 'POST', body: fd });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      await sendMessage('', { attachment_url: data.url, attachment_type: data.type, attachment_name: data.name });
+    } catch (err) {
+      addBubble('admin', "Sorry, that file couldn't be uploaded. Please try a smaller file.");
+    }
+  });
+
+  // --- Voice recording ---
+  chatMicBtn?.addEventListener('click', async function () {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      return;
+    }
+    try {
+      var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = function (e) { if (e.data.size > 0) recordedChunks.push(e.data); };
+      mediaRecorder.onstop = async function () {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        chatMicBtn.style.color = '';
+        var blob = new Blob(recordedChunks, { type: 'audio/webm' });
+        if (blob.size === 0) return;
+        var fd = new FormData();
+        fd.append('file', blob, 'voice-message.webm');
+        try {
+          var res = await fetch('/api/chat/upload', { method: 'POST', body: fd });
+          var data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Upload failed');
+          await sendMessage('', { attachment_url: data.url, attachment_type: 'audio', attachment_name: 'Voice message' });
+        } catch (err) {
+          addBubble('admin', "Sorry, that voice message couldn't be sent.");
+        }
+      };
+      mediaRecorder.start();
+      chatMicBtn.style.color = '#e12d38';
+    } catch (err) {
+      addBubble('admin', "We couldn't access your microphone. Please check your browser permissions.");
+    }
   });
 })();

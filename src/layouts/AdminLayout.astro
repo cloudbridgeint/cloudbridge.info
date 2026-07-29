@@ -79,6 +79,7 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
   </style>
 </head>
 <body class="app-canvas">
+  <audio id="chatNotifySound" src="/sounds/notify.wav" preload="auto"></audio>
   <div class="relative z-10 h-screen box-border">
     <div class="flex bg-white overflow-hidden h-full">
 
@@ -155,12 +156,12 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
           </button>
 
-          <button class="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-500 transition">
+          <a href="/cbc-admin/messages" id="topbarMsgBtn" class="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-500 transition relative">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/></svg>
-          </button>
+            <span id="topbarMsgBadge" class="hidden absolute -top-1 -right-1 min-w-[16px] h-[16px] px-[3px] rounded-full bg-sunrise-600 ring-2 ring-white text-[9px] leading-[16px] text-white text-center font-bold"></span>
+          </a>
           <button class="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-500 transition relative">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-sunrise-600 ring-2 ring-white"></span>
           </button>
 
           <div class="flex items-center gap-2.5 pl-3 md:pl-4 border-l border-slate-100">
@@ -223,6 +224,41 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
       return data;
     }
     window.apiFetch = apiFetch;
+
+    // Global new-message notification (sound + badge), active on every admin page
+    (function () {
+      let lastSeenMsgId = null;
+      const sound = document.getElementById('chatNotifySound');
+      const badge = document.getElementById('topbarMsgBadge');
+
+      async function checkUnread() {
+        try {
+          const data = await apiFetch('/api/chat/unread');
+          if (badge) {
+            if (data.unread > 0) {
+              badge.textContent = data.unread > 9 ? '9+' : String(data.unread);
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
+          }
+          if (lastSeenMsgId === null) {
+            // First check after page load: just record the baseline, don't ding for old messages
+            lastSeenMsgId = data.latest_user_message_id;
+            return;
+          }
+          if (data.latest_user_message_id > lastSeenMsgId) {
+            lastSeenMsgId = data.latest_user_message_id;
+            sound?.play().catch(() => {});
+          }
+        } catch (err) {
+          // best-effort; ignore if not authenticated or offline
+        }
+      }
+
+      checkUnread();
+      setInterval(checkUnread, 6000);
+    })();
   </script>
 </body>
 </html>

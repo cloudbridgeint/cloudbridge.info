@@ -12,14 +12,23 @@ const formMessages = results as any[];
   <h1 class="text-2xl font-bold text-bridge-950 mb-1">Messages</h1>
   <p class="text-slate-500 text-sm mb-6">Live chat with visitors from the site widget, plus messages submitted through contact forms.</p>
 
-  <!-- Live chat -->
+  <!-- Live chat (messenger-style) -->
   <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden mb-8">
-    <div class="flex h-[560px]">
+    <div class="flex h-[600px]">
+
       <!-- Conversation list -->
-      <div class="w-64 sm:w-72 shrink-0 border-r border-slate-100 flex flex-col">
-        <div class="px-4 py-3 border-b border-slate-100 shrink-0">
-          <p class="font-semibold text-bridge-950 text-sm">Live Chat</p>
-          <p class="text-xs text-slate-400">Conversations from the site widget</p>
+      <div class="w-72 sm:w-80 shrink-0 border-r border-slate-100 flex flex-col bg-white/60">
+        <div class="p-3 border-b border-slate-100 shrink-0">
+          <div class="relative">
+            <input id="chatSearch" type="text" placeholder="Search"
+              class="w-full bg-slate-100 border border-transparent rounded-full pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <div class="flex items-center gap-1 mt-2.5">
+            <button type="button" data-filter="all" class="chat-filter-tab active">All</button>
+            <button type="button" data-filter="unread" class="chat-filter-tab">Unread</button>
+            <button type="button" data-filter="archived" class="chat-filter-tab">Archive</button>
+          </div>
         </div>
         <div id="sessionList" class="flex-1 overflow-y-auto">
           <p class="text-slate-400 text-xs p-4">Loading…</p>
@@ -27,16 +36,31 @@ const formMessages = results as any[];
       </div>
 
       <!-- Thread -->
-      <div class="flex-1 min-w-0 flex flex-col">
-        <div id="threadHeader" class="px-4 py-3 border-b border-slate-100 shrink-0">
-          <p class="font-semibold text-bridge-950 text-sm">Select a conversation</p>
-          <p class="text-xs text-slate-400">No conversation selected</p>
+      <div class="flex-1 min-w-0 flex flex-col bg-slate-50">
+        <div id="threadHeader" class="flex items-center justify-between px-4 py-3 border-b border-slate-100 shrink-0 bg-white">
+          <div class="flex items-center gap-3">
+            <div id="threadAvatar" class="w-9 h-9 rounded-full bg-iris-500 flex items-center justify-center text-white text-xs font-bold shrink-0">·</div>
+            <div>
+              <p id="threadName" class="font-semibold text-bridge-950 text-sm">Select a conversation</p>
+              <p id="threadSub" class="text-xs text-slate-400">No conversation selected</p>
+            </div>
+          </div>
+          <button id="archiveBtn" type="button" disabled class="text-xs font-semibold text-slate-400 hover:text-sunrise-600 disabled:opacity-40 disabled:pointer-events-none px-3 py-1.5 rounded-full hover:bg-slate-50 transition">Archive</button>
         </div>
-        <div id="threadMessages" class="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-slate-50">
+
+        <div id="threadMessages" class="flex-1 overflow-y-auto px-4 py-4 space-y-2.5">
           <p class="text-slate-400 text-sm text-center mt-10">Pick a conversation on the left to view messages.</p>
         </div>
+
         <form id="replyForm" class="flex items-center gap-2 px-3 py-3 border-t border-slate-100 shrink-0 bg-white">
-          <input id="replyInput" type="text" placeholder="Write a reply…" disabled
+          <input id="replyFileInput" type="file" class="hidden" accept="image/*,audio/*,.pdf,.doc,.docx">
+          <button type="button" id="replyAttachBtn" disabled class="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-iris-600 hover:bg-slate-100 transition shrink-0 disabled:opacity-40" aria-label="Attach file">
+            <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+          </button>
+          <button type="button" id="replyMicBtn" disabled class="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-iris-600 hover:bg-slate-100 transition shrink-0 disabled:opacity-40" aria-label="Record voice message">
+            <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+          </button>
+          <input id="replyInput" type="text" placeholder="Type your message here" disabled
             class="flex-1 min-w-0 rounded-full bg-slate-100 border border-transparent px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition disabled:opacity-50">
           <button type="submit" disabled id="replySendBtn"
             class="w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0 transition hover:brightness-110 bg-iris-600 disabled:opacity-50" aria-label="Send">
@@ -70,11 +94,32 @@ const formMessages = results as any[];
   </div>
 </AdminLayout>
 
+<style>
+  .chat-filter-tab { font-size: 12px; font-weight: 600; color: #94a3b8; padding: 4px 12px; border-radius: 9999px; transition: .15s; }
+  .chat-filter-tab:hover { background: #f1f5f9; }
+  .chat-filter-tab.active { background: #eef0fd; color: #4d51b0; }
+</style>
+
 <script is:inline>
   let sessions = [];
   let activeSessionId = null;
   let renderedIds = {};
-  let pollTimer = null;
+  let currentFilter = 'all';
+  let searchTerm = '';
+  let mediaRecorder = null;
+  let recordedChunks = [];
+
+  const avatarPalette = ['bg-iris-500','bg-sunrise-500','bg-emerald-500','bg-amber-500','bg-sky-500','bg-pink-500'];
+  function avatarColor(id) {
+    let h = 0;
+    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+    return avatarPalette[h % avatarPalette.length];
+  }
+  function initials(s) {
+    const label = (s || '').trim();
+    if (!label) return '?';
+    return label.slice(0, 2).toUpperCase();
+  }
 
   function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
   function timeAgo(iso) {
@@ -87,26 +132,41 @@ const formMessages = results as any[];
     if (hrs < 24) return hrs + 'h ago';
     return Math.round(hrs / 24) + 'd ago';
   }
-
   function sessionLabel(s) {
     return s.name || s.email || s.phone || ('Visitor ' + s.session_id.slice(0, 6));
   }
 
+  function filteredSessions() {
+    return sessions.filter(s => {
+      if (currentFilter === 'unread' && !s.unread_admin) return false;
+      if (currentFilter === 'archived' && s.status !== 'archived') return false;
+      if (currentFilter !== 'archived' && s.status === 'archived') return false;
+      if (searchTerm && !sessionLabel(s).toLowerCase().includes(searchTerm.toLowerCase())) return false;
+      return true;
+    });
+  }
+
   function renderSessionList() {
     const el = document.getElementById('sessionList');
-    if (sessions.length === 0) {
-      el.innerHTML = '<p class="text-slate-400 text-xs p-4">No conversations yet — they will appear here once a visitor uses the chat widget.</p>';
+    const list = filteredSessions();
+    if (list.length === 0) {
+      el.innerHTML = '<p class="text-slate-400 text-xs p-4">No conversations here yet.</p>';
       return;
     }
-    el.innerHTML = sessions.map(s => `
+    el.innerHTML = list.map(s => `
       <button type="button" data-session="${s.session_id}"
-        class="session-item w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-slate-50 transition ${s.session_id === activeSessionId ? 'bg-iris-50' : ''}">
-        <div class="flex items-center justify-between gap-2">
-          <p class="text-sm font-semibold text-bridge-950 truncate">${escapeHtml(sessionLabel(s))}</p>
-          ${s.unread_admin ? '<span class="w-2 h-2 rounded-full bg-sunrise-600 shrink-0"></span>' : ''}
+        class="session-item w-full text-left px-3 py-3 border-b border-slate-50 hover:bg-slate-50 transition flex items-center gap-3 ${s.session_id === activeSessionId ? 'bg-iris-50' : ''}">
+        <div class="w-10 h-10 rounded-full ${avatarColor(s.session_id)} flex items-center justify-center text-white text-xs font-bold shrink-0">${initials(sessionLabel(s))}</div>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-sm font-semibold text-bridge-950 truncate">${escapeHtml(sessionLabel(s))}</p>
+            <span class="text-[10px] text-slate-300 shrink-0">${timeAgo(s.updated_at)}</span>
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-xs text-slate-400 truncate">${s.last_sender === 'admin' ? 'You: ' : ''}${escapeHtml(s.last_message || '')}</p>
+            ${s.unread_admin ? '<span class="w-2 h-2 rounded-full bg-sunrise-600 shrink-0"></span>' : ''}
+          </div>
         </div>
-        <p class="text-xs text-slate-400 truncate mt-0.5">${s.last_sender === 'admin' ? 'You: ' : ''}${escapeHtml(s.last_message || '')}</p>
-        <p class="text-[11px] text-slate-300 mt-0.5">${timeAgo(s.updated_at)}</p>
       </button>
     `).join('');
 
@@ -115,28 +175,49 @@ const formMessages = results as any[];
     });
   }
 
+  document.querySelectorAll('.chat-filter-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      currentFilter = tab.getAttribute('data-filter');
+      document.querySelectorAll('.chat-filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      renderSessionList();
+    });
+  });
+  document.getElementById('chatSearch').addEventListener('input', (e) => {
+    searchTerm = e.target.value;
+    renderSessionList();
+  });
+
   async function loadSessions() {
     try {
       const data = await apiFetch('/api/chat/sessions');
       sessions = data.sessions || [];
       renderSessionList();
-    } catch (err) {
-      // best-effort
-    }
+    } catch (err) { /* best-effort */ }
   }
 
-  function addBubble(sender, text, when) {
+  function attachmentHtml(m) {
+    if (!m.attachment_url) return '';
+    if (m.attachment_type === 'image') {
+      return `<a href="${m.attachment_url}" target="_blank" rel="noopener"><img src="${m.attachment_url}" class="max-w-[220px] rounded-xl mt-1.5 block"></a>`;
+    }
+    if (m.attachment_type === 'audio') {
+      return `<audio controls src="${m.attachment_url}" class="mt-1.5 max-w-[220px] h-9"></audio>`;
+    }
+    return `<a href="${m.attachment_url}" target="_blank" rel="noopener" class="flex items-center gap-2 mt-1.5 bg-black/5 rounded-lg px-3 py-2 text-xs font-medium underline">📎 ${escapeHtml(m.attachment_name || 'Download file')}</a>`;
+  }
+
+  function addBubble(m) {
     const wrap = document.getElementById('threadMessages');
     const empty = wrap.querySelector('.text-center');
     if (empty) empty.remove();
     const div = document.createElement('div');
-    if (sender === 'user') {
-      div.className = 'bg-white rounded-2xl rounded-tl-sm shadow-sm px-4 py-2.5 text-sm text-bridge-900 max-w-[80%] leading-relaxed';
-    } else {
-      div.className = 'ml-auto rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white max-w-[80%] leading-relaxed';
-      div.style.backgroundImage = 'linear-gradient(90deg,#4d51b0,#3f4293)';
-    }
-    div.textContent = text;
+    const isUser = m.sender === 'user';
+    div.className = isUser
+      ? 'bg-white rounded-2xl rounded-tl-sm shadow-sm px-4 py-2.5 text-sm text-bridge-900 max-w-[75%] leading-relaxed'
+      : 'ml-auto rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white max-w-[75%] leading-relaxed';
+    if (!isUser) div.style.backgroundImage = 'linear-gradient(90deg,#4d51b0,#3f4293)';
+    div.innerHTML = (m.message ? escapeHtml(m.message) : '') + attachmentHtml(m);
     wrap.appendChild(div);
     wrap.scrollTop = wrap.scrollHeight;
   }
@@ -147,22 +228,22 @@ const formMessages = results as any[];
     renderSessionList();
 
     document.getElementById('threadMessages').innerHTML = '<p class="text-slate-400 text-sm text-center mt-10">Loading…</p>';
-    document.getElementById('replyInput').disabled = false;
-    document.getElementById('replySendBtn').disabled = false;
+    ['replyInput','replySendBtn','replyAttachBtn','replyMicBtn','archiveBtn'].forEach(id => document.getElementById(id).disabled = false);
 
     try {
       const data = await apiFetch('/api/chat/thread?session_id=' + encodeURIComponent(sessionId));
       const s = data.session || {};
-      document.getElementById('threadHeader').innerHTML = `
-        <p class="font-semibold text-bridge-950 text-sm">${escapeHtml(sessionLabel(s))}</p>
-        <p class="text-xs text-slate-400">${escapeHtml(s.email || '')} ${s.phone ? '· ' + escapeHtml(s.phone) : ''} ${s.source_page ? '· via ' + escapeHtml(s.source_page) : ''}</p>
-      `;
+      document.getElementById('threadAvatar').className = `w-9 h-9 rounded-full ${avatarColor(sessionId)} flex items-center justify-center text-white text-xs font-bold shrink-0`;
+      document.getElementById('threadAvatar').textContent = initials(sessionLabel(s));
+      document.getElementById('threadName').textContent = sessionLabel(s);
+      document.getElementById('threadSub').textContent = [s.email, s.phone, s.source_page ? ('via ' + s.source_page) : ''].filter(Boolean).join(' · ') || 'Site visitor';
+      document.getElementById('archiveBtn').textContent = s.status === 'archived' ? 'Unarchive' : 'Archive';
+
       document.getElementById('threadMessages').innerHTML = '';
-      (data.messages || []).forEach(m => { renderedIds[m.id] = true; addBubble(m.sender, m.message); });
+      (data.messages || []).forEach(m => { renderedIds[m.id] = true; addBubble(m); });
     } catch (err) {
       document.getElementById('threadMessages').innerHTML = '<p class="text-slate-400 text-sm text-center mt-10">Could not load this conversation.</p>';
     }
-
     loadSessions();
   }
 
@@ -173,31 +254,106 @@ const formMessages = results as any[];
       (data.messages || []).forEach(m => {
         if (renderedIds[m.id]) return;
         renderedIds[m.id] = true;
-        addBubble(m.sender, m.message);
+        addBubble(m);
+      });
+    } catch (err) { /* best-effort */ }
+  }
+
+  async function sendReply({ message, attachment_url, attachment_type, attachment_name }) {
+    if (!activeSessionId) return;
+    addBubble({ sender: 'admin', message: message || '', attachment_url, attachment_type, attachment_name });
+    try {
+      await apiFetch('/api/chat/reply', {
+        method: 'POST',
+        body: JSON.stringify({ session_id: activeSessionId, message: message || '', attachment_url, attachment_type, attachment_name }),
       });
     } catch (err) {
-      // best-effort
+      showToast('Could not send reply', 'error');
     }
+    loadSessions();
   }
 
   document.getElementById('replyForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const input = document.getElementById('replyInput');
     const msg = input.value.trim();
-    if (!msg || !activeSessionId) return;
+    if (!msg) return;
     input.value = '';
-    addBubble('admin', msg);
+    await sendReply({ message: msg });
+  });
+
+  document.getElementById('archiveBtn').addEventListener('click', async () => {
+    if (!activeSessionId) return;
+    const btn = document.getElementById('archiveBtn');
+    const archiving = btn.textContent === 'Archive';
     try {
-      await apiFetch('/api/chat/reply', {
+      await apiFetch('/api/chat/archive', {
         method: 'POST',
-        body: JSON.stringify({ session_id: activeSessionId, message: msg }),
+        body: JSON.stringify({ session_id: activeSessionId, status: archiving ? 'archived' : 'open' }),
       });
+      btn.textContent = archiving ? 'Unarchive' : 'Archive';
+      showToast(archiving ? 'Conversation archived' : 'Conversation restored');
+      loadSessions();
     } catch (err) {
-      showToast('Could not send reply', 'error');
+      showToast('Could not update conversation', 'error');
     }
-    loadSessions();
+  });
+
+  // --- Attachment upload ---
+  document.getElementById('replyAttachBtn').addEventListener('click', () => {
+    document.getElementById('replyFileInput').click();
+  });
+  document.getElementById('replyFileInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file || !activeSessionId) return;
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const res = await fetch('/api/chat/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      await sendReply({ message: '', attachment_url: data.url, attachment_type: data.type, attachment_name: data.name });
+    } catch (err) {
+      showToast('Could not upload file', 'error');
+    }
+  });
+
+  // --- Voice recording ---
+  const micBtn = document.getElementById('replyMicBtn');
+  micBtn.addEventListener('click', async () => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        micBtn.classList.remove('text-sunrise-600', 'bg-sunrise-50');
+        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+        if (blob.size === 0 || !activeSessionId) return;
+        const fd = new FormData();
+        fd.append('file', blob, 'voice-message.webm');
+        try {
+          const res = await fetch('/api/chat/upload', { method: 'POST', body: fd });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Upload failed');
+          await sendReply({ message: '', attachment_url: data.url, attachment_type: 'audio', attachment_name: 'Voice message' });
+        } catch (err) {
+          showToast('Could not send voice message', 'error');
+        }
+      };
+      mediaRecorder.start();
+      micBtn.classList.add('text-sunrise-600', 'bg-sunrise-50');
+    } catch (err) {
+      showToast('Microphone access denied', 'error');
+    }
   });
 
   loadSessions();
-  pollTimer = setInterval(() => { loadSessions(); pollActiveThread(); }, 4000);
+  setInterval(() => { loadSessions(); pollActiveThread(); }, 4000);
 </script>

@@ -10,7 +10,7 @@ export const GET: APIRoute = async (context) => {
   }
 
   const { results } = await db.prepare(
-    'SELECT id, sender, message, created_at FROM chat_messages WHERE session_id = ? ORDER BY id ASC LIMIT 200'
+    'SELECT id, sender, message, attachment_url, attachment_type, attachment_name, created_at FROM chat_messages WHERE session_id = ? ORDER BY id ASC LIMIT 200'
   ).bind(sessionId).all();
 
   // Viewing clears the "admin replied, user hasn't seen" flag
