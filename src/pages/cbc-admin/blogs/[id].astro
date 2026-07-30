@@ -93,7 +93,7 @@ function resolveImg(url: string | null) {
           <div id="heroDropzoneEmpty" class={`${post.hero_image ? 'hidden' : ''} text-slate-400 px-4 pointer-events-none`}>
             <svg class="w-8 h-8 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 8h.01M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>
             <p class="text-xs font-medium">Click or drag an image here</p>
-            <p class="text-[11px] text-slate-400 mt-0.5">PNG or JPG</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">PNG or JPG, up to ~1.4MB</p>
           </div>
           <button type="button" id="heroRemoveBtn" class={`${post.hero_image ? '' : 'hidden'} absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition`}>
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
@@ -172,8 +172,9 @@ function resolveImg(url: string | null) {
       const fd = new FormData();
       fd.append('file', file);
       const res = await fetch('/api/media', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      let data = {};
+      try { data = await res.json(); } catch { /* empty/non-JSON body, fall through to generic error below */ }
+      if (!res.ok) throw new Error(data.error || `Upload failed (server error ${res.status})`);
       return data;
     }
 
