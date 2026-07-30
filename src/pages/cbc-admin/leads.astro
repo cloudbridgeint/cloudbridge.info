@@ -118,7 +118,7 @@ function timeOnly(ts: string) {
   </div>
 
   <!-- Advance View modal -->
-  <div id="advanceModal" class="hidden fixed inset-0 bg-bridge-950/50 backdrop-blur-sm z-50 flex items-center justify-center px-4 py-8 overflow-y-auto">
+  <div id="advanceModal" class="hidden fixed inset-0 bg-bridge-950/25 backdrop-blur-sm z-50 flex items-center justify-center px-4 py-8 overflow-y-auto">
     <div class="advance-modal-panel relative w-full max-w-3xl my-auto overflow-hidden rounded-3xl">
       <!-- colorful glow blobs behind the glass -->
       <div class="advance-glow advance-glow-1"></div>
@@ -165,11 +165,11 @@ function timeOnly(ts: string) {
 
   /* Glassmorphism panel for the Advance View modal */
   .advance-modal-panel {
-    background: linear-gradient(160deg, rgba(255,255,255,0.55), rgba(255,255,255,0.35));
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.5);
-    box-shadow: 0 25px 60px -15px rgba(15,28,48,0.45), inset 0 1px 0 rgba(255,255,255,0.6);
+    background: linear-gradient(160deg, rgba(255,255,255,0.85), rgba(255,255,255,0.7));
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid rgba(255,255,255,0.6);
+    box-shadow: 0 25px 60px -15px rgba(15,28,48,0.25), inset 0 1px 0 rgba(255,255,255,0.7);
   }
   .advance-modal-header {
     background: linear-gradient(120deg, #4d51b0 0%, #5b5fc7 45%, #c0201f 130%);
@@ -181,14 +181,14 @@ function timeOnly(ts: string) {
   .advance-glow {
     position: absolute;
     border-radius: 9999px;
-    filter: blur(60px);
-    opacity: 0.55;
+    filter: blur(70px);
+    opacity: 0.25;
     z-index: 0;
     pointer-events: none;
   }
   .advance-glow-1 { width: 260px; height: 260px; top: -80px; left: -60px; background: #8286e2; }
-  .advance-glow-2 { width: 220px; height: 220px; bottom: -70px; right: -50px; background: #c0201f; }
-  .advance-glow-3 { width: 200px; height: 200px; bottom: 40%; right: 20%; background: #5eead4; opacity: 0.35; }
+  .advance-glow-2 { width: 220px; height: 220px; bottom: -70px; right: -50px; background: #e08a8a; opacity: 0.2; }
+  .advance-glow-3 { width: 200px; height: 200px; bottom: 40%; right: 20%; background: #5eead4; opacity: 0.18; }
 </style>
 
 <script is:inline>
