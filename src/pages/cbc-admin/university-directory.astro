@@ -1,0 +1,283 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+---
+<AdminLayout title="University & Colleges" active="university-directory">
+  <div class="flex items-center justify-between gap-4 flex-wrap">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">University & Colleges</h1>
+      <p class="text-slate-500 mt-1 text-sm">Add, edit, or remove the entries shown on the public University & College directory page.</p>
+    </div>
+    <button id="addBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition shrink-0">+ Add University</button>
+  </div>
+
+  <div class="mt-6 card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-wrap gap-3">
+      <p class="font-semibold text-bridge-950 text-sm">All Entries <span id="uniCount" class="text-slate-400 font-normal"></span></p>
+      <div class="relative">
+        <input id="uniSearch" type="text" placeholder="Search universities"
+          class="w-56 bg-slate-50 border border-transparent rounded-full pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-xs text-slate-500 border-b border-slate-100 bg-slate-50/50">
+            <th class="px-5 py-3 font-medium whitespace-nowrap">University</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Country</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">City</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Fee Range</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Ranking</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Scholarship</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap"></th>
+          </tr>
+        </thead>
+        <tbody id="uniTableBody"></tbody>
+      </table>
+      <p id="uniEmpty" class="hidden text-slate-400 text-sm p-8 text-center">No entries yet. Click "+ Add University" to get started.</p>
+    </div>
+  </div>
+
+  <!-- Add/Edit modal -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/40 z-40 flex items-center justify-center px-4 py-8 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-auto p-6 max-h-[90vh] overflow-y-auto">
+      <h3 id="modalTitle" class="font-bold text-lg text-slate-900 mb-4">Add University</h3>
+      <input type="hidden" id="editId">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">University name</label>
+          <input id="fName" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. Aston University">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Country</label>
+          <input id="fCountry" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. UK">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">City</label>
+          <input id="fCity" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Tuition Fee — Min ($/yr)</label>
+          <input id="fFeeMin" type="number" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Tuition Fee — Max ($/yr)</label>
+          <input id="fFeeMax" type="number" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Ranking</label>
+          <input id="fRanking" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. 423 or Not Ranked">
+        </div>
+        <div class="flex items-end pb-2">
+          <label class="flex items-center gap-2 text-sm text-slate-700">
+            <input id="fScholarship" type="checkbox" class="rounded border-slate-300">
+            Scholarship available
+          </label>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Intake months <span class="text-slate-400 font-normal">(comma separated)</span></label>
+          <input id="fIntake" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="September, January">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Intake years <span class="text-slate-400 font-normal">(comma separated)</span></label>
+          <input id="fIntakeYear" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="2026, 2027">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Faculties <span class="text-slate-400 font-normal">(comma separated)</span></label>
+          <input id="fFaculty" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Business, Engineering">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Study levels <span class="text-slate-400 font-normal">(comma separated)</span></label>
+          <input id="fStudyLevel" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Undergraduate, Postgraduate">
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Logo</label>
+          <div class="flex items-center gap-3">
+            <input type="file" id="fLogoFile" accept="image/*" class="text-sm flex-1">
+            <img id="fLogoPreview" class="hidden h-12 w-12 object-contain border rounded-lg p-1 shrink-0">
+          </div>
+          <input type="hidden" id="fLogoUrl">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Cover image <span class="text-slate-400 font-normal">(2nd image)</span></label>
+          <div class="flex items-center gap-3">
+            <input type="file" id="fCoverFile" accept="image/*" class="text-sm flex-1">
+            <img id="fCoverPreview" class="hidden h-12 w-12 object-cover border rounded-lg shrink-0">
+          </div>
+          <input type="hidden" id="fCoverUrl">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 mt-6">
+        <button id="cancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Cancel</button>
+        <button id="saveBtn" class="px-4 py-2 text-sm rounded-lg bg-bridge-700 hover:bg-bridge-800 text-white font-semibold">Save</button>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script is:inline>
+  let allUnis = [];
+
+  function resolveImg(url, fallback) {
+    if (!url) return fallback || '/assets/logo.png';
+    if (url.startsWith('media:')) return `/api/media/${url.slice(6)}`;
+    return url;
+  }
+  function escapeHtml(s) {
+    const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML;
+  }
+
+  async function load() {
+    allUnis = await apiFetch('/api/university-directory');
+    render();
+  }
+
+  function render() {
+    const q = (document.getElementById('uniSearch').value || '').toLowerCase();
+    const rows = allUnis.filter(u =>
+      !q || `${u.name} ${u.country} ${u.city}`.toLowerCase().includes(q)
+    );
+    document.getElementById('uniCount').textContent = `(${allUnis.length})`;
+    const body = document.getElementById('uniTableBody');
+    body.innerHTML = rows.map(u => `
+      <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition">
+        <td class="px-5 py-3 font-semibold text-bridge-950 whitespace-nowrap flex items-center gap-2">
+          <img src="${resolveImg(u.logo)}" class="w-7 h-7 object-contain rounded border border-slate-100 shrink-0">
+          ${escapeHtml(u.name)}
+        </td>
+        <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(u.country)}</td>
+        <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(u.city)}</td>
+        <td class="px-5 py-3 text-slate-600 whitespace-nowrap">$${Number(u.fee_min||0).toLocaleString()}–$${Number(u.fee_max||0).toLocaleString()}</td>
+        <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(u.ranking)}</td>
+        <td class="px-5 py-3 whitespace-nowrap">${u.scholarship ? '<span class="text-emerald-600 font-medium text-xs">Yes</span>' : '<span class="text-slate-400 text-xs">No</span>'}</td>
+        <td class="px-5 py-3 whitespace-nowrap">
+          <button class="text-xs font-semibold text-iris-700 hover:underline" onclick="editUni(${u.id})">Edit</button>
+          <button class="text-xs font-semibold text-red-600 hover:underline ml-3" onclick="deleteUni(${u.id})">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+    document.getElementById('uniEmpty').classList.toggle('hidden', allUnis.length > 0);
+  }
+
+  document.getElementById('uniSearch').addEventListener('input', render);
+
+  window.editUni = (id) => {
+    const u = allUnis.find(x => x.id === id);
+    if (!u) return;
+    document.getElementById('modalTitle').textContent = 'Edit University';
+    document.getElementById('editId').value = u.id;
+    document.getElementById('fName').value = u.name || '';
+    document.getElementById('fCountry').value = u.country || '';
+    document.getElementById('fCity').value = u.city || '';
+    document.getElementById('fFeeMin').value = u.fee_min || 0;
+    document.getElementById('fFeeMax').value = u.fee_max || 0;
+    document.getElementById('fRanking').value = u.ranking || '';
+    document.getElementById('fScholarship').checked = !!u.scholarship;
+    document.getElementById('fIntake').value = u.intake || '';
+    document.getElementById('fIntakeYear').value = u.intake_year || '';
+    document.getElementById('fFaculty').value = u.faculty || '';
+    document.getElementById('fStudyLevel').value = u.study_level || '';
+    document.getElementById('fLogoUrl').value = u.logo || '';
+    document.getElementById('fCoverUrl').value = u.cover_image || '';
+    const logoPreview = document.getElementById('fLogoPreview');
+    if (u.logo) { logoPreview.src = resolveImg(u.logo); logoPreview.classList.remove('hidden'); }
+    else { logoPreview.classList.add('hidden'); }
+    const coverPreview = document.getElementById('fCoverPreview');
+    if (u.cover_image) { coverPreview.src = resolveImg(u.cover_image); coverPreview.classList.remove('hidden'); }
+    else { coverPreview.classList.add('hidden'); }
+    document.getElementById('modal').classList.remove('hidden');
+  };
+
+  window.deleteUni = async (id) => {
+    if (!confirm('Delete this university?')) return;
+    try {
+      await apiFetch(`/api/university-directory/${id}`, { method: 'DELETE' });
+      showToast('Deleted');
+      load();
+    } catch (e) { showToast(e.message, 'error'); }
+  };
+
+  document.getElementById('addBtn').addEventListener('click', () => {
+    document.getElementById('modalTitle').textContent = 'Add University';
+    document.getElementById('editId').value = '';
+    ['fName','fCountry','fCity','fRanking','fIntake','fIntakeYear','fFaculty','fStudyLevel','fLogoUrl','fCoverUrl'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fFeeMin').value = 0;
+    document.getElementById('fFeeMax').value = 0;
+    document.getElementById('fScholarship').checked = false;
+    document.getElementById('fLogoFile').value = '';
+    document.getElementById('fCoverFile').value = '';
+    document.getElementById('fLogoPreview').classList.add('hidden');
+    document.getElementById('fCoverPreview').classList.add('hidden');
+    document.getElementById('modal').classList.remove('hidden');
+  });
+  document.getElementById('cancelBtn').addEventListener('click', () => {
+    document.getElementById('modal').classList.add('hidden');
+  });
+
+  async function uploadImage(file) {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/api/media', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    return data;
+  }
+
+  document.getElementById('fLogoFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const data = await uploadImage(file);
+      document.getElementById('fLogoUrl').value = `media:${data.id}`;
+      const preview = document.getElementById('fLogoPreview');
+      preview.src = data.url;
+      preview.classList.remove('hidden');
+    } catch (err) { showToast(err.message, 'error'); }
+  });
+
+  document.getElementById('fCoverFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const data = await uploadImage(file);
+      document.getElementById('fCoverUrl').value = `media:${data.id}`;
+      const preview = document.getElementById('fCoverPreview');
+      preview.src = data.url;
+      preview.classList.remove('hidden');
+    } catch (err) { showToast(err.message, 'error'); }
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const id = document.getElementById('editId').value;
+    const payload = {
+      name: document.getElementById('fName').value.trim(),
+      country: document.getElementById('fCountry').value.trim(),
+      city: document.getElementById('fCity').value.trim(),
+      fee_min: Number(document.getElementById('fFeeMin').value) || 0,
+      fee_max: Number(document.getElementById('fFeeMax').value) || 0,
+      ranking: document.getElementById('fRanking').value.trim(),
+      scholarship: document.getElementById('fScholarship').checked,
+      intake: document.getElementById('fIntake').value.trim(),
+      intake_year: document.getElementById('fIntakeYear').value.trim(),
+      faculty: document.getElementById('fFaculty').value.trim(),
+      study_level: document.getElementById('fStudyLevel').value.trim(),
+      logo: document.getElementById('fLogoUrl').value.trim(),
+      cover_image: document.getElementById('fCoverUrl').value.trim(),
+    };
+    if (!payload.name || !payload.country) { showToast('Name and country are required', 'error'); return; }
+    try {
+      if (id) {
+        await apiFetch(`/api/university-directory/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+      } else {
+        await apiFetch('/api/university-directory', { method: 'POST', body: JSON.stringify(payload) });
+      }
+      showToast('Saved');
+      document.getElementById('modal').classList.add('hidden');
+      load();
+    } catch (e) { showToast(e.message, 'error'); }
+  });
+
+  load();
+</script>

@@ -1,0 +1,241 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+---
+<AdminLayout title="Courses" active="courses">
+  <div class="flex items-center justify-between gap-4 flex-wrap">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Courses</h1>
+      <p class="text-slate-500 mt-1 text-sm">Add, edit, or remove the courses shown on the public Courses page.</p>
+    </div>
+    <button id="addBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition shrink-0">+ Add Course</button>
+  </div>
+
+  <div class="mt-6 card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-wrap gap-3">
+      <p class="font-semibold text-bridge-950 text-sm">All Courses <span id="courseCount" class="text-slate-400 font-normal"></span></p>
+      <div class="relative">
+        <input id="courseSearch" type="text" placeholder="Search courses"
+          class="w-56 bg-slate-50 border border-transparent rounded-full pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-iris-200 focus:bg-white transition">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-xs text-slate-500 border-b border-slate-100 bg-slate-50/50">
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Course</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">University</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Country</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Level</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Subject</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Delivery</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Duration</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap"></th>
+          </tr>
+        </thead>
+        <tbody id="courseTableBody"></tbody>
+      </table>
+      <p id="courseEmpty" class="hidden text-slate-400 text-sm p-8 text-center">No courses yet. Click "+ Add Course" to get started.</p>
+    </div>
+  </div>
+
+  <!-- Add/Edit modal -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/40 z-40 flex items-center justify-center px-4 py-8 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg my-auto p-6">
+      <h3 id="modalTitle" class="font-bold text-lg text-slate-900 mb-4">Add Course</h3>
+      <input type="hidden" id="editId">
+      <div class="grid grid-cols-2 gap-3">
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Course name</label>
+          <input id="fName" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. BSc Computer Science">
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">University</label>
+          <input id="fUniversity" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. Aston University">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Country</label>
+          <input id="fCountry" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. UK">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">City</label>
+          <input id="fCity" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Study Level</label>
+          <select id="fLevel" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+            <option value="Foundation">Foundation</option>
+            <option value="Diploma">Diploma</option>
+            <option value="Undergraduate">Undergraduate</option>
+            <option value="Postgraduate">Postgraduate</option>
+            <option value="PhD">PhD</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Subject</label>
+          <input id="fSubject" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. Computing">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Delivery</label>
+          <select id="fDelivery" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+            <option value="On-Campus">On-Campus</option>
+            <option value="Online">Online</option>
+            <option value="Blended">Blended</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Duration</label>
+          <input id="fDuration" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. 3 Years">
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Logo / Image</label>
+          <div class="flex items-center gap-3">
+            <input type="file" id="fLogoFile" accept="image/*" class="text-sm flex-1">
+            <img id="fLogoPreview" class="hidden h-12 w-12 object-contain border rounded-lg p-1 shrink-0">
+          </div>
+          <input type="hidden" id="fLogoUrl">
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 mt-6">
+        <button id="cancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Cancel</button>
+        <button id="saveBtn" class="px-4 py-2 text-sm rounded-lg bg-bridge-700 hover:bg-bridge-800 text-white font-semibold">Save</button>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script is:inline>
+  let allCourses = [];
+
+  function resolveImg(url) {
+    if (!url) return '/assets/logo.png';
+    if (url.startsWith('media:')) return `/api/media/${url.slice(6)}`;
+    return url;
+  }
+  function escapeHtml(s) {
+    const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML;
+  }
+
+  async function load() {
+    allCourses = await apiFetch('/api/courses');
+    render();
+  }
+
+  function render() {
+    const q = (document.getElementById('courseSearch').value || '').toLowerCase();
+    const rows = allCourses.filter(c =>
+      !q || `${c.name} ${c.university} ${c.subject} ${c.country}`.toLowerCase().includes(q)
+    );
+    document.getElementById('courseCount').textContent = `(${allCourses.length})`;
+    const body = document.getElementById('courseTableBody');
+    body.innerHTML = rows.map(c => `
+      <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition">
+        <td class="px-5 py-3 font-semibold text-bridge-950 whitespace-nowrap flex items-center gap-2">
+          <img src="${resolveImg(c.logo)}" class="w-7 h-7 object-contain rounded border border-slate-100 shrink-0">
+          ${escapeHtml(c.name)}
+        </td>
+        <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(c.university)}</td>
+        <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(c.country)}</td>
+        <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(c.level)}</td>
+        <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(c.subject)}</td>
+        <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(c.delivery)}</td>
+        <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(c.duration)}</td>
+        <td class="px-5 py-3 whitespace-nowrap">
+          <button class="text-xs font-semibold text-iris-700 hover:underline" onclick="editCourse(${c.id})">Edit</button>
+          <button class="text-xs font-semibold text-red-600 hover:underline ml-3" onclick="deleteCourse(${c.id})">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+    document.getElementById('courseEmpty').classList.toggle('hidden', allCourses.length > 0);
+  }
+
+  document.getElementById('courseSearch').addEventListener('input', render);
+
+  window.editCourse = (id) => {
+    const c = allCourses.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('modalTitle').textContent = 'Edit Course';
+    document.getElementById('editId').value = c.id;
+    document.getElementById('fName').value = c.name || '';
+    document.getElementById('fUniversity').value = c.university || '';
+    document.getElementById('fCountry').value = c.country || '';
+    document.getElementById('fCity').value = c.city || '';
+    document.getElementById('fLevel').value = c.level || 'Undergraduate';
+    document.getElementById('fSubject').value = c.subject || '';
+    document.getElementById('fDelivery').value = c.delivery || 'On-Campus';
+    document.getElementById('fDuration').value = c.duration || '';
+    document.getElementById('fLogoUrl').value = c.logo || '';
+    const preview = document.getElementById('fLogoPreview');
+    if (c.logo) { preview.src = resolveImg(c.logo); preview.classList.remove('hidden'); }
+    else { preview.classList.add('hidden'); }
+    document.getElementById('modal').classList.remove('hidden');
+  };
+
+  window.deleteCourse = async (id) => {
+    if (!confirm('Delete this course?')) return;
+    try {
+      await apiFetch(`/api/courses/${id}`, { method: 'DELETE' });
+      showToast('Deleted');
+      load();
+    } catch (e) { showToast(e.message, 'error'); }
+  };
+
+  document.getElementById('addBtn').addEventListener('click', () => {
+    document.getElementById('modalTitle').textContent = 'Add Course';
+    document.getElementById('editId').value = '';
+    ['fName','fUniversity','fCountry','fCity','fSubject','fDuration','fLogoUrl'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fLevel').value = 'Undergraduate';
+    document.getElementById('fDelivery').value = 'On-Campus';
+    document.getElementById('fLogoFile').value = '';
+    document.getElementById('fLogoPreview').classList.add('hidden');
+    document.getElementById('modal').classList.remove('hidden');
+  });
+  document.getElementById('cancelBtn').addEventListener('click', () => {
+    document.getElementById('modal').classList.add('hidden');
+  });
+
+  document.getElementById('fLogoFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const res = await fetch('/api/media', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      document.getElementById('fLogoUrl').value = `media:${data.id}`;
+      const preview = document.getElementById('fLogoPreview');
+      preview.src = data.url;
+      preview.classList.remove('hidden');
+    } catch (err) { showToast(err.message, 'error'); }
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const id = document.getElementById('editId').value;
+    const payload = {
+      name: document.getElementById('fName').value.trim(),
+      university: document.getElementById('fUniversity').value.trim(),
+      country: document.getElementById('fCountry').value.trim(),
+      city: document.getElementById('fCity').value.trim(),
+      level: document.getElementById('fLevel').value,
+      subject: document.getElementById('fSubject').value.trim(),
+      delivery: document.getElementById('fDelivery').value,
+      duration: document.getElementById('fDuration').value.trim(),
+      logo: document.getElementById('fLogoUrl').value.trim(),
+    };
+    if (!payload.name) { showToast('Course name is required', 'error'); return; }
+    try {
+      if (id) {
+        await apiFetch(`/api/courses/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+      } else {
+        await apiFetch('/api/courses', { method: 'POST', body: JSON.stringify(payload) });
+      }
+      showToast('Saved');
+      document.getElementById('modal').classList.add('hidden');
+      load();
+    } catch (e) { showToast(e.message, 'error'); }
+  });
+
+  load();
+</script>

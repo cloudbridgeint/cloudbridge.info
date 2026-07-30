@@ -1,9 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCourses } from '../lib/content';
+export const prerender = false;
 const title = "Courses & Programs | CloudBridge Study Abroad";
 const description = "Browse available courses and programs across partner universities in the UK, Malaysia, and the USA with CloudBridge.";
+const db = (Astro.locals as any).runtime.env.DB;
+const courses = await getCourses(db);
 ---
 <Layout title={title} description={description}>
+<script is:inline set:html={`window.courseDirectory = ${JSON.stringify(courses)};`}></script>
 
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">

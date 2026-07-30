@@ -24,6 +24,33 @@ export function cImage(map: Record<string, string>, key: string, fallback: strin
   return v;
 }
 
+export async function getCourses(db: D1Like) {
+  const { results } = await db.prepare(
+    'SELECT * FROM courses WHERE active = 1 ORDER BY sort_order ASC, id ASC'
+  ).all();
+  return (results as any[]).map(c => ({
+    name: c.name, university: c.university, country: c.country, city: c.city,
+    level: c.level, subject: c.subject, delivery: c.delivery, duration: c.duration,
+    logo: mediaUrl(c.logo, '/assets/logo.png'),
+  }));
+}
+
+export async function getUniversityDirectory(db: D1Like) {
+  const { results } = await db.prepare(
+    'SELECT * FROM university_directory WHERE active = 1 ORDER BY sort_order ASC, id ASC'
+  ).all();
+  const splitCsv = (s: string) => (s || '').split(',').map((x: string) => x.trim()).filter(Boolean);
+  return (results as any[]).map(u => ({
+    name: u.name, country: u.country, city: u.city,
+    feeMin: u.fee_min, feeMax: u.fee_max,
+    intake: splitCsv(u.intake), intakeYear: splitCsv(u.intake_year),
+    scholarship: !!u.scholarship, ranking: u.ranking,
+    faculty: splitCsv(u.faculty), studyLevel: splitCsv(u.study_level),
+    logo: mediaUrl(u.logo, '/assets/logo.png'),
+    coverImage: u.cover_image ? mediaUrl(u.cover_image, '') : '',
+  }));
+}
+
 export async function getUniversities(db: D1Like, country?: string) {
   const stmt = country
     ? db.prepare('SELECT * FROM universities WHERE active = 1 AND country = ? ORDER BY sort_order ASC, id ASC').bind(country)

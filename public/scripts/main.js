@@ -472,7 +472,7 @@ function initUniCarousels() {
    drive a live-filtered grid on the right. All filtering runs
    client-side against the static dataset below.
    ============================================================ */
-const universityDirectory = [
+const universityDirectory = window.universityDirectory || [
   {name:"Aston University", country:"UK", city:"Birmingham", feeMin:13000, feeMax:17000, intake:["September","January"], intakeYear:["2026","2027"], scholarship:true, ranking:"423", faculty:["Business","Engineering","Life Sciences"], studyLevel:["Undergraduate","Postgraduate","PhD"], logo:"/assets/universities/aston.png"},
   {name:"Arden University", country:"UK", city:"Coventry", feeMin:7000, feeMax:9500, intake:["September","January","May"], intakeYear:["2026","2027"], scholarship:true, ranking:"Not Ranked", faculty:["Business","Computing","Law"], studyLevel:["Undergraduate","Postgraduate"], logo:"/assets/universities/arden.png"},
   {name:"Birmingham City University", country:"UK", city:"Birmingham", feeMin:12500, feeMax:16000, intake:["September","January"], intakeYear:["2026","2027"], scholarship:true, ranking:"1001-1200", faculty:["Business","Art & Design","Computing"], studyLevel:["Undergraduate","Postgraduate"], logo:"/assets/universities/bcu.png"},
@@ -527,7 +527,7 @@ const uniFeeBrackets = [0,5000,10000,15000,20000,25000,30000,35000,40000,50000];
 function uniInitials(name) {
   return name.split(' ').filter(w => w[0] === w[0].toUpperCase() && /[A-Za-z]/.test(w[0])).slice(0,2).map(w => w[0]).join('').toUpperCase() || name.slice(0,2).toUpperCase();
 }
-const courseDirectory = [
+const courseDirectory = window.courseDirectory || [
   {name:"BSc Biomedical Science", university:"Aston University", country:"UK", city:"Birmingham", level:"Undergraduate", subject:"Life Sciences", delivery:"On-Campus", duration:"3 Years", logo:"/assets/universities/aston.png"},
   {name:"BA Business Management", university:"Aston University", country:"UK", city:"Birmingham", level:"Undergraduate", subject:"Business", delivery:"On-Campus", duration:"3 Years", logo:"/assets/universities/aston.png"},
   {name:"LLB Law", university:"Arden University", country:"UK", city:"Coventry", level:"Undergraduate", subject:"Law", delivery:"On-Campus", duration:"3 Years", logo:"/assets/universities/arden.png"},

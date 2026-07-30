@@ -1,9 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getUniversityDirectory } from '../lib/content';
+export const prerender = false;
 const title = "Universities & Colleges | CloudBridge Study Abroad";
 const description = "Browse 500+ partner universities and colleges in the UK, Malaysia, and the USA with CloudBridge's study abroad directory.";
+const db = (Astro.locals as any).runtime.env.DB;
+const universities = await getUniversityDirectory(db);
 ---
 <Layout title={title} description={description}>
+<script is:inline set:html={`window.universityDirectory = ${JSON.stringify(universities)};`}></script>
 
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
