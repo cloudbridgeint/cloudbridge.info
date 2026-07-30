@@ -118,32 +118,43 @@ function timeOnly(ts: string) {
   </div>
 
   <!-- Advance View modal -->
-  <div id="advanceModal" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4 py-8 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg my-auto overflow-hidden">
-      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-        <p class="font-semibold text-bridge-950">Lead Details</p>
-        <button type="button" id="advanceModalClose" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 transition">
-          <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <div class="p-6 grid grid-cols-2 gap-x-5 gap-y-3.5 text-sm max-h-[70vh] overflow-y-auto">
-        <div><p class="text-xs text-slate-400">Name</p><p id="mName" class="font-semibold text-bridge-950 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">Phone</p><p id="mPhone" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">Email</p><p id="mEmail" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">Residence</p><p id="mResidence" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">Completed Degree</p><p id="mDegree" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">English Test</p><p id="mEnglish" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">Test Score</p><p id="mScore" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">Subject Interested</p><p id="mSubject" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">Destination</p><p id="mDestination" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">Date</p><p id="mDate" class="font-medium text-slate-700 mt-0.5"></p></div>
+  <div id="advanceModal" class="hidden fixed inset-0 bg-bridge-950/50 backdrop-blur-sm z-50 flex items-center justify-center px-4 py-8 overflow-y-auto">
+    <div class="advance-modal-panel relative w-full max-w-3xl my-auto overflow-hidden rounded-3xl">
+      <!-- colorful glow blobs behind the glass -->
+      <div class="advance-glow advance-glow-1"></div>
+      <div class="advance-glow advance-glow-2"></div>
+      <div class="advance-glow advance-glow-3"></div>
 
-        <div class="col-span-2 mt-1 pt-3 border-t border-slate-100">
-          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Advance Info</p>
+      <div class="relative">
+        <div class="flex items-center justify-between px-8 py-5 advance-modal-header">
+          <div>
+            <p class="font-bold text-white text-[19.5px] leading-tight">Lead Details</p>
+            <p class="text-white/70 text-[13.5px] mt-0.5">Full submission &amp; advance info</p>
+          </div>
+          <button type="button" id="advanceModalClose" class="w-9 h-9 rounded-full flex items-center justify-center text-white/80 hover:bg-white/15 transition">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
         </div>
-        <div><p class="text-xs text-slate-400">Submitted Time</p><p id="mTime" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div><p class="text-xs text-slate-400">Detected Location</p><p id="mLocation" class="font-medium text-slate-700 mt-0.5"></p></div>
-        <div class="col-span-2"><p class="text-xs text-slate-400">IP Address</p><p id="mIp" class="font-medium text-slate-700 mt-0.5 font-mono"></p></div>
+
+        <div class="p-8 grid grid-cols-2 gap-x-6 gap-y-5 text-[15.5px] max-h-[70vh] overflow-y-auto">
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Name</p><p id="mName" class="font-bold text-bridge-950 mt-1"></p></div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Phone</p><p id="mPhone" class="font-semibold text-slate-700 mt-1"></p></div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Email</p><p id="mEmail" class="font-semibold text-slate-700 mt-1 break-all"></p></div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Residence</p><p id="mResidence" class="font-semibold text-slate-700 mt-1"></p></div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Completed Degree</p><p id="mDegree" class="font-semibold text-slate-700 mt-1"></p></div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">English Test</p><p id="mEnglish" class="font-semibold text-slate-700 mt-1"></p></div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Test Score</p><p id="mScore" class="font-semibold text-slate-700 mt-1"></p></div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Subject Interested</p><p id="mSubject" class="font-semibold text-slate-700 mt-1"></p></div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Destination</p><p id="mDestination" class="font-semibold text-slate-700 mt-1"></p></div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Date</p><p id="mDate" class="font-semibold text-slate-700 mt-1"></p></div>
+
+          <div class="col-span-2 mt-2 pt-4 border-t border-white/40">
+            <p class="text-[13px] font-bold advance-info-tag uppercase tracking-wider inline-block px-3 py-1 rounded-full">Advance Info</p>
+          </div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Submitted Time</p><p id="mTime" class="font-semibold text-slate-700 mt-1"></p></div>
+          <div><p class="text-[13.5px] text-bridge-900/50 font-medium">Detected Location</p><p id="mLocation" class="font-semibold text-slate-700 mt-1"></p></div>
+          <div class="col-span-2"><p class="text-[13.5px] text-bridge-900/50 font-medium">IP Address</p><p id="mIp" class="font-semibold text-slate-700 mt-1 font-mono text-[15px]"></p></div>
+        </div>
       </div>
     </div>
   </div>
@@ -151,6 +162,33 @@ function timeOnly(ts: string) {
 
 <style>
   .advance-view-btn { white-space: nowrap; }
+
+  /* Glassmorphism panel for the Advance View modal */
+  .advance-modal-panel {
+    background: linear-gradient(160deg, rgba(255,255,255,0.55), rgba(255,255,255,0.35));
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: 0 25px 60px -15px rgba(15,28,48,0.45), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  .advance-modal-header {
+    background: linear-gradient(120deg, #4d51b0 0%, #5b5fc7 45%, #c0201f 130%);
+  }
+  .advance-info-tag {
+    color: #3f4293;
+    background: linear-gradient(120deg, rgba(197,199,243,0.6), rgba(255,230,217,0.6));
+  }
+  .advance-glow {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(60px);
+    opacity: 0.55;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .advance-glow-1 { width: 260px; height: 260px; top: -80px; left: -60px; background: #8286e2; }
+  .advance-glow-2 { width: 220px; height: 220px; bottom: -70px; right: -50px; background: #c0201f; }
+  .advance-glow-3 { width: 200px; height: 200px; bottom: 40%; right: 20%; background: #5eead4; opacity: 0.35; }
 </style>
 
 <script is:inline>
