@@ -27,14 +27,13 @@ function resolveImg(url: string | null) {
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
       </a>
       <h1 class="text-2xl font-bold text-slate-900">Edit Post</h1>
+      <span id="statusBadge" class={`text-xs font-semibold px-2.5 py-1 rounded-full ${post.published ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>{post.published ? 'Published' : 'Draft'}</span>
     </div>
     <div class="flex items-center gap-2">
       <a href={postHref(post.slug)} target="_blank" class="text-sm text-slate-500 hover:underline mr-2">View live &rarr;</a>
       <button id="deleteBtn" class="text-sm font-semibold text-red-600 hover:underline mr-2">Delete</button>
-      <label class="flex items-center gap-2 text-sm text-slate-600 mr-2">
-        <input type="checkbox" id="fPublished" checked={!!post.published}> Publish
-      </label>
-      <button id="saveBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition">Update Post</button>
+      <button id="saveDraftBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition">Save Post</button>
+      <button id="publishBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition">Publish</button>
     </div>
   </div>
 
@@ -86,10 +85,21 @@ function resolveImg(url: string | null) {
         </div>
       </div>
 
-      <div class="bg-white rounded-xl ring-1 ring-black/5 shadow-sm p-4 space-y-2">
-        <label class="block text-xs font-medium text-slate-600">Featured image</label>
-        <img id="fImgPreview" class={`${post.hero_image ? '' : 'hidden'} w-full h-32 object-cover rounded-lg border`} src={resolveImg(post.hero_image)}>
-        <input type="file" id="fImgFile" accept="image/*" class="w-full text-sm">
+      <!-- Featured image dropzone -->
+      <div class="bg-white rounded-xl ring-1 ring-black/5 shadow-sm p-4">
+        <label class="block text-xs font-medium text-slate-600 mb-2">Featured image</label>
+        <div id="heroDropzone" class="relative border-2 border-dashed border-slate-300 rounded-xl h-44 flex items-center justify-center text-center cursor-pointer hover:border-iris-400 hover:bg-iris-50/40 transition overflow-hidden">
+          <img id="fImgPreview" class={`${post.hero_image ? '' : 'hidden'} absolute inset-0 w-full h-full object-cover`} src={resolveImg(post.hero_image)}>
+          <div id="heroDropzoneEmpty" class={`${post.hero_image ? 'hidden' : ''} text-slate-400 px-4 pointer-events-none`}>
+            <svg class="w-8 h-8 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M4 8h.01M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>
+            <p class="text-xs font-medium">Click or drag an image here</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">PNG or JPG</p>
+          </div>
+          <button type="button" id="heroRemoveBtn" class={`${post.hero_image ? '' : 'hidden'} absolute top-2 right-2 w-7 h-7 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition`}>
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <input type="file" id="fImgFile" accept="image/*" class="hidden">
         <input type="hidden" id="fImgUrl" value={post.hero_image || ''}>
       </div>
     </div>
@@ -100,7 +110,7 @@ function resolveImg(url: string | null) {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js" is:inline></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css">
-<style>
+<style is:global>
   #editor { font-size: 15px; }
   .ql-editor { min-height: 420px; padding: 1.25rem; }
   .ql-editor h1 { font-size: 1.75rem; font-weight: 800; margin-top: 0.5em; }
@@ -115,29 +125,32 @@ function resolveImg(url: string | null) {
   .ql-snow .ql-picker.ql-header { width: 130px; }
   .ql-snow .ql-picker.ql-header .ql-picker-label::before,
   .ql-snow .ql-picker.ql-header .ql-picker-item::before {
-    content: 'Paragraph';
+    content: 'Paragraph' !important;
   }
   .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="1"]::before,
-  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="1"]::before { content: 'Heading 1'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="1"]::before { content: 'Heading 1' !important; }
   .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
-  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"]::before { content: 'Heading 2'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"]::before { content: 'Heading 2' !important; }
   .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
-  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"]::before { content: 'Heading 3'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"]::before { content: 'Heading 3' !important; }
   .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="4"]::before,
-  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="4"]::before { content: 'Heading 4'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="4"]::before { content: 'Heading 4' !important; }
   .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="5"]::before,
-  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="5"]::before { content: 'Heading 5'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="5"]::before { content: 'Heading 5' !important; }
   .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="6"]::before,
-  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="6"]::before { content: 'Heading 6'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="6"]::before { content: 'Heading 6' !important; }
   .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="1"] { font-size: 1.6em; }
   .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"] { font-size: 1.4em; }
   .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"] { font-size: 1.25em; }
   .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="4"] { font-size: 1.1em; }
   .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="5"] { font-size: 1em; }
   .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="6"] { font-size: 0.9em; }
+
+  #heroDropzone.dragover { border-color: #5b5fc7; background-color: rgba(91,95,199,0.06); }
+  #editor.dragover { outline: 2px dashed #5b5fc7; outline-offset: -4px; }
 </style>
 
-<script define:vars={{ postId: post?.id, initialBody: post?.body || '' }} is:inline>
+<script define:vars={{ postId: post?.id, initialBody: post?.body || '', initialPublished: !!post?.published }} is:inline>
   if (document.getElementById('editor')) {
     const quill = new Quill('#editor', {
       theme: 'snow',
@@ -155,6 +168,21 @@ function resolveImg(url: string | null) {
     });
     quill.root.innerHTML = initialBody;
 
+    async function uploadFile(file) {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/media', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      return data;
+    }
+
+    function insertImageIntoEditor(url) {
+      const range = quill.getSelection(true) || { index: quill.getLength() };
+      quill.insertEmbed(range.index, 'image', url, 'user');
+      quill.setSelection(range.index + 1);
+    }
+
     quill.getModule('toolbar').addHandler('image', () => {
       const input = document.createElement('input');
       input.type = 'file';
@@ -162,51 +190,89 @@ function resolveImg(url: string | null) {
       input.onchange = async () => {
         const file = input.files[0];
         if (!file) return;
-        const fd = new FormData();
-        fd.append('file', file);
-        try {
-          const res = await fetch('/api/media', { method: 'POST', body: fd });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error);
-          const range = quill.getSelection(true);
-          quill.insertEmbed(range.index, 'image', data.url, 'user');
-          quill.setSelection(range.index + 1);
-        } catch (err) { showToast(err.message, 'error'); }
+        try { insertImageIntoEditor((await uploadFile(file)).url); }
+        catch (err) { showToast(err.message, 'error'); }
       };
       input.click();
     });
 
-    document.getElementById('fImgFile').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const fd = new FormData();
-      fd.append('file', file);
-      try {
-        const res = await fetch('/api/media', { method: 'POST', body: fd });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
-        document.getElementById('fImgUrl').value = `media:${data.id}`;
-        const preview = document.getElementById('fImgPreview');
-        preview.src = data.url;
-        preview.classList.remove('hidden');
-        renderSeo();
-      } catch (err) { showToast(err.message, 'error'); }
+    const editorEl = document.getElementById('editor');
+    editorEl.addEventListener('dragover', (e) => { e.preventDefault(); editorEl.classList.add('dragover'); });
+    editorEl.addEventListener('dragleave', () => editorEl.classList.remove('dragover'));
+    editorEl.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      editorEl.classList.remove('dragover');
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        try { insertImageIntoEditor((await uploadFile(file)).url); }
+        catch (err) { showToast(err.message, 'error'); }
+      }
     });
 
-    document.getElementById('saveBtn').addEventListener('click', async () => {
+    const dropzone = document.getElementById('heroDropzone');
+    const heroFileInput = document.getElementById('fImgFile');
+    function showHeroPreview(url) {
+      document.getElementById('fImgPreview').src = url;
+      document.getElementById('fImgPreview').classList.remove('hidden');
+      document.getElementById('heroDropzoneEmpty').classList.add('hidden');
+      document.getElementById('heroRemoveBtn').classList.remove('hidden');
+    }
+    async function handleHeroFile(file) {
+      if (!file) return;
+      try {
+        const data = await uploadFile(file);
+        document.getElementById('fImgUrl').value = `media:${data.id}`;
+        showHeroPreview(data.url);
+        renderSeo();
+      } catch (err) { showToast(err.message, 'error'); }
+    }
+    dropzone.addEventListener('click', (e) => {
+      if (e.target.closest('#heroRemoveBtn')) return;
+      heroFileInput.click();
+    });
+    heroFileInput.addEventListener('change', (e) => handleHeroFile(e.target.files[0]));
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      handleHeroFile(e.dataTransfer.files && e.dataTransfer.files[0]);
+    });
+    document.getElementById('heroRemoveBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('fImgUrl').value = '';
+      heroFileInput.value = '';
+      document.getElementById('fImgPreview').classList.add('hidden');
+      document.getElementById('heroDropzoneEmpty').classList.remove('hidden');
+      document.getElementById('heroRemoveBtn').classList.add('hidden');
+      renderSeo();
+    });
+
+    let currentPublished = initialPublished;
+    function updateStatusBadge() {
+      const badge = document.getElementById('statusBadge');
+      badge.textContent = currentPublished ? 'Published' : 'Draft';
+      badge.className = `text-xs font-semibold px-2.5 py-1 rounded-full ${currentPublished ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`;
+    }
+
+    async function savePost(forcePublish) {
       const title = document.getElementById('fTitle').value.trim();
       const slug = document.getElementById('fSlug').value.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-');
       const description = document.getElementById('fDesc').value.trim();
       const category = document.getElementById('fCategory').value.trim();
       const body = quill.root.innerHTML;
       const hero_image = document.getElementById('fImgUrl').value;
-      const published = document.getElementById('fPublished').checked;
       if (!title || !slug) { showToast('Title and slug are required', 'error'); return; }
+      const published = forcePublish ? true : currentPublished;
       try {
         await apiFetch(`/api/blog-posts/${postId}`, { method: 'PUT', body: JSON.stringify({ title, slug, description, category, body, hero_image, published }) });
-        showToast('Post updated');
+        currentPublished = published;
+        updateStatusBadge();
+        showToast(forcePublish ? 'Post published' : 'Post saved');
       } catch (e) { showToast(e.message, 'error'); }
-    });
+    }
+    document.getElementById('saveDraftBtn').addEventListener('click', () => savePost(false));
+    document.getElementById('publishBtn').addEventListener('click', () => savePost(true));
 
     document.getElementById('deleteBtn').addEventListener('click', async () => {
       if (!confirm('Delete this blog post? This cannot be undone.')) return;
