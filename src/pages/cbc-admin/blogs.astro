@@ -23,8 +23,12 @@ export const prerender = false;
           <input id="fTitle" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Slug (URL) — e.g. study-in-uk</label>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Slug (URL) — e.g. study-in-uk <span class="text-slate-400 font-normal">(for the 6 original articles, changing this will move it off its current page URL)</span></label>
           <input id="fSlug" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Category / badge — e.g. Study Destinations, Visa Tips</label>
+          <input id="fCategory" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
         </div>
         <div>
           <label class="block text-xs font-medium text-slate-600 mb-1">Short description (used in listings)</label>
@@ -37,7 +41,7 @@ export const prerender = false;
           <img id="fImgPreview" class="hidden mt-2 h-24 object-cover rounded-lg border">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Body content</label>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Body content <span class="text-slate-400 font-normal">(plain text paragraphs, or HTML for more formatting — headings, bold, etc.)</span></label>
           <textarea id="fBody" rows="8" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono"></textarea>
         </div>
         <label class="flex items-center gap-2 text-sm">
@@ -66,6 +70,9 @@ export const prerender = false;
     render();
   }
 
+  const DEDICATED_SLUGS = new Set(['study-in-uk','study-in-usa','study-in-europe','visa-interview-tips','find-scholarships','first-month-abroad']);
+  function postHref(slug) { return DEDICATED_SLUGS.has(slug) ? `/${slug}` : `/blogs/${slug}`; }
+
   function render() {
     const container = document.getElementById('listContainer');
     container.innerHTML = allPosts.map(p => `
@@ -73,9 +80,10 @@ export const prerender = false;
         <img src="${resolveImg(p.hero_image)}" class="w-20 h-14 object-cover rounded-lg shrink-0">
         <div class="flex-1 min-w-0">
           <p class="font-medium text-slate-900 text-sm truncate">${escapeHtml(p.title)}</p>
-          <p class="text-xs text-slate-500 mt-0.5">/blogs/${escapeHtml(p.slug)} &middot; ${p.published ? '<span class="text-emerald-600 font-medium">Published</span>' : '<span class="text-amber-600 font-medium">Draft</span>'}</p>
+          <p class="text-xs text-slate-500 mt-0.5">${p.category ? escapeHtml(p.category) + ' &middot; ' : ''}${postHref(p.slug)} &middot; ${p.published ? '<span class="text-emerald-600 font-medium">Published</span>' : '<span class="text-amber-600 font-medium">Draft</span>'}</p>
         </div>
         <div class="flex gap-3 shrink-0">
+          <a href="${postHref(p.slug)}" target="_blank" class="text-xs text-slate-500 hover:underline">View</a>
           <button class="text-xs text-bridge-700 hover:underline" onclick="editPost(${p.id})">Edit</button>
           <button class="text-xs text-red-600 hover:underline" onclick="deletePost(${p.id})">Delete</button>
         </div>
@@ -90,6 +98,7 @@ export const prerender = false;
     document.getElementById('editId').value = p.id;
     document.getElementById('fTitle').value = p.title;
     document.getElementById('fSlug').value = p.slug;
+    document.getElementById('fCategory').value = p.category || '';
     document.getElementById('fDesc').value = p.description || '';
     document.getElementById('fBody').value = p.body || '';
     document.getElementById('fImgUrl').value = p.hero_image || '';
@@ -108,7 +117,7 @@ export const prerender = false;
 
   document.getElementById('addBtn').addEventListener('click', () => {
     document.getElementById('modalTitle').textContent = 'New Post';
-    ['editId','fTitle','fSlug','fDesc','fBody','fImgUrl'].forEach(id => document.getElementById(id).value = '');
+    ['editId','fTitle','fSlug','fCategory','fDesc','fBody','fImgUrl'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('fPublished').checked = false;
     document.getElementById('fImgPreview').classList.add('hidden');
     document.getElementById('modal').classList.remove('hidden');
@@ -136,13 +145,14 @@ export const prerender = false;
     const title = document.getElementById('fTitle').value.trim();
     const slug = document.getElementById('fSlug').value.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-');
     const description = document.getElementById('fDesc').value.trim();
+    const category = document.getElementById('fCategory').value.trim();
     const body = document.getElementById('fBody').value;
     const hero_image = document.getElementById('fImgUrl').value;
     const published = document.getElementById('fPublished').checked;
     if (!title || !slug) { showToast('Title and slug are required', 'error'); return; }
     try {
-      if (id) await apiFetch(`/api/blog-posts/${id}`, { method: 'PUT', body: JSON.stringify({ title, slug, description, body, hero_image, published }) });
-      else await apiFetch('/api/blog-posts', { method: 'POST', body: JSON.stringify({ title, slug, description, body, hero_image, published }) });
+      if (id) await apiFetch(`/api/blog-posts/${id}`, { method: 'PUT', body: JSON.stringify({ title, slug, description, category, body, hero_image, published }) });
+      else await apiFetch('/api/blog-posts', { method: 'POST', body: JSON.stringify({ title, slug, description, category, body, hero_image, published }) });
       showToast('Saved');
       document.getElementById('modal').classList.add('hidden');
       load();

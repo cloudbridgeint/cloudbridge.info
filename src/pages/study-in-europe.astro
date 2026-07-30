@@ -1,72 +1,17 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { Image } from 'astro:assets';
-import blogStudyEurope from '../assets/blog/study-europe.jpg';
-const title = "Studying in Europe: An Affordable Study Abroad Alternative | CloudBridge";
-const description = "Low-tuition universities in Germany, the Netherlands, France, and Ireland — a practical guide to studying in Europe from CloudBridge.";
+import BlogPost from "../layouts/BlogPost.astro";
+import Layout from "../layouts/Layout.astro";
+import { getBlogPostBySlug } from "../lib/content";
+export const prerender = false;
+const db = (Astro.locals as any).runtime.env.DB;
+const post = await getBlogPostBySlug(db, "study-in-europe");
 ---
-<Layout title={title} description={description}>
-
-<section class="py-10 bg-white border-b border-black/5">
-  <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb !text-ink/40"><a href="/">Home</a> / <a href="/blogs">Blogs</a> / Study in Europe</p>
-  </div>
-</section>
-<article class="py-10 md:py-14">
-  <div class="max-w-container mx-auto px-4 md:px-8 max-w-3xl">
-    <p class="course-badge">Study Destinations</p>
-    <h1 class="mt-4 text-3xl md:text-4xl font-extrabold text-bridge-950 leading-tight">Studying in Europe: An Affordable Alternative Worth Considering</h1>
-    <p class="mt-4 text-sm text-ink/50">Updated July 2026 · 7 min read</p>
-    <div class="mt-8 rounded-2xl overflow-hidden">
-      <Image src={blogStudyEurope} alt="A student traveller overlooking a harbour town on the European coastline" class="w-full h-auto object-cover" loading="eager" fetchpriority="high" widths={[480, 768, 1200]} sizes="(min-width: 768px) 700px, 100vw" />
+{post ? <BlogPost post={post} /> : (
+  <Layout title="Article not found | CloudBridge" description="This article is no longer available.">
+    <div class="max-w-container mx-auto px-4 md:px-8 py-24 text-center">
+      <h1 class="text-2xl font-bold text-bridge-950">Article not found</h1>
+      <p class="mt-2 text-ink/60">This article may have been unpublished or removed.</p>
+      <a href="/blogs" class="btn-primary nav-link inline-flex mt-6">Browse all articles</a>
     </div>
-
-    <p class="mt-8 text-lg text-ink/70 leading-relaxed">When students think about studying abroad, the conversation usually starts with the UK or the USA — and mainland Europe barely gets a mention. That's a shame, because for the right student, countries like Germany, the Netherlands, Ireland, and France offer genuinely strong universities, often at a fraction of the cost, with their own clear paths to post-study work. If budget is the main thing holding you back from studying abroad, Europe deserves a proper look before you rule it out.</p>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">Why Europe is worth comparing against the UK and USA</h2>
-    <p class="mt-3 text-ink/70 leading-relaxed">The biggest reason is cost. Public universities in Germany, for instance, charge little to no tuition even for international students at many institutions — you'll mainly cover a small administrative or semester fee plus your own living costs. Other countries land somewhere in between: noticeably cheaper than the UK or USA, but still offering degrees taught fully in English at a growing number of universities, so the language barrier is less of an obstacle than most students expect.</p>
-    <p class="mt-3 text-ink/70 leading-relaxed">Most popular study destinations in mainland Europe also come with their own post-study work visas — commonly 9 months to 2 years depending on the country — giving you a real window to gain international work experience after graduating, similar in spirit to the UK's Graduate Route or US OPT.</p>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">What it actually costs</h2>
-    <p class="mt-3 text-ink/70 leading-relaxed">This is where Europe pulls ahead for budget-conscious students. Public universities in Germany often charge only a nominal semester contribution (frequently under €500), with living costs of roughly €800–€1,200 a month depending on the city. The Netherlands and France typically charge tuition in the €2,000–€15,000 a year range for international students, still well below equivalent programs in the UK or USA, with living costs in a broadly similar range to Germany.</p>
-    <p class="mt-3 text-ink/70 leading-relaxed">Ireland sits a little closer to UK pricing — tuition commonly in the €10,000–€25,000 range — but is worth considering for students who want an English-speaking country with an EU-style visa and work environment.</p>
-    <div class="mt-6 rounded-xl bg-bridge-50 p-5 border border-bridge-100">
-      <p class="text-sm text-bridge-900"><strong>Quick tip:</strong> If low tuition is your priority, look specifically at public universities rather than private ones — the fee difference within the same country can be dramatic, and public institutions are just as internationally recognised.</p>
-    </div>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">Entry requirements and the application process</h2>
-    <p class="mt-3 text-ink/70 leading-relaxed">Requirements vary by country, but most follow a similar pattern: academic transcripts, an English proficiency score (IELTS is widely accepted for English-taught programs), a Statement of Purpose, and academic references. Some countries require a national visa application through their local embassy in Dhaka rather than a single unified process, and a few universities ask for a short online interview — details we walk through country by country once you've shortlisted where you're applying.</p>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">Scholarships and funding</h2>
-    <p class="mt-3 text-ink/70 leading-relaxed">Many European countries and universities run their own government or institutional scholarship schemes for international students, on top of the already-lower base tuition. Because eligibility criteria and deadlines differ so much from country to country, this is one of the areas where working with a counsellor tends to save the most time — rather than checking a dozen separate national scholarship portals yourself.</p>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">Frequently asked questions</h2>
-    <div class="mt-6 border border-black/10 rounded-2xl divide-y divide-black/10 bg-white">
-      <div>
-        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Do I need to know a European language to study there?<span class="faq-icon transition-transform">+</span></button>
-        <p class="faq-answer px-6 pb-5 text-sm text-ink/70">Not necessarily. A large and growing number of bachelor's and master's programs across mainland Europe are taught entirely in English, particularly at postgraduate level.</p>
-      </div>
-      <div>
-        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Is it really true that some universities are almost tuition-free?<span class="faq-icon transition-transform">+</span></button>
-        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">Yes — several public universities in Germany, in particular, charge little beyond a small semester contribution for both domestic and international students. You'll still need to budget for living costs and health insurance.</p>
-      </div>
-      <div>
-        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Can I work after graduating in Europe?<span class="faq-icon transition-transform">+</span></button>
-        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">Most popular study destinations in Europe offer a post-study work visa, typically ranging from around 9 months to 2 years depending on the country and qualification level.</p>
-      </div>
-    </div>
-
-    <div class="mt-12 rounded-2xl bg-dusk-gradient text-white p-8 text-center">
-      <h3 class="font-display text-xl font-bold">Curious if Europe fits your budget and goals?</h3>
-      <p class="mt-2 text-white/75 text-sm max-w-md mx-auto">Talk to a CloudBridge counsellor about which country and university makes the most sense for you — free, no obligation.</p>
-      <div class="mt-5 flex flex-wrap justify-center gap-3">
-        <a href="/#lead-form" class="btn-primary nav-link inline-flex">Get Free Consultation</a>
-        <a href="/destinations" class="btn-secondary nav-link inline-flex">Explore Study Destinations</a>
-      </div>
-    </div>
-
-    <p class="mt-8"><a href="/blogs" class="nav-link text-sm font-semibold text-bridge-800 hover:underline">&larr; Back to all articles</a></p>
-  </div>
-</article>
-
-</Layout>
+  </Layout>
+)}

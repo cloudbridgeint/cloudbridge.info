@@ -72,6 +72,11 @@ export async function getPublishedBlogPosts(db: D1Like, limit?: number) {
   return results as any[];
 }
 
+export async function getBlogPostBySlug(db: D1Like, slug: string) {
+  const row = await db.prepare('SELECT * FROM blog_posts WHERE slug = ? AND published = 1').bind(slug).first();
+  return row as any;
+}
+
 export async function getPublishedEvents(db: D1Like) {
   const { results } = await db.prepare('SELECT * FROM events WHERE published = 1 ORDER BY event_date ASC').all();
   return results as any[];

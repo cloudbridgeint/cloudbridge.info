@@ -1,10 +1,11 @@
 ---
-import BlogPost from "../layouts/BlogPost.astro";
-import Layout from "../layouts/Layout.astro";
-import { getBlogPostBySlug } from "../lib/content";
+import BlogPost from '../../layouts/BlogPost.astro';
+import Layout from '../../layouts/Layout.astro';
+import { getBlogPostBySlug } from '../../lib/content';
 export const prerender = false;
 const db = (Astro.locals as any).runtime.env.DB;
-const post = await getBlogPostBySlug(db, "first-month-abroad");
+const { slug } = Astro.params;
+const post = slug ? await getBlogPostBySlug(db, slug) : null;
 ---
 {post ? <BlogPost post={post} /> : (
   <Layout title="Article not found | CloudBridge" description="This article is no longer available.">

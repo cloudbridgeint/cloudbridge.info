@@ -1,92 +1,17 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { Image } from 'astro:assets';
-import blogVisaTips from '../assets/blog/visa-tips.jpg';
-const title = "5 Documents Students Forget Before Their Visa Interview | CloudBridge";
-const description = "What to bring to your student visa interview, why applications get refused, and how to answer common visa interview questions.";
+import BlogPost from "../layouts/BlogPost.astro";
+import Layout from "../layouts/Layout.astro";
+import { getBlogPostBySlug } from "../lib/content";
+export const prerender = false;
+const db = (Astro.locals as any).runtime.env.DB;
+const post = await getBlogPostBySlug(db, "visa-interview-tips");
 ---
-<Layout title={title} description={description}>
-
-<section class="py-10 bg-white border-b border-black/5">
-  <div class="max-w-container mx-auto px-4 md:px-8">
-    <p class="crumb !text-ink/40"><a href="/">Home</a> / <a href="/blogs">Blogs</a> / Visa Interview Tips</p>
-  </div>
-</section>
-<article class="py-10 md:py-14">
-  <div class="max-w-container mx-auto px-4 md:px-8 max-w-3xl">
-    <p class="course-badge">Visa Tips</p>
-    <h1 class="mt-4 text-3xl md:text-4xl font-extrabold text-bridge-950 leading-tight">5 Documents Students Forget Before Their Visa Interview (And How to Prepare)</h1>
-    <p class="mt-4 text-sm text-ink/50">Updated July 2026 · 7 min read</p>
-    <div class="mt-8 rounded-2xl overflow-hidden">
-      <Image src={blogVisaTips} alt="A student holding a passport and boarding pass in front of an airport window" class="w-full h-auto object-cover" loading="eager" fetchpriority="high" widths={[480, 768, 1200]} sizes="(min-width: 768px) 700px, 100vw" />
+{post ? <BlogPost post={post} /> : (
+  <Layout title="Article not found | CloudBridge" description="This article is no longer available.">
+    <div class="max-w-container mx-auto px-4 md:px-8 py-24 text-center">
+      <h1 class="text-2xl font-bold text-bridge-950">Article not found</h1>
+      <p class="mt-2 text-ink/60">This article may have been unpublished or removed.</p>
+      <a href="/blogs" class="btn-primary nav-link inline-flex mt-6">Browse all articles</a>
     </div>
-
-    <p class="mt-8 text-lg text-ink/70 leading-relaxed">A surprising number of student visa applications aren't rejected because of grades or funding — they stall because one document was missing, out of date, or didn't match what the university reported. Here's exactly what to have ready, what actually gets asked in the interview, and why applications get refused so you can avoid the same mistakes.</p>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">What documents do I need for my student visa interview?</h2>
-    <p class="mt-3 text-ink/70 leading-relaxed">At minimum, bring your passport, your university's offer/acceptance letter (CAS for the UK, I-20 for the USA), proof of tuition and living-cost funds, academic transcripts and certificates, your English proficiency score, and passport-size photos. The five documents students most often forget are:</p>
-    <ul class="mt-4 space-y-2 text-ink/70">
-      <li class="flex gap-2"><span class="text-harbor-500 font-bold">1.</span> A bank statement that's older than the required window (most embassies want funds shown for the last 28-30 days, not a one-off deposit).</li>
-      <li class="flex gap-2"><span class="text-harbor-500 font-bold">2.</span> Original academic certificates — not just photocopies or the online portal printout.</li>
-      <li class="flex gap-2"><span class="text-harbor-500 font-bold">3.</span> A cover letter or Statement of Purpose consistent with what they told the visa officer verbally.</li>
-      <li class="flex gap-2"><span class="text-harbor-500 font-bold">4.</span> Proof of ties to home (family, property, or a return-intent explanation) for interview-based visas.</li>
-      <li class="flex gap-2"><span class="text-harbor-500 font-bold">5.</span> A receipt for the visa fee and biometrics appointment confirmation.</li>
-    </ul>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">Why do student visa applications get rejected?</h2>
-    <p class="mt-3 text-ink/70 leading-relaxed">The most common reasons are unclear or insufficient proof of funds, inconsistencies between the application form and supporting documents, a Statement of Purpose that doesn't clearly explain your study and career plan, or the officer not being convinced you intend to return home after your studies (for interview-based visas like the US F-1). Almost all of these are avoidable with careful preparation rather than bad luck.</p>
-    <div class="mt-6 rounded-xl bg-bridge-50 p-5 border border-bridge-100">
-      <p class="text-sm text-bridge-900"><strong>Quick tip:</strong> Keep every number in your application consistent — the same course name, same intake date, and same funding figures on your bank statement, your SOP, and your visa form. Small mismatches are one of the most common (and easiest to avoid) reasons for extra scrutiny.</p>
-    </div>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">What questions are asked in a student visa interview?</h2>
-    <p class="mt-3 text-ink/70 leading-relaxed">Expect questions about why you chose that specific university and course, how you'll fund your studies, what your plans are after graduating, and sometimes basic questions about the course content itself. For the US F-1 interview specifically, officers also commonly ask about your family and ties back home, since demonstrating intent to return is part of what they're assessing.</p>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">How should I answer "why do you want to study here"?</h2>
-    <p class="mt-3 text-ink/70 leading-relaxed">Give a specific, honest answer tied to the course and university — not a generic "better education" response. Mention the actual program name, something specific about the university (a module, a research area, a ranking in your field), and how it connects to your career plan back home. Officers hear vague answers dozens of times a day; specificity is what stands out.</p>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">How long does the visa process take?</h2>
-    <p class="mt-3 text-ink/70 leading-relaxed">UK Student visas are typically processed in around 3 weeks outside the UK. US F-1 visas depend heavily on embassy appointment availability, so we recommend booking your interview slot the moment your I-20 arrives. Either way, apply as soon as your CAS or I-20 is issued rather than waiting — a comfortable buffer avoids last-minute stress if extra documents are requested.</p>
-
-    <h2 class="mt-10 text-2xl font-display font-bold text-bridge-900">Frequently asked questions</h2>
-    <div class="mt-6 border border-black/10 rounded-2xl divide-y divide-black/10 bg-white">
-      <div>
-        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Can I reapply after a visa refusal?<span class="faq-icon transition-transform">+</span></button>
-        <p class="faq-answer px-6 pb-5 text-sm text-ink/70">Yes, in almost all cases you can reapply. The key is understanding exactly why the refusal happened and fixing that specific issue — reapplying with the same weak documents rarely helps.</p>
-      </div>
-      <div>
-        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Do I need to speak fluently in the interview?<span class="faq-icon transition-transform">+</span></button>
-        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">No — officers are assessing your intent and documentation, not your accent or fluency. Clear, honest, and consistent answers matter far more than perfect English.</p>
-      </div>
-      <div>
-        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">Should I bring printed or digital documents?<span class="faq-icon transition-transform">+</span></button>
-        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">Printed, organised copies are safest. Some embassies accept digital documents, but a physical folder in a clear order avoids any risk of a phone dying or a file not opening on the day.</p>
-      </div>
-      <div>
-        <button class="faq-btn w-full text-left px-6 py-4 font-display font-semibold text-bridge-900 flex justify-between items-center">What if my bank balance fluctuated recently?<span class="faq-icon transition-transform">+</span></button>
-        <p class="faq-answer hidden px-6 pb-5 text-sm text-ink/70">Be ready to explain any large or unusual transactions with a simple paper trail (salary, sale of an asset, a family contribution letter). Unexplained large deposits just before applying are one of the most common red flags.</p>
-      </div>
-    </div>
-
-    <div class="mt-12 rounded-2xl bg-dusk-gradient text-white p-8 text-center">
-      <h3 class="font-display text-xl font-bold">Want your documents checked before your interview?</h3>
-      <p class="mt-2 text-white/75 text-sm max-w-md mx-auto">A CloudBridge counsellor will review your full file and run a mock interview with you — free, no obligation.</p>
-      <div class="mt-5 flex flex-wrap justify-center gap-3">
-        <a href="/#lead-form" class="btn-primary nav-link inline-flex">Get Free Consultation</a>
-        <a href="/student-visa" class="btn-secondary nav-link inline-flex">Student Visa Support</a>
-      </div>
-    </div>
-
-    <p class="mt-8"><a href="/blogs" class="nav-link text-sm font-semibold text-bridge-800 hover:underline">&larr; Back to all articles</a></p>
-  </div>
-</article>
-<script type="application/ld+json" is:inline>
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"Can I reapply after a visa refusal?","acceptedAnswer":{"@type":"Answer","text":"Yes, in almost all cases you can reapply. The key is understanding exactly why the refusal happened and fixing that specific issue — reapplying with the same weak documents rarely helps."}},
-{"@type":"Question","name":"Do I need to speak fluently in the interview?","acceptedAnswer":{"@type":"Answer","text":"No — officers are assessing your intent and documentation, not your accent or fluency. Clear, honest, and consistent answers matter far more than perfect English."}},
-{"@type":"Question","name":"Should I bring printed or digital documents?","acceptedAnswer":{"@type":"Answer","text":"Printed, organised copies are safest. Some embassies accept digital documents, but a physical folder in a clear order avoids any risk of a phone dying or a file not opening on the day."}},
-{"@type":"Question","name":"What if my bank balance fluctuated recently?","acceptedAnswer":{"@type":"Answer","text":"Be ready to explain any large or unusual transactions with a simple paper trail. Unexplained large deposits just before applying are one of the most common red flags."}}
-]}
-<\/script>
-
-</Layout>
+  </Layout>
+)}

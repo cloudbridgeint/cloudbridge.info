@@ -1,7 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getPublishedEvents, mediaUrl } from '../lib/content';
+export const prerender = false;
 const title = "Events | CloudBridge Study Abroad";
 const description = "Upcoming CloudBridge education fairs, webinars, and campus events for students planning to study abroad.";
+const db = (Astro.locals as any).runtime.env.DB;
+const events = await getPublishedEvents(db);
+
+const gradients = [
+  'linear-gradient(160deg,#2e4a7a,#4d70a8)',
+  'linear-gradient(160deg,#1e786e,#22a396)',
+  'linear-gradient(160deg,#963c3c,#c25a5a)',
+  'linear-gradient(160deg,#6b4a9e,#9370c9)',
+];
+function formatDate(dateStr: string) {
+  if (!dateStr) return 'Date TBA';
+  const d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
 ---
 <Layout title={title} description={description}>
 
@@ -14,20 +31,26 @@ const description = "Upcoming CloudBridge education fairs, webinars, and campus 
 </section>
 <section class="py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
-        <div class="h-36" style="background:linear-gradient(160deg,#2e4a7a,#4d70a8)"></div>
-        <div class="p-5"><p class="text-xs text-ink/50">3 May 2026 · 2PM–5PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">UK Open Assessment Day — Dhaka</h3><p class="mt-2 text-sm text-ink/60">Meet UK university representatives and get on-the-spot conditional offers.</p></div>
+    {events.length > 0 ? (
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {events.map((ev: any, i: number) => (
+          <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
+            {ev.image ? (
+              <img src={mediaUrl(ev.image, '')} alt={ev.title} class="h-36 w-full object-cover">
+            ) : (
+              <div class="h-36" style={`background:${gradients[i % gradients.length]}`}></div>
+            )}
+            <div class="p-5">
+              <p class="text-xs text-ink/50">{formatDate(ev.event_date)}{ev.location ? ` · ${ev.location}` : ''}</p>
+              <h3 class="mt-1 font-display font-bold text-bridge-900">{ev.title}</h3>
+              {ev.description && <p class="mt-2 text-sm text-ink/60">{ev.description}</p>}
+            </div>
+          </div>
+        ))}
       </div>
-      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
-        <div class="h-36" style="background:linear-gradient(160deg,#1e786e,#22a396)"></div>
-        <div class="p-5"><p class="text-xs text-ink/50">17 May 2026 · 10AM–6PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">Multi-Destination Education Expo — Dhaka</h3><p class="mt-2 text-sm text-ink/60">Explore UK, Malaysia, and USA options under one roof.</p></div>
-      </div>
-      <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5">
-        <div class="h-36" style="background:linear-gradient(160deg,#963c3c,#c25a5a)"></div>
-        <div class="p-5"><p class="text-xs text-ink/50">9 May 2026 · 11AM–5PM</p><h3 class="mt-1 font-display font-bold text-bridge-900">Study Abroad Expo — Sylhet</h3><p class="mt-2 text-sm text-ink/60">One-on-one counselling sessions, no appointment needed.</p></div>
-      </div>
-    </div>
+    ) : (
+      <p class="text-ink/60">No upcoming events right now — check back soon.</p>
+    )}
     <p class="mt-8 text-sm text-ink/50">More events added regularly — check back soon.</p>
     <div class="mt-8"><a href="/#lead-form" class="btn-primary nav-link inline-flex">Reserve Your Seat</a></div>
   </div>
