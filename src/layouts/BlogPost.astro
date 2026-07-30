@@ -35,4 +35,23 @@ const heroSrc = post.hero_image ? mediaUrl(post.hero_image, '') : '';
   </div>
 </article>
 
+<style is:global>
+  /* Base typography for rich-text content written via the WYSIWYG editor
+     (older migrated articles already carry their own Tailwind classes, so
+     these rules simply give plain/un-classed tags from the editor a matching look). */
+  .blog-body { color: rgba(15, 28, 48, 0.7); line-height: 1.75; }
+  .blog-body p { margin-top: 0.75rem; }
+  .blog-body h1 { font-size: 1.75rem; font-weight: 800; color: #0f1c30; margin-top: 2rem; }
+  .blog-body h2 { font-size: 1.5rem; font-weight: 700; font-family: inherit; color: #15263f; margin-top: 2rem; }
+  .blog-body h3 { font-size: 1.2rem; font-weight: 700; color: #15263f; margin-top: 1.5rem; }
+  .blog-body a { color: #254368; font-weight: 600; text-decoration: underline; }
+  .blog-body strong { font-weight: 700; color: #0f1c30; }
+  .blog-body ul, .blog-body ol { margin-top: 0.75rem; padding-left: 1.5rem; }
+  .blog-body ul { list-style: disc; }
+  .blog-body ol { list-style: decimal; }
+  .blog-body li { margin-top: 0.25rem; }
+  .blog-body blockquote { border-left: 3px solid #5b5fc7; padding-left: 1rem; margin: 1.25rem 0; color: #33356f; font-style: italic; }
+  .blog-body img { border-radius: 1rem; margin-top: 1.25rem; max-width: 100%; height: auto; }
+</style>
+
 </Layout>

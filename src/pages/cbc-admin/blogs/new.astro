@@ -1,0 +1,151 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+export const prerender = false;
+---
+<AdminLayout title="New Post" active="blogs">
+  <div class="flex items-center justify-between gap-4 flex-wrap mb-6">
+    <div class="flex items-center gap-3">
+      <a href="/cbc-admin/blogs" class="w-9 h-9 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-500 transition shrink-0">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </a>
+      <h1 class="text-2xl font-bold text-slate-900">New Post</h1>
+    </div>
+    <div class="flex items-center gap-2">
+      <label class="flex items-center gap-2 text-sm text-slate-600 mr-2">
+        <input type="checkbox" id="fPublished"> Publish
+      </label>
+      <button id="saveBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition">Save Post</button>
+    </div>
+  </div>
+
+  <div class="grid lg:grid-cols-[1fr_320px] gap-6 items-start">
+    <!-- Main column: title + editor -->
+    <div class="space-y-4 min-w-0">
+      <input id="fTitle" type="text" placeholder="Post title"
+        class="w-full text-2xl font-bold text-slate-900 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-iris-200">
+
+      <div class="bg-white rounded-xl ring-1 ring-black/5 shadow-sm overflow-hidden">
+        <div id="editorToolbar"></div>
+        <div id="editor" style="min-height: 420px;"></div>
+      </div>
+    </div>
+
+    <!-- Sidebar: metadata -->
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl ring-1 ring-black/5 shadow-sm p-4 space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Slug (URL)</label>
+          <input id="fSlug" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. my-new-post">
+          <p class="text-[11px] text-slate-400 mt-1">Will be published at /blogs/&lt;slug&gt;</p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Category / badge</label>
+          <input id="fCategory" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="e.g. Study Destinations">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Short description</label>
+          <textarea id="fDesc" rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Shown in the blog listing and search results"></textarea>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl ring-1 ring-black/5 shadow-sm p-4 space-y-2">
+        <label class="block text-xs font-medium text-slate-600">Featured image</label>
+        <img id="fImgPreview" class="hidden w-full h-32 object-cover rounded-lg border">
+        <input type="file" id="fImgFile" accept="image/*" class="w-full text-sm">
+        <input type="hidden" id="fImgUrl">
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js" is:inline></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css">
+<style>
+  #editor { font-size: 15px; }
+  .ql-editor { min-height: 420px; padding: 1.25rem; }
+  .ql-editor h1 { font-size: 1.75rem; font-weight: 800; margin-top: 0.5em; }
+  .ql-editor h2 { font-size: 1.4rem; font-weight: 700; margin-top: 0.75em; }
+  .ql-editor h3 { font-size: 1.15rem; font-weight: 700; margin-top: 0.75em; }
+  .ql-toolbar.ql-snow { border: none; border-bottom: 1px solid #eef0f5; }
+  .ql-container.ql-snow { border: none; }
+</style>
+
+<script is:inline>
+  const quill = new Quill('#editor', {
+    theme: 'snow',
+    modules: {
+      toolbar: [
+        [{ header: [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline'],
+        ['link', 'image'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['blockquote'],
+        ['clean'],
+      ],
+    },
+    placeholder: 'Write your article…',
+  });
+
+  // Custom image handler: upload via /api/media instead of base64-embedding
+  quill.getModule('toolbar').addHandler('image', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (!file) return;
+      const fd = new FormData();
+      fd.append('file', file);
+      try {
+        const res = await fetch('/api/media', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        const range = quill.getSelection(true);
+        quill.insertEmbed(range.index, 'image', data.url, 'user');
+        quill.setSelection(range.index + 1);
+      } catch (err) { showToast(err.message, 'error'); }
+    };
+    input.click();
+  });
+
+  // Auto-generate slug from title while the slug field is untouched
+  let slugTouched = false;
+  document.getElementById('fSlug').addEventListener('input', () => { slugTouched = true; });
+  document.getElementById('fTitle').addEventListener('input', (e) => {
+    if (slugTouched) return;
+    document.getElementById('fSlug').value = e.target.value.trim().toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+  });
+
+  document.getElementById('fImgFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('file', file);
+    try {
+      const res = await fetch('/api/media', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      document.getElementById('fImgUrl').value = `media:${data.id}`;
+      const preview = document.getElementById('fImgPreview');
+      preview.src = data.url;
+      preview.classList.remove('hidden');
+    } catch (err) { showToast(err.message, 'error'); }
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const title = document.getElementById('fTitle').value.trim();
+    const slug = document.getElementById('fSlug').value.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+    const description = document.getElementById('fDesc').value.trim();
+    const category = document.getElementById('fCategory').value.trim();
+    const body = quill.root.innerHTML;
+    const hero_image = document.getElementById('fImgUrl').value;
+    const published = document.getElementById('fPublished').checked;
+    if (!title || !slug) { showToast('Title and slug are required', 'error'); return; }
+    try {
+      await apiFetch('/api/blog-posts', { method: 'POST', body: JSON.stringify({ title, slug, description, category, body, hero_image, published }) });
+      showToast('Post created');
+      setTimeout(() => { location.href = '/cbc-admin/blogs'; }, 500);
+    } catch (e) { showToast(e.message, 'error'); }
+  });
+</script>

@@ -8,52 +8,10 @@ export const prerender = false;
       <h1 class="text-2xl font-bold text-slate-900">Blog Posts</h1>
       <p class="text-slate-500 mt-1 text-sm">Write, edit, and publish blog articles.</p>
     </div>
-    <button id="addBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition">+ New Post</button>
+    <a href="/cbc-admin/blogs/new" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition">+ New Post</a>
   </div>
 
   <div id="listContainer" class="mt-8 space-y-3"></div>
-
-  <div id="modal" class="hidden fixed inset-0 bg-black/40 z-40 flex items-center justify-center px-4 py-8 overflow-y-auto">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl p-6 my-auto">
-      <h3 id="modalTitle" class="font-bold text-lg text-slate-900 mb-4">New Post</h3>
-      <input type="hidden" id="editId">
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Title</label>
-          <input id="fTitle" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Slug (URL) — e.g. study-in-uk <span class="text-slate-400 font-normal">(for the 6 original articles, changing this will move it off its current page URL)</span></label>
-          <input id="fSlug" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Category / badge — e.g. Study Destinations, Visa Tips</label>
-          <input id="fCategory" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Short description (used in listings)</label>
-          <textarea id="fDesc" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Hero image</label>
-          <input type="file" id="fImgFile" accept="image/*" class="w-full text-sm">
-          <input type="hidden" id="fImgUrl">
-          <img id="fImgPreview" class="hidden mt-2 h-24 object-cover rounded-lg border">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Body content <span class="text-slate-400 font-normal">(plain text paragraphs, or HTML for more formatting — headings, bold, etc.)</span></label>
-          <textarea id="fBody" rows="8" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono"></textarea>
-        </div>
-        <label class="flex items-center gap-2 text-sm">
-          <input type="checkbox" id="fPublished"> Published (visible on the site)
-        </label>
-      </div>
-      <div class="flex justify-end gap-2 mt-6">
-        <button id="cancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Cancel</button>
-        <button id="saveBtn" class="px-4 py-2 text-sm rounded-lg bg-bridge-700 hover:bg-bridge-800 text-white font-semibold">Save</button>
-      </div>
-    </div>
-  </div>
 </AdminLayout>
 
 <script is:inline>
@@ -84,80 +42,18 @@ export const prerender = false;
         </div>
         <div class="flex gap-3 shrink-0">
           <a href="${postHref(p.slug)}" target="_blank" class="text-xs text-slate-500 hover:underline">View</a>
-          <button class="text-xs text-bridge-700 hover:underline" onclick="editPost(${p.id})">Edit</button>
+          <a href="/cbc-admin/blogs/${p.id}" class="text-xs text-bridge-700 hover:underline">Edit</a>
           <button class="text-xs text-red-600 hover:underline" onclick="deletePost(${p.id})">Delete</button>
         </div>
       </div>
-    `).join('') || '<p class="text-slate-500 text-sm">No blog posts yet.</p>';
+    `).join('') || '<p class="text-slate-500 text-sm">No blog posts yet. Click "+ New Post" to write your first article.</p>';
   }
-
-  window.editPost = (id) => {
-    const p = allPosts.find(x => x.id === id);
-    if (!p) return;
-    document.getElementById('modalTitle').textContent = 'Edit Post';
-    document.getElementById('editId').value = p.id;
-    document.getElementById('fTitle').value = p.title;
-    document.getElementById('fSlug').value = p.slug;
-    document.getElementById('fCategory').value = p.category || '';
-    document.getElementById('fDesc').value = p.description || '';
-    document.getElementById('fBody').value = p.body || '';
-    document.getElementById('fImgUrl').value = p.hero_image || '';
-    document.getElementById('fPublished').checked = !!p.published;
-    const preview = document.getElementById('fImgPreview');
-    preview.src = resolveImg(p.hero_image);
-    preview.classList.remove('hidden');
-    document.getElementById('modal').classList.remove('hidden');
-  };
 
   window.deletePost = async (id) => {
     if (!confirm('Delete this blog post?')) return;
     try { await apiFetch(`/api/blog-posts/${id}`, { method: 'DELETE' }); showToast('Deleted'); load(); }
     catch (e) { showToast(e.message, 'error'); }
   };
-
-  document.getElementById('addBtn').addEventListener('click', () => {
-    document.getElementById('modalTitle').textContent = 'New Post';
-    ['editId','fTitle','fSlug','fCategory','fDesc','fBody','fImgUrl'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('fPublished').checked = false;
-    document.getElementById('fImgPreview').classList.add('hidden');
-    document.getElementById('modal').classList.remove('hidden');
-  });
-  document.getElementById('cancelBtn').addEventListener('click', () => document.getElementById('modal').classList.add('hidden'));
-
-  document.getElementById('fImgFile').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const fd = new FormData();
-    fd.append('file', file);
-    try {
-      const res = await fetch('/api/media', { method: 'POST', body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      document.getElementById('fImgUrl').value = `media:${data.id}`;
-      const preview = document.getElementById('fImgPreview');
-      preview.src = data.url;
-      preview.classList.remove('hidden');
-    } catch (err) { showToast(err.message, 'error'); }
-  });
-
-  document.getElementById('saveBtn').addEventListener('click', async () => {
-    const id = document.getElementById('editId').value;
-    const title = document.getElementById('fTitle').value.trim();
-    const slug = document.getElementById('fSlug').value.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-');
-    const description = document.getElementById('fDesc').value.trim();
-    const category = document.getElementById('fCategory').value.trim();
-    const body = document.getElementById('fBody').value;
-    const hero_image = document.getElementById('fImgUrl').value;
-    const published = document.getElementById('fPublished').checked;
-    if (!title || !slug) { showToast('Title and slug are required', 'error'); return; }
-    try {
-      if (id) await apiFetch(`/api/blog-posts/${id}`, { method: 'PUT', body: JSON.stringify({ title, slug, description, category, body, hero_image, published }) });
-      else await apiFetch('/api/blog-posts', { method: 'POST', body: JSON.stringify({ title, slug, description, category, body, hero_image, published }) });
-      showToast('Saved');
-      document.getElementById('modal').classList.add('hidden');
-      load();
-    } catch (e) { showToast(e.message, 'error'); }
-  });
 
   load();
 </script>
