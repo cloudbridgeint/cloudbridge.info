@@ -50,6 +50,27 @@ function resolveImg(url: string | null) {
     </div>
 
     <div class="space-y-4">
+
+      <!-- On-Page SEO score panel -->
+      <div class="bg-white rounded-xl ring-1 ring-black/5 shadow-sm p-4">
+        <button type="button" id="seoToggle" class="w-full flex items-center justify-between">
+          <span class="text-sm font-semibold text-slate-900">On-Page SEO</span>
+          <div class="flex items-center gap-2">
+            <div class="relative w-11 h-11 shrink-0">
+              <svg class="w-11 h-11 -rotate-90" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="32" fill="none" stroke-width="8" class="ring-track"/>
+                <circle id="seoRing" cx="40" cy="40" r="32" fill="none" stroke-width="8" stroke="#ef4444" stroke-linecap="round" stroke-dasharray="0 201.06" style="transition: stroke-dasharray 0.3s ease, stroke 0.3s ease;"/>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span id="seoScoreText" class="text-[10px] font-bold text-bridge-950">0%</span>
+              </div>
+            </div>
+            <svg id="seoChevron" class="w-4 h-4 text-slate-400 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </button>
+        <div id="seoDetails" class="hidden mt-4 space-y-2.5 border-t border-slate-100 pt-3"></div>
+      </div>
+
       <div class="bg-white rounded-xl ring-1 ring-black/5 shadow-sm p-4 space-y-3">
         <div>
           <label class="block text-xs font-medium text-slate-600 mb-1">Slug (URL) <span class="text-slate-400 font-normal">(changing this moves the post off its current URL)</span></label>
@@ -85,8 +106,35 @@ function resolveImg(url: string | null) {
   .ql-editor h1 { font-size: 1.75rem; font-weight: 800; margin-top: 0.5em; }
   .ql-editor h2 { font-size: 1.4rem; font-weight: 700; margin-top: 0.75em; }
   .ql-editor h3 { font-size: 1.15rem; font-weight: 700; margin-top: 0.75em; }
+  .ql-editor h4 { font-size: 1.05rem; font-weight: 700; margin-top: 0.75em; }
+  .ql-editor h5 { font-size: 0.95rem; font-weight: 700; margin-top: 0.75em; }
+  .ql-editor h6 { font-size: 0.85rem; font-weight: 700; margin-top: 0.75em; text-transform: uppercase; letter-spacing: 0.03em; }
   .ql-toolbar.ql-snow { border: none; border-bottom: 1px solid #eef0f5; }
   .ql-container.ql-snow { border: none; }
+
+  .ql-snow .ql-picker.ql-header { width: 130px; }
+  .ql-snow .ql-picker.ql-header .ql-picker-label::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item::before {
+    content: 'Paragraph';
+  }
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="1"]::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="1"]::before { content: 'Heading 1'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"]::before { content: 'Heading 2'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"]::before { content: 'Heading 3'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="4"]::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="4"]::before { content: 'Heading 4'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="5"]::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="5"]::before { content: 'Heading 5'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-label[data-value="6"]::before,
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="6"]::before { content: 'Heading 6'; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="1"] { font-size: 1.6em; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"] { font-size: 1.4em; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"] { font-size: 1.25em; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="4"] { font-size: 1.1em; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="5"] { font-size: 1em; }
+  .ql-snow .ql-picker.ql-header .ql-picker-item[data-value="6"] { font-size: 0.9em; }
 </style>
 
 <script define:vars={{ postId: post?.id, initialBody: post?.body || '' }} is:inline>
@@ -95,7 +143,7 @@ function resolveImg(url: string | null) {
       theme: 'snow',
       modules: {
         toolbar: [
-          [{ header: [1, 2, 3, false] }],
+          [{ header: [1, 2, 3, 4, 5, 6, false] }],
           ['bold', 'italic', 'underline'],
           ['link', 'image'],
           [{ list: 'ordered' }, { list: 'bullet' }],
@@ -141,6 +189,7 @@ function resolveImg(url: string | null) {
         const preview = document.getElementById('fImgPreview');
         preview.src = data.url;
         preview.classList.remove('hidden');
+        renderSeo();
       } catch (err) { showToast(err.message, 'error'); }
     });
 
@@ -167,5 +216,81 @@ function resolveImg(url: string | null) {
         setTimeout(() => { location.href = '/cbc-admin/blogs'; }, 500);
       } catch (e) { showToast(e.message, 'error'); }
     });
+
+    // ---------------- On-Page SEO score ----------------
+    const SEO_CHECKS = [
+      { key: 'title', label: 'Title added' },
+      { key: 'titleLength', label: 'Title length is good (under 60 characters)' },
+      { key: 'metaDesc', label: 'Meta description added' },
+      { key: 'metaDescLength', label: 'Meta description length is good (50–160 characters)' },
+      { key: 'slug', label: 'SEO-friendly URL slug set' },
+      { key: 'featuredImage', label: 'Featured image added' },
+      { key: 'h2', label: 'At least one H2 subheading used' },
+      { key: 'h3', label: 'At least one H3 subheading used' },
+      { key: 'internalLink', label: 'At least one internal link added' },
+      { key: 'externalLink', label: 'At least one outbound link added' },
+    ];
+
+    function hasLinkType(html, wantExternal) {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return Array.from(div.querySelectorAll('a[href]')).some((a) => {
+        const href = a.getAttribute('href') || '';
+        const isExternal = /^https?:\/\//i.test(href) && !href.includes(location.hostname);
+        return wantExternal ? isExternal : (href.length > 0 && !isExternal);
+      });
+    }
+
+    function evaluateSeo() {
+      const title = document.getElementById('fTitle').value.trim();
+      const slug = document.getElementById('fSlug').value.trim();
+      const desc = document.getElementById('fDesc').value.trim();
+      const heroUrl = document.getElementById('fImgUrl').value.trim();
+      const bodyHtml = quill.root.innerHTML;
+      return {
+        title: title.length > 0,
+        titleLength: title.length > 0 && title.length <= 60,
+        metaDesc: desc.length > 0,
+        metaDescLength: desc.length >= 50 && desc.length <= 160,
+        slug: slug.length > 0,
+        featuredImage: heroUrl.length > 0,
+        h2: /<h2[\s>]/i.test(bodyHtml),
+        h3: /<h3[\s>]/i.test(bodyHtml),
+        internalLink: hasLinkType(bodyHtml, false),
+        externalLink: hasLinkType(bodyHtml, true),
+      };
+    }
+
+    function renderSeo() {
+      const results = evaluateSeo();
+      const passed = SEO_CHECKS.filter((c) => results[c.key]).length;
+      const pct = Math.round((passed / SEO_CHECKS.length) * 100);
+
+      document.getElementById('seoScoreText').textContent = pct + '%';
+      const circumference = 2 * Math.PI * 32;
+      const dash = (pct / 100) * circumference;
+      const ring = document.getElementById('seoRing');
+      ring.setAttribute('stroke-dasharray', `${dash} ${circumference}`);
+      ring.setAttribute('stroke', pct === 100 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444');
+
+      document.getElementById('seoDetails').innerHTML = SEO_CHECKS.map((c) => {
+        const ok = results[c.key];
+        return `<div class="flex items-center gap-2 text-xs">
+          <span class="w-2 h-2 rounded-full shrink-0 ${ok ? 'bg-emerald-500' : 'bg-red-500'}"></span>
+          <span class="${ok ? 'text-slate-600' : 'text-slate-400'}">${c.label}</span>
+        </div>`;
+      }).join('');
+    }
+
+    document.getElementById('seoToggle').addEventListener('click', () => {
+      document.getElementById('seoDetails').classList.toggle('hidden');
+      document.getElementById('seoChevron').classList.toggle('rotate-180');
+    });
+
+    ['fTitle', 'fSlug', 'fDesc'].forEach((id) => {
+      document.getElementById(id).addEventListener('input', renderSeo);
+    });
+    quill.on('text-change', renderSeo);
+    renderSeo();
   }
 </script>
