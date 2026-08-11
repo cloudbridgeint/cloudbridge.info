@@ -11,13 +11,13 @@ export const GET: APIRoute = async (context) => {
 
 export const POST: APIRoute = async (context) => {
   const db = (context.locals as any).runtime.env.DB;
-  const { title, description, image, event_date, location, published = 1 } = await context.request.json();
+  const { title, description, image, event_date, event_time, location, published = 1 } = await context.request.json();
   if (!title) {
     return new Response(JSON.stringify({ error: 'title required' }), { status: 400 });
   }
   const result = await db.prepare(
-    `INSERT INTO events (title, description, image, event_date, location, published, slug) VALUES (?, ?, ?, ?, ?, ?, ?)`
-  ).bind(title, description || '', image || null, event_date || null, location || '', published ? 1 : 0, eventSlug(title)).run();
+    `INSERT INTO events (title, description, image, event_date, event_time, location, published, slug) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(title, description || '', image || null, event_date || null, event_time || '', location || '', published ? 1 : 0, eventSlug(title)).run();
   return new Response(JSON.stringify({ success: true, id: result.meta.last_row_id }), {
     status: 201,
     headers: { 'Content-Type': 'application/json' },

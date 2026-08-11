@@ -42,7 +42,7 @@ function formatDate(dateStr: string) {
               <div class="h-36" style={`background:${gradients[i % gradients.length]}`}></div>
             )}
             <div class="p-5 flex flex-col h-full">
-              <p class="text-xs text-ink/50">{formatDate(ev.event_date)}{ev.location ? ` · ${ev.location}` : ''}</p>
+              <p class="text-xs text-ink/50">{formatDate(ev.event_date)}{ev.event_time ? ` · ${ev.event_time}` : ''}{ev.location ? ` · ${ev.location}` : ''}</p>
               <h3 class="mt-1 font-display font-bold text-bridge-900"><a href={`/events/${ev.slug}/${eventPeriod(ev.event_date)}`} class="nav-link hover:text-sunrise-600 transition">{ev.title}</a></h3>
               {ev.description && <p class="mt-2 text-sm text-ink/60">{ev.description}</p>}
               <div class="mt-4 pt-4 border-t border-black/5 flex flex-wrap gap-2">

@@ -25,6 +25,8 @@ export const prerender = false;
         <div class="grid grid-cols-2 gap-3">
           <div><label class="block text-xs font-medium text-slate-600 mb-1">Date</label>
             <input type="date" id="fDate" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></div>
+          <div><label class="block text-xs font-medium text-slate-600 mb-1">Time</label>
+            <input type="text" id="fTime" placeholder="e.g. 10:00 AM – 6:00 PM" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></div>
           <div><label class="block text-xs font-medium text-slate-600 mb-1">Location</label>
             <input id="fLocation" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></div>
         </div>
@@ -58,7 +60,7 @@ export const prerender = false;
         <img src="${resolveImg(ev.image)}" class="w-20 h-14 object-cover rounded-lg shrink-0">
         <div class="flex-1 min-w-0">
           <p class="font-medium text-slate-900 text-sm truncate">${escapeHtml(ev.title)}</p>
-          <p class="text-xs text-slate-500 mt-0.5">${escapeHtml(ev.event_date || 'No date')} &middot; ${escapeHtml(ev.location || '')} &middot; ${ev.published ? '<span class="text-emerald-600 font-medium">Published</span>' : '<span class="text-amber-600 font-medium">Hidden</span>'}</p>
+          <p class="text-xs text-slate-500 mt-0.5">${escapeHtml(ev.event_date || 'No date')}${ev.event_time ? ' · ' + escapeHtml(ev.event_time) : ''} &middot; ${escapeHtml(ev.location || '')} &middot; ${ev.published ? '<span class="text-emerald-600 font-medium">Published</span>' : '<span class="text-amber-600 font-medium">Hidden</span>'}</p>
         </div>
         <div class="flex gap-3 shrink-0">
           <button class="text-xs text-bridge-700 hover:underline" onclick="editEvent(${ev.id})">Edit</button>
@@ -76,6 +78,7 @@ export const prerender = false;
     document.getElementById('fTitle').value = ev.title;
     document.getElementById('fDesc').value = ev.description || '';
     document.getElementById('fDate').value = ev.event_date || '';
+    document.getElementById('fTime').value = ev.event_time || '';
     document.getElementById('fLocation').value = ev.location || '';
     document.getElementById('fImgUrl').value = ev.image || '';
     document.getElementById('fPublished').checked = !!ev.published;
@@ -93,7 +96,7 @@ export const prerender = false;
 
   document.getElementById('addBtn').addEventListener('click', () => {
     document.getElementById('modalTitle').textContent = 'New Event';
-    ['editId','fTitle','fDesc','fDate','fLocation','fImgUrl'].forEach(id => document.getElementById(id).value = '');
+    ['editId','fTitle','fDesc','fDate','fTime','fLocation','fImgUrl'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('fPublished').checked = true;
     document.getElementById('fImgPreview').classList.add('hidden');
     document.getElementById('modal').classList.remove('hidden');
@@ -120,13 +123,14 @@ export const prerender = false;
     const title = document.getElementById('fTitle').value.trim();
     const description = document.getElementById('fDesc').value.trim();
     const event_date = document.getElementById('fDate').value;
+    const event_time = document.getElementById('fTime').value.trim();
     const location = document.getElementById('fLocation').value.trim();
     const image = document.getElementById('fImgUrl').value;
     const published = document.getElementById('fPublished').checked;
     if (!title) { showToast('Title is required', 'error'); return; }
     try {
-      if (id) await apiFetch(`/api/events/${id}`, { method: 'PUT', body: JSON.stringify({ title, description, event_date, location, image, published }) });
-      else await apiFetch('/api/events', { method: 'POST', body: JSON.stringify({ title, description, event_date, location, image, published }) });
+      if (id) await apiFetch(`/api/events/${id}`, { method: 'PUT', body: JSON.stringify({ title, description, event_date, event_time, location, image, published }) });
+      else await apiFetch('/api/events', { method: 'POST', body: JSON.stringify({ title, description, event_date, event_time, location, image, published }) });
       showToast('Saved');
       document.getElementById('modal').classList.add('hidden');
       load();

@@ -25,6 +25,16 @@ const faqs = await getFaqs(db);
 const eventSectionOn = c(cm, 'home.event.enabled', '1') !== '0';
 const monthEvent = eventSectionOn ? await getEventThisMonth(db) : null;
 
+// Banner excerpt: the full description is markdown-ish and long, so strip the
+// syntax and any heading/bullet lines and keep the opening prose. The rest is
+// on the event page behind View Details.
+const eventExcerpt = String(monthEvent?.description || '')
+  .split(/\r?\n/)
+  .filter(l => l.trim() && !/^\s*(##|[-•*])\s/.test(l))
+  .join(' ')
+  .replace(/\*\*(.+?)\*\*/g, '$1')
+  .trim();
+
 const eventDateLabel = monthEvent?.event_date
   ? new Date(monthEvent.event_date + 'T00:00:00').toLocaleDateString('en-GB',
       { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
@@ -125,7 +135,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
 
 {monthEvent && (
 <section id="eventThisMonth" class="py-16 bg-bridge-50/50">
-  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10 items-center">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10 items-stretch">
     <div class="rounded-2xl h-64 md:h-80 overflow-hidden">
       {monthEvent.image ? (
         <img src={mediaUrl(monthEvent.image, '/assets/logo.png')} alt={monthEvent.title} class="w-full h-full object-cover">
@@ -142,30 +152,45 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
         </div>
       )}
     </div>
-    <div>
-      <p class="text-sunrise-600 font-display font-semibold text-sm uppercase tracking-wide mb-3">{c(cm, 'home.event.label', 'Event On This Month')}</p>
+
+    <!-- Matches the image height so the two columns line up and the buttons
+         sit level with the bottom of the image. -->
+    <div class="md:h-80 flex flex-col">
+      <p class="text-sunrise-600 font-display font-semibold text-sm uppercase tracking-wide mb-2">{c(cm, 'home.event.label', 'Event On This Month')}</p>
       <h2 class="section-heading">{monthEvent.title}</h2>
-      <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink/70">
-        <span class="inline-flex items-center gap-2">
-          <svg viewBox="0 0 24 24" class="w-4 h-4 text-sunrise-600" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+
+      <!-- Date, then venue, then time — one per line -->
+      <ul class="mt-3 space-y-1.5 text-sm text-ink/70">
+        <li class="flex items-center gap-2">
+          <svg viewBox="0 0 24 24" class="w-4 h-4 text-sunrise-600 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
           {eventDateLabel}
-        </span>
+        </li>
         {monthEvent.location && (
-          <span class="inline-flex items-center gap-2">
-            <svg viewBox="0 0 24 24" class="w-4 h-4 text-sunrise-600" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.2 7-10a7 7 0 1 0-14 0c0 4.8 7 10 7 10Z"/><circle cx="12" cy="11" r="2.5"/></svg>
+          <li class="flex items-center gap-2">
+            <svg viewBox="0 0 24 24" class="w-4 h-4 text-sunrise-600 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.2 7-10a7 7 0 1 0-14 0c0 4.8 7 10 7 10Z"/><circle cx="12" cy="11" r="2.5"/></svg>
             {monthEvent.location}
-          </span>
+          </li>
         )}
-      </div>
-      {monthEvent.description && <p class="mt-4 text-ink/60">{monthEvent.description}</p>}
-      <div class="mt-6 flex flex-wrap gap-3">
+        {monthEvent.event_time && (
+          <li class="flex items-center gap-2">
+            <svg viewBox="0 0 24 24" class="w-4 h-4 text-sunrise-600 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            {monthEvent.event_time}
+          </li>
+        )}
+      </ul>
+
+      {eventExcerpt && <p class="mt-3 text-ink/60 line-clamp-2">{eventExcerpt}</p>}
+
+      <!-- mt-auto pins the buttons to the bottom of the column, level with the
+           bottom of the image, however short the excerpt is. -->
+      <div class="mt-auto pt-5 flex flex-wrap gap-3">
         <button type="button" class="btn-primary inline-flex"
           data-ev-register
           data-ev-id={monthEvent.id}
           data-ev-title={monthEvent.title}
           data-ev-date={eventDateLabel}
           data-ev-location={monthEvent.location || ''}
-          data-ev-description={monthEvent.description || ''}>{c(cm, 'home.event.button', 'Register Now')}</button>
+          data-ev-description={eventExcerpt}>{c(cm, 'home.event.button', 'Register Now')}</button>
         <a href={`/events/${monthEvent.slug}/${eventPeriod(monthEvent.event_date)}`} class="btn-outline nav-link inline-flex">{c(cm, 'home.event.button_secondary', 'View Details')}</a>
       </div>
     </div>

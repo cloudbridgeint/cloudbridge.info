@@ -73,6 +73,12 @@ const eventSchema = isPast ? null : {
             {ev.location}
           </span>
         )}
+        {ev.event_time && (
+          <span class="inline-flex items-center gap-2">
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            {ev.event_time}
+          </span>
+        )}
       </div>
     </div>
   </section>
@@ -171,6 +177,7 @@ const eventSchema = isPast ? null : {
               <p class="mt-2 text-sm text-ink/60">Free to attend. Registration takes under a minute.</p>
               <dl class="mt-5 space-y-3 text-sm">
                 <div class="flex justify-between gap-4"><dt class="text-ink/50">Date</dt><dd class="font-semibold text-bridge-900 text-right">{dateLabel}</dd></div>
+                {ev.event_time && <div class="flex justify-between gap-4"><dt class="text-ink/50">Time</dt><dd class="font-semibold text-bridge-900 text-right">{ev.event_time}</dd></div>}
                 {ev.location && <div class="flex justify-between gap-4"><dt class="text-ink/50">Venue</dt><dd class="font-semibold text-bridge-900 text-right">{ev.location}</dd></div>}
                 <div class="flex justify-between gap-4"><dt class="text-ink/50">Entry</dt><dd class="font-semibold text-bridge-900 text-right">Free</dd></div>
               </dl>
