@@ -70,6 +70,28 @@ export const GET: APIRoute = async (context) => {
     // pages rather than a 500.
   }
 
+  // Event pages: one entry per recurring event, not per occurrence. The slug is
+  // reused each time the event runs, so this stays a stable, compounding URL
+  // rather than a new thin page every month.
+  try {
+    const db = (context.locals as any).runtime?.env?.DB;
+    if (db) {
+      const { results } = await db.prepare(
+        `SELECT slug, MAX(event_date) AS last_date FROM events
+         WHERE published = 1 AND slug IS NOT NULL AND slug != ''
+         GROUP BY slug`
+      ).all();
+      for (const row of results || []) {
+        if (!row?.slug) continue;
+        urls.push(
+          `  <url>\n    <loc>${SITE}/events/${esc(row.slug)}</loc>\n    <lastmod>${today}</lastmod>\n` +
+          `    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>`);
+      }
+    }
+  } catch {
+    // a database hiccup shouldn't break the sitemap
+  }
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;
 

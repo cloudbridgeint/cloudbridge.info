@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { eventSlug } from '../../../lib/content';
 
 export const prerender = false;
 
@@ -9,13 +10,16 @@ export const PUT: APIRoute = async (context) => {
   await db.prepare(
     `UPDATE events SET
       title = COALESCE(?, title),
+      -- a recurring event keeps its slug, so the URL and its search ranking
+      -- survive every time the date is moved forward
+      slug = COALESCE(?, slug),
       description = COALESCE(?, description),
       image = COALESCE(?, image),
       event_date = COALESCE(?, event_date),
       location = COALESCE(?, location),
       published = COALESCE(?, published)
      WHERE id = ?`
-  ).bind(title ?? null, description ?? null, image ?? null, event_date ?? null, location ?? null,
+  ).bind(title ?? null, title ? eventSlug(title) : null, description ?? null, image ?? null, event_date ?? null, location ?? null,
     published === undefined ? null : (published ? 1 : 0), id).run();
   return new Response(JSON.stringify({ success: true }), { headers: { 'Content-Type': 'application/json' } });
 };

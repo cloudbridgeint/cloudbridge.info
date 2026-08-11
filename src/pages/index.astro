@@ -166,13 +166,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
           data-ev-date={eventDateLabel}
           data-ev-location={monthEvent.location || ''}
           data-ev-description={monthEvent.description || ''}>{c(cm, 'home.event.button', 'Register Now')}</button>
-        <button type="button" class="btn-outline inline-flex"
-          data-ev-details
-          data-ev-id={monthEvent.id}
-          data-ev-title={monthEvent.title}
-          data-ev-date={eventDateLabel}
-          data-ev-location={monthEvent.location || ''}
-          data-ev-description={monthEvent.description || ''}>{c(cm, 'home.event.button_secondary', 'View Details')}</button>
+        <a href={`/events/${monthEvent.slug}`} class="btn-outline nav-link inline-flex">{c(cm, 'home.event.button_secondary', 'View Details')}</a>
       </div>
     </div>
   </div>

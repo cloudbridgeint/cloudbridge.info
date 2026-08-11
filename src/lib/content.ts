@@ -77,6 +77,53 @@ export async function getEventThisMonth(db: D1Like) {
   return (row as any) || null;
 }
 
+/** URL-safe slug from an event title. Kept here so the page route and the
+ *  admin write path can never disagree about what a title turns into. */
+export function eventSlug(title: string): string {
+  return String(title || '')
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase() || 'event';
+}
+
+/**
+ * Resolve /events/<slug> to a single event.
+ *
+ * A recurring event reuses its slug every time it runs, so the URL is stable
+ * and keeps whatever search ranking it has built. That means several rows can
+ * share a slug: prefer the soonest one still to come, and fall back to the most
+ * recent past one so an old shared link shows the event as finished instead of
+ * 404ing.
+ */
+export async function getEventBySlug(db: D1Like, slug: string) {
+  const upcoming = await db.prepare(
+    `SELECT * FROM events
+     WHERE published = 1 AND slug = ? AND event_date >= date('now')
+     ORDER BY event_date ASC LIMIT 1`
+  ).bind(slug).first();
+  if (upcoming) return { event: upcoming as any, past: false };
+
+  const previous = await db.prepare(
+    `SELECT * FROM events
+     WHERE published = 1 AND slug = ?
+     ORDER BY event_date DESC LIMIT 1`
+  ).bind(slug).first();
+  if (previous) return { event: previous as any, past: true };
+
+  return null;
+}
+
+/** Distinct event slugs, for the sitemap. One entry per recurring event. */
+export async function getEventSlugs(db: D1Like) {
+  const { results } = await db.prepare(
+    `SELECT slug, MAX(event_date) AS last_date FROM events
+     WHERE published = 1 AND slug IS NOT NULL AND slug != ''
+     GROUP BY slug`
+  ).all();
+  return (results || []) as any[];
+}
+
 export async function getFaqs(db: D1Like) {
   const { results } = await db.prepare('SELECT * FROM faqs WHERE active = 1 ORDER BY sort_order ASC, id ASC').all();
   return results as any[];

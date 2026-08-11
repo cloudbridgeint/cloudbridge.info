@@ -43,7 +43,7 @@ function formatDate(dateStr: string) {
             )}
             <div class="p-5 flex flex-col h-full">
               <p class="text-xs text-ink/50">{formatDate(ev.event_date)}{ev.location ? ` · ${ev.location}` : ''}</p>
-              <h3 class="mt-1 font-display font-bold text-bridge-900">{ev.title}</h3>
+              <h3 class="mt-1 font-display font-bold text-bridge-900"><a href={`/events/${ev.slug}`} class="nav-link hover:text-sunrise-600 transition">{ev.title}</a></h3>
               {ev.description && <p class="mt-2 text-sm text-ink/60">{ev.description}</p>}
               <div class="mt-4 pt-4 border-t border-black/5 flex flex-wrap gap-2">
                 <button type="button" class="btn-primary !text-xs !px-4 !py-2 inline-flex"
@@ -53,13 +53,7 @@ function formatDate(dateStr: string) {
                   data-ev-date={formatDate(ev.event_date)}
                   data-ev-location={ev.location || ''}
                   data-ev-description={ev.description || ''}>Register Now</button>
-                <button type="button" class="btn-outline !text-xs !px-4 !py-2 inline-flex"
-                  data-ev-details
-                  data-ev-id={ev.id}
-                  data-ev-title={ev.title}
-                  data-ev-date={formatDate(ev.event_date)}
-                  data-ev-location={ev.location || ''}
-                  data-ev-description={ev.description || ''}>See Details</button>
+                <a href={`/events/${ev.slug}`} class="btn-outline nav-link !text-xs !px-4 !py-2 inline-flex">See Details</a>
               </div>
             </div>
           </div>

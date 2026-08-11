@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { eventSlug } from '../../../lib/content';
 
 export const prerender = false;
 
@@ -15,8 +16,8 @@ export const POST: APIRoute = async (context) => {
     return new Response(JSON.stringify({ error: 'title required' }), { status: 400 });
   }
   const result = await db.prepare(
-    `INSERT INTO events (title, description, image, event_date, location, published) VALUES (?, ?, ?, ?, ?, ?)`
-  ).bind(title, description || '', image || null, event_date || null, location || '', published ? 1 : 0).run();
+    `INSERT INTO events (title, description, image, event_date, location, published, slug) VALUES (?, ?, ?, ?, ?, ?, ?)`
+  ).bind(title, description || '', image || null, event_date || null, location || '', published ? 1 : 0, eventSlug(title)).run();
   return new Response(JSON.stringify({ success: true, id: result.meta.last_row_id }), {
     status: 201,
     headers: { 'Content-Type': 'application/json' },
