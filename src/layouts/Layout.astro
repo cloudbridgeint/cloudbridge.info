@@ -193,6 +193,32 @@ import '../styles/site.css';
   .uni-tab-btn.active { background:#db1f2a; color:#fff; border-color:#db1f2a; }
   .uni-tab-btn { border-radius:0.5rem; }
   @media (max-width:767px){ #heroSlider .slider-arrow { display:none; } }
+  /* The panel floats under the header bar rather than sitting in the flow —
+     opening the menu must not shift the page behind it. The header is
+     position:sticky, so it is the containing block for this. */
+  #mobileMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 20px 34px -14px rgba(15, 28, 48, .32);
+    max-height: calc(100vh - 100%);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Dim the page behind the open menu so the overlay reads as a layer. */
+  /* The floating call/chat widget sits above the header, so it would hover over
+     the open menu and can cover the items nearest the bottom. Hide it while the
+     overlay is up. */
+  body.mobile-menu-open #fabWidget { display: none; }
+  #mobileMenuBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 17, 30, .35);
+    z-index: 40;
+  }
   .mobile-menu-item { display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.9rem 1.1rem; border-radius:.85rem; background:#f4f5f9; color:#0f1c30; font-weight:600; font-size:.95rem; }
   .mobile-menu-item.mobile-menu-apply { color:#e12d38; }
   .mobile-accordion-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:.9rem 1.1rem; border-radius:.85rem; background:#f4f5f9; color:#0f1c30; font-weight:600; font-size:.95rem; border:none; cursor:pointer; text-align:left; }
@@ -288,6 +314,7 @@ import '../styles/site.css';
     <a href="/free-consultation" class="nav-link block w-full text-center py-4 text-white font-display font-bold text-base" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%)">Free Consultation</a>
   </nav>
 </header>
+<div id="mobileMenuBackdrop" class="hidden min-[1120px]:hidden"></div>
 
 <!-- Page content swaps here -->
 

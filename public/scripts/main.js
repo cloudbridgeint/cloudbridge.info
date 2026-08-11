@@ -1184,8 +1184,36 @@ function initPageScripts() {
 }
 
 // Mobile menu toggle (bound once — header is static across pages)
+function setMobileMenu(open) {
+  const menu = document.getElementById('mobileMenu');
+  const backdrop = document.getElementById('mobileMenuBackdrop');
+  if (!menu) return;
+  menu.classList.toggle('hidden', !open);
+  if (backdrop) backdrop.classList.toggle('hidden', !open);
+  // Lock the page behind the overlay so scrolling the menu doesn't scroll it,
+  // and flag the state so the floating widget can step out of the way.
+  document.body.style.overflow = open ? 'hidden' : '';
+  document.body.classList.toggle('mobile-menu-open', open);
+}
+
 document.getElementById('mobileToggle').addEventListener('click', () => {
-  document.getElementById('mobileMenu').classList.toggle('hidden');
+  const menu = document.getElementById('mobileMenu');
+  setMobileMenu(menu.classList.contains('hidden'));
+});
+
+// Tapping the dimmed area or pressing Escape closes it, and so does following
+// a link — otherwise the overlay would stay open over the next page.
+document.addEventListener('click', (e) => {
+  if (e.target && e.target.id === 'mobileMenuBackdrop') setMobileMenu(false);
+  const link = e.target.closest && e.target.closest('#mobileMenu a[href]');
+  if (link) setMobileMenu(false);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') setMobileMenu(false);
+});
+// A resize into desktop width must not leave the body scroll-locked.
+window.addEventListener('resize', () => {
+  if (window.innerWidth >= 1120) setMobileMenu(false);
 });
 
 // Mobile menu accordion (e.g. "About" expanding to About Us / Our Team)
