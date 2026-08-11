@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { Image } from 'astro:assets';
-import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getNextEvent, mediaUrl } from '../lib/content';
+import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, mediaUrl } from '../lib/content';
 import heroSlide1 from '../assets/hero/slide1.jpg';
 import heroSlide2 from '../assets/hero/slide2.jpg';
 import heroSlide3 from '../assets/hero/slide3.jpg';
@@ -19,10 +19,13 @@ const cm = await getAllContent(db);
 const universities = await getUniversities(db);
 const faqs = await getFaqs(db);
 
-const nextEvent = await getNextEvent(db);
+// The banner can be switched off from the admin panel even when an event
+// exists — e.g. while a date is still being confirmed.
+const eventSectionOn = c(cm, 'home.event.enabled', '1') !== '0';
+const monthEvent = eventSectionOn ? await getEventThisMonth(db) : null;
 
-const eventDateLabel = nextEvent?.event_date
-  ? new Date(nextEvent.event_date + 'T00:00:00').toLocaleDateString('en-GB',
+const eventDateLabel = monthEvent?.event_date
+  ? new Date(monthEvent.event_date + 'T00:00:00').toLocaleDateString('en-GB',
       { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
   : '';
 
@@ -119,44 +122,44 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
   </div>
 </section>
 
-{nextEvent && (
-<section class="py-16 bg-bridge-50/50">
+{monthEvent && (
+<section id="eventThisMonth" class="py-16 bg-bridge-50/50">
   <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-10 items-center">
     <div class="rounded-2xl h-64 md:h-80 overflow-hidden">
-      {nextEvent.image ? (
-        <img src={mediaUrl(nextEvent.image, '/assets/logo.png')} alt={nextEvent.title} class="w-full h-full object-cover">
+      {monthEvent.image ? (
+        <img src={mediaUrl(monthEvent.image, '/assets/logo.png')} alt={monthEvent.title} class="w-full h-full object-cover">
       ) : (
         <div class="w-full h-full flex flex-col items-center justify-center text-white text-center px-6"
              style="background-image:linear-gradient(160deg,#0f1c30 0%,#1c3255 45%,#2f5182 100%)">
           <p class="font-display text-5xl md:text-6xl font-extrabold leading-none">
-            {new Date(nextEvent.event_date + 'T00:00:00').getDate()}
+            {new Date(monthEvent.event_date + 'T00:00:00').getDate()}
           </p>
           <p class="mt-1 font-display font-semibold uppercase tracking-widest text-sm text-white/80">
-            {new Date(nextEvent.event_date + 'T00:00:00').toLocaleDateString('en-GB', { month: 'long' })}
+            {new Date(monthEvent.event_date + 'T00:00:00').toLocaleDateString('en-GB', { month: 'long' })}
           </p>
-          <p class="mt-4 text-white/70 text-sm max-w-xs">{nextEvent.location || 'Venue to be announced'}</p>
+          <p class="mt-4 text-white/70 text-sm max-w-xs">{monthEvent.location || 'Venue to be announced'}</p>
         </div>
       )}
     </div>
     <div>
-      <p class="text-sunrise-600 font-display font-semibold text-sm uppercase tracking-wide mb-3">Upcoming Event</p>
-      <h2 class="section-heading">{nextEvent.title}</h2>
+      <p class="text-sunrise-600 font-display font-semibold text-sm uppercase tracking-wide mb-3">{c(cm, 'home.event.label', 'Event On This Month')}</p>
+      <h2 class="section-heading">{monthEvent.title}</h2>
       <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink/70">
         <span class="inline-flex items-center gap-2">
           <svg viewBox="0 0 24 24" class="w-4 h-4 text-sunrise-600" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
           {eventDateLabel}
         </span>
-        {nextEvent.location && (
+        {monthEvent.location && (
           <span class="inline-flex items-center gap-2">
             <svg viewBox="0 0 24 24" class="w-4 h-4 text-sunrise-600" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-5.2 7-10a7 7 0 1 0-14 0c0 4.8 7 10 7 10Z"/><circle cx="12" cy="11" r="2.5"/></svg>
-            {nextEvent.location}
+            {monthEvent.location}
           </span>
         )}
       </div>
-      {nextEvent.description && <p class="mt-4 text-ink/60">{nextEvent.description}</p>}
+      {monthEvent.description && <p class="mt-4 text-ink/60">{monthEvent.description}</p>}
       <div class="mt-6 flex flex-wrap gap-3">
-        <a href={`/?event=${encodeURIComponent(nextEvent.title)}#lead-form`} class="btn-primary nav-link inline-flex">Register Now</a>
-        <a href="/events" class="btn-outline nav-link inline-flex">See all events</a>
+        <a href={`/?event=${encodeURIComponent(monthEvent.title)}#lead-form`} class="btn-primary nav-link inline-flex">{c(cm, 'home.event.button', 'Register Now')}</a>
+        <a href="/events" class="btn-outline nav-link inline-flex">{c(cm, 'home.event.button_secondary', 'See all events')}</a>
       </div>
     </div>
   </div>

@@ -50,6 +50,16 @@ const sections = [
     ],
   },
   {
+    title: 'Event On This Month',
+    note: 'The event itself is managed on the Events page — this banner automatically shows the next published event dated inside the current month, and hides itself once that month has no event left. Set "Show this section" to Hide to switch it off even when an event exists.',
+    fields: [
+      { key: 'home.event.enabled', label: 'Show this section', type: 'toggle', default: '1' },
+      { key: 'home.event.label', label: 'Small label above the title', type: 'text', default: 'Event On This Month' },
+      { key: 'home.event.button', label: 'Main button text', type: 'text', default: 'Register Now' },
+      { key: 'home.event.button_secondary', label: 'Second button text', type: 'text', default: 'See all events' },
+    ],
+  },
+  {
     title: 'Choose Your Destination',
     fields: [
       { key: 'home.destination.heading', label: 'Section heading', type: 'text', default: 'Choose Your Destination' },
@@ -104,7 +114,12 @@ const sections = [
           {section.fields.map((f: any) => (
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-1">{f.label}</label>
-              {f.type === 'image' ? (
+              {f.type === 'toggle' ? (
+                <select class="field-input w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" data-key={f.key}>
+                  <option value="1" selected={(cm[f.key] ?? f.default) !== '0'}>Show</option>
+                  <option value="0" selected={(cm[f.key] ?? f.default) === '0'}>Hide</option>
+                </select>
+              ) : f.type === 'image' ? (
                 <div class="flex items-center gap-4">
                   <img class="img-preview h-16 w-24 object-cover rounded-lg border" data-key={f.key} src={resolveImg(cm[f.key], f.fallback)}>
                   <input type="file" accept="image/*" class="img-file text-sm" data-key={f.key}>

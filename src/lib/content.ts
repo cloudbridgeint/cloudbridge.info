@@ -60,14 +60,18 @@ export async function getUniversities(db: D1Like, country?: string) {
 }
 
 /**
- * The soonest published event that hasn't happened yet — used for the homepage
- * banner. Returning only future events means the banner retires itself instead
- * of advertising a date that has passed.
+ * The soonest published event that falls inside the current calendar month and
+ * hasn't happened yet. Scoped to this month on purpose: showing next month's
+ * or a finished event under an "Event On This Month" heading would make the
+ * site look unmaintained, so when the month has nothing left the banner simply
+ * disappears.
  */
-export async function getNextEvent(db: D1Like) {
+export async function getEventThisMonth(db: D1Like) {
   const row = await db.prepare(
     `SELECT * FROM events
-     WHERE published = 1 AND event_date >= date('now')
+     WHERE published = 1
+       AND event_date >= date('now')
+       AND strftime('%Y-%m', event_date) = strftime('%Y-%m', 'now')
      ORDER BY event_date ASC LIMIT 1`
   ).first();
   return (row as any) || null;
