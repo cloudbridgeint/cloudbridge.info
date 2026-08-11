@@ -28,6 +28,7 @@ const settingsSubItems = [
   { key: 'footer', label: 'Footer', href: '/cbc-admin/footer', icon: 'M4 6h16M4 12h16M4 18h7' },
 ];
 const settingsActive = settingsSubItems.some(i => i.key === active);
+import '../styles/admin.css';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -36,20 +37,7 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>{title} — CloudBridge Admin</title>
-  <script src="https://cdn.tailwindcss.com" is:inline></script>
-  <script is:inline>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            bridge: { 50:'#eef2f9',100:'#dbe6f2',500:'#3d6099',600:'#2f5182',700:'#254368',800:'#1c3255',900:'#15263f',950:'#0f1c30' },
-            sunrise: { 50:'#fdeceb', 100:'#ffe6d9',500:'#c0201f',600:'#aa1821',700:'#8f1519' },
-            iris: { 50:'#f1f1fc',100:'#e3e4f9',200:'#c5c7f3',300:'#a2a5ec',400:'#8286e2',500:'#5b5fc7',600:'#4d51b0',700:'#3f4293',800:'#33356f',900:'#282a57' },
-          },
-        },
-      },
-    };
-  </script>
+  
   <style is:global>
     body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }

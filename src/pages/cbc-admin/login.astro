@@ -1,6 +1,7 @@
 ---
 import logo from '../../assets/logo-white.png';
 export const prerender = false;
+import '../../styles/admin.css';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -9,13 +10,6 @@ export const prerender = false;
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>Login — CloudBridge Admin</title>
-  <script src="https://cdn.tailwindcss.com" is:inline></script>
-  <script is:inline>
-    tailwind.config = { theme: { extend: { colors: {
-      bridge: { 700:'#254368', 900:'#15263f', 950:'#0f1c30' },
-      sunrise: { 600:'#aa1821' },
-    } } } };
-  </script>
   <style is:global>
     body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
     .pill-input {
