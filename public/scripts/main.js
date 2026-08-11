@@ -280,6 +280,7 @@ function applyNext() {
     for (const field of fields) {
       if (!field.checkValidity()) { field.reportValidity(); return; }
     }
+    if (typeof window.applyValidateCombos === 'function' && !window.applyValidateCombos(panel)) return;
   }
   if (applyStep < 4) { applyShowStep(applyStep + 1); }
   else { applySubmitForm(); }
@@ -329,7 +330,6 @@ async function applySubmitForm() {
       source_page: 'apply-now',
       dob: val('applyDob'),
       gender: val('applyGender'),
-      nationality: val('applyNationality'),
       residence_country: val('applyResidenceCountry'),
       address: val('applyAddress'),
       degree_level: val('applyQualification'),
@@ -346,6 +346,7 @@ async function applySubmitForm() {
       doc_english_cert: docEnglishCert,
       doc_cv: docCV,
       doc_personal_statement: docPersonalStatement,
+      ...(typeof window.applyGetExtraFields === 'function' ? window.applyGetExtraFields() : {}),
     };
     fetch('/api/leads', {
       method: 'POST',

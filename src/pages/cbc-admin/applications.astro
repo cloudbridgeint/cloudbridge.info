@@ -68,7 +68,7 @@ const monthOptions = Array.from(monthSet.entries()).sort((a, b) => (a[0] < b[0] 
     destination_country: r.destination_country || '', status: r.status || 'new', created_at: r.created_at,
     name: r.name || 'Anonymous', email: r.email || '', phone: r.phone || '',
     dob: r.dob || '', gender: r.gender || '', nationality: r.nationality || '',
-    residence_country: r.residence_country || '', address: r.address || '',
+    residence_country: r.residence_country || '', residence_city: r.residence_city || '', address: r.address || '',
     degree_level: r.degree_level || '', institute_name: r.institute_name || '',
     course_studied: r.course_studied || '', graduation_year: r.graduation_year || '',
     english_test: r.english_test || '', test_score: r.test_score || '',
@@ -298,8 +298,8 @@ const monthOptions = Array.from(monthSet.entries()).sort((a, b) => (a[0] < b[0] 
                 <div><p class="text-xs text-slate-400">Phone</p><p id="ppPhone" class="font-medium text-slate-700 mt-0.5">—</p></div>
                 <div><p class="text-xs text-slate-400">Gender</p><p id="ppGender" class="font-medium text-slate-700 mt-0.5">—</p></div>
                 <div><p class="text-xs text-slate-400">Date of birth</p><p id="ppDob" class="font-medium text-slate-700 mt-0.5">—</p></div>
-                <div><p class="text-xs text-slate-400">Nationality</p><p id="ppNationality" class="font-medium text-slate-700 mt-0.5">—</p></div>
-                <div><p class="text-xs text-slate-400">Residence</p><p id="ppResidence" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                <div><p class="text-xs text-slate-400">Country of residence</p><p id="ppResidence" class="font-medium text-slate-700 mt-0.5">—</p></div>
+                <div><p class="text-xs text-slate-400">City / District</p><p id="ppResidenceCity" class="font-medium text-slate-700 mt-0.5">—</p></div>
                 <div class="col-span-2"><p class="text-xs text-slate-400">Address</p><p id="ppAddress" class="font-medium text-slate-700 mt-0.5">—</p></div>
               </div>
             </div>
@@ -466,7 +466,7 @@ const monthOptions = Array.from(monthSet.entries()).sort((a, b) => (a[0] < b[0] 
       { key: 'decision', label: 'Decision' },
     ];
     const COMPLETENESS_FIELDS = [
-      'phone', 'email', 'dob', 'gender', 'nationality', 'residence_country', 'address',
+      'phone', 'email', 'dob', 'gender', 'residence_country', 'residence_city', 'address',
       'degree_level', 'institute_name', 'course_studied', 'graduation_year',
       'english_test', 'preferred_study_level', 'subject_interested', 'destination_country', 'intake_month',
     ];
@@ -577,8 +577,8 @@ const monthOptions = Array.from(monthSet.entries()).sort((a, b) => (a[0] < b[0] 
       set('ppPhone', app.phone);
       set('ppGender', app.gender);
       set('ppDob', app.dob);
-      set('ppNationality', app.nationality);
       set('ppResidence', app.residence_country);
+      set('ppResidenceCity', app.residence_city);
       set('ppAddress', app.address);
 
       renderDocuments(app);

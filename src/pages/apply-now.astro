@@ -48,8 +48,37 @@ const description = "Submit your study abroad application to CloudBridge in four
             <div><label class="apply-label-field">Email Address <span class="text-sunrise-600">*</span></label><input id="applyEmail" required type="email" placeholder="name@email.com" class="apply-input"></div>
             <div><label class="apply-label-field">Date of Birth <span class="text-sunrise-600">*</span></label><input id="applyDob" required type="date" class="apply-input"></div>
             <div><label class="apply-label-field">Gender <span class="text-sunrise-600">*</span></label><select id="applyGender" required class="apply-input"><option value="">— Select —</option><option>Male</option><option>Female</option><option>Other</option></select></div>
-            <div><label class="apply-label-field">Nationality <span class="text-sunrise-600">*</span></label><select id="applyNationality" required class="apply-input"><option value="">— Select —</option><option>Bangladeshi</option><option>Indian</option><option>Other</option></select></div>
-            <div><label class="apply-label-field">Country of Residence <span class="text-sunrise-600">*</span></label><select id="applyResidenceCountry" required class="apply-input"><option value="">— Select —</option><option>Bangladesh</option><option>India</option><option>UAE</option><option>Saudi Arabia</option><option>Other</option></select></div>
+            <div>
+              <label class="apply-label-field">Country of Residence <span class="text-sunrise-600">*</span></label>
+              <div class="cb-combo" id="comboResidenceCountry" data-combo-required="Please select your country of residence">
+                <input type="hidden" id="applyResidenceCountry" value="">
+                <button type="button" class="apply-input cb-combo-btn placeholder" data-combo-toggle>
+                  <span data-combo-text>— Select —</span>
+                  <svg class="cb-combo-caret" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06 0L10 10.94l3.71-3.73a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 010-1.06z" clip-rule="evenodd"/></svg>
+                </button>
+                <div class="cb-combo-panel hidden" data-combo-panel>
+                  <div class="cb-combo-searchwrap"><input type="text" class="cb-combo-search" data-combo-search placeholder="Search country…" autocomplete="off"></div>
+                  <div class="cb-combo-list" data-combo-list></div>
+                </div>
+              </div>
+              <p class="cb-field-error" data-combo-error></p>
+            </div>
+            <div>
+              <label class="apply-label-field">City / District <span class="text-sunrise-600">*</span></label>
+              <div class="cb-combo" id="comboResidenceCity" data-combo-required="Please select your city">
+                <input type="hidden" id="applyResidenceCity" value="">
+                <button type="button" class="apply-input cb-combo-btn placeholder" data-combo-toggle disabled>
+                  <span data-combo-text>Select a country first</span>
+                  <svg class="cb-combo-caret" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06 0L10 10.94l3.71-3.73a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 010-1.06z" clip-rule="evenodd"/></svg>
+                </button>
+                <div class="cb-combo-panel hidden" data-combo-panel>
+                  <div class="cb-combo-searchwrap"><input type="text" class="cb-combo-search" data-combo-search placeholder="Search city…" autocomplete="off"></div>
+                  <div class="cb-combo-list" data-combo-list></div>
+                  <p class="cb-combo-hint">Can't find yours? Type the full name and pick "Use …".</p>
+                </div>
+              </div>
+              <p class="cb-field-error" data-combo-error></p>
+            </div>
             <div class="sm:col-span-2"><label class="apply-label-field">Full Address <span class="text-sunrise-600">*</span></label><input id="applyAddress" required placeholder="House, Road, Area, City" class="apply-input"></div>
           </div>
         </div>
@@ -74,6 +103,32 @@ const description = "Submit your study abroad application to CloudBridge in four
             Course Preference
           </h2>
           <div class="mt-6 grid sm:grid-cols-2 gap-5">
+            <div class="sm:col-span-2">
+              <label class="apply-label-field">Preferred Study Destination <span class="text-sunrise-600">*</span></label>
+              <div class="flex gap-3 items-start">
+                <div class="flex-1 min-w-0">
+                  <div class="cb-combo" id="comboDestCountry">
+                    <input type="hidden" id="applyDestPick" value="">
+                    <button type="button" class="apply-input cb-combo-btn placeholder" data-combo-toggle>
+                      <span data-combo-text>— Select a country —</span>
+                      <svg class="cb-combo-caret" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06 0L10 10.94l3.71-3.73a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 010-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                    <div class="cb-combo-panel hidden" data-combo-panel>
+                      <div class="cb-combo-searchwrap"><input type="text" class="cb-combo-search" data-combo-search placeholder="Search country…" autocomplete="off"></div>
+                      <div class="cb-combo-list" data-combo-list></div>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" id="applyDestAddBtn" class="cb-addbtn" disabled>+ Add</button>
+              </div>
+              <div id="applyDestOtherWrap" class="hidden mt-3">
+                <input type="text" id="applyDestOtherInput" class="apply-input" placeholder="Type the country name, then press + Add" autocomplete="off">
+              </div>
+              <input type="hidden" id="applyDestinationCountries" value="">
+              <div id="applyDestChips" class="cb-chip-row"></div>
+              <p class="cb-field-error" id="applyDestError">Please add at least one preferred country</p>
+              <p class="mt-2 text-xs text-ink/45">Add as many countries as you're interested in. Choose "Other (not listed)" to enter one manually.</p>
+            </div>
             <div><label class="apply-label-field">Preferred Study Level <span class="text-sunrise-600">*</span></label><select id="applyStudyLevel" required class="apply-input"><option value="">— Select —</option><option>Foundation</option><option>Undergraduate</option><option>Postgraduate</option><option>PHD</option></select></div>
             <div><label class="apply-label-field">Preferred Subject <span class="text-sunrise-600">*</span></label><select required id="applySubjectSelect" class="apply-input"><option value="">— Select —</option></select></div>
             <div><label class="apply-label-field">Intake Month <span class="text-sunrise-600">*</span></label><select id="applyIntakeMonth" required class="apply-input"><option value="">— Select —</option><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select></div>
@@ -87,11 +142,11 @@ const description = "Submit your study abroad application to CloudBridge in four
             Upload Documents
           </h2>
           <div class="mt-6 space-y-5">
-            <div><label class="apply-label-field">Academic Certificate <span class="text-sunrise-600">*</span></label><div class="apply-file"><input id="applyFileCert" required type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-badge required">Required</span></div></div>
-            <div><label class="apply-label-field">Mark Sheet / Transcript <span class="text-sunrise-600">*</span></label><div class="apply-file"><input id="applyFileTranscript" required type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-badge required">Required</span></div></div>
-            <div><label class="apply-label-field">English Test Certificate</label><div class="apply-file"><input id="applyFileEnglishCert" type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-badge">Optional</span></div></div>
-            <div><label class="apply-label-field">CV / Resume</label><div class="apply-file"><input id="applyFileCV" type="file" accept=".pdf,.doc,.docx" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/DOC)</span><span class="apply-file-badge">Optional</span></div></div>
-            <div><label class="apply-label-field">Personal Statement</label><div class="apply-file"><input id="applyFilePersonalStatement" type="file" accept=".pdf,.doc,.docx" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/DOC)</span><span class="apply-file-badge">Optional</span></div></div>
+            <div><label class="apply-label-field">Academic Certificate <span class="text-sunrise-600">*</span></label><div class="apply-file" data-file-row="applyFileCert"><input id="applyFileCert" required type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-actions" data-file-actions><span class="apply-file-badge required">Required</span></span></div></div>
+            <div><label class="apply-label-field">Mark Sheet / Transcript <span class="text-sunrise-600">*</span></label><div class="apply-file" data-file-row="applyFileTranscript"><input id="applyFileTranscript" required type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-actions" data-file-actions><span class="apply-file-badge required">Required</span></span></div></div>
+            <div><label class="apply-label-field">English Test Certificate</label><div class="apply-file" data-file-row="applyFileEnglishCert"><input id="applyFileEnglishCert" type="file" accept=".pdf,.jpg,.jpeg,.png" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/JPG/PNG)</span><span class="apply-file-actions" data-file-actions><span class="apply-file-badge">Optional</span></span></div></div>
+            <div><label class="apply-label-field">CV / Resume</label><div class="apply-file" data-file-row="applyFileCV"><input id="applyFileCV" type="file" accept=".pdf,.doc,.docx" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/DOC)</span><span class="apply-file-actions" data-file-actions><span class="apply-file-badge">Optional</span></span></div></div>
+            <div><label class="apply-label-field">Personal Statement</label><div class="apply-file" data-file-row="applyFilePersonalStatement"><input id="applyFilePersonalStatement" type="file" accept=".pdf,.doc,.docx" class="apply-file-input"><span class="apply-file-label"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Choose file (PDF/DOC)</span><span class="apply-file-actions" data-file-actions><span class="apply-file-badge">Optional</span></span></div></div>
           </div>
         </div>
 
@@ -113,11 +168,22 @@ const description = "Submit your study abroad application to CloudBridge in four
           <svg viewBox="0 0 24 24" class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
         </div>
         <h2 class="mt-4 font-display font-bold text-xl text-bridge-900">Application Submitted!</h2>
-        <p class="mt-2 text-ink/60 max-w-sm mx-auto">Thanks — a CloudBridge counsellor will review your application and get back to you shortly. <span class="block text-xs text-ink/40 mt-1">(demo only — nothing was actually sent)</span></p>
+        <p class="mt-3 font-display font-semibold text-bridge-900">Thanks for applying with us!</p>
+        <p class="mt-2 text-ink/60 max-w-md mx-auto">Our expert counsellor will review your application and get back to you soon.</p>
       </div>
 
     </div>
   </div>
 </section>
+
+<div id="cbPreviewModal" class="hidden">
+  <div class="cb-prev-box">
+    <div class="cb-prev-head">
+      <p id="cbPreviewName" class="font-display font-bold text-bridge-900 text-sm truncate">Preview</p>
+      <button type="button" id="cbPreviewClose" class="rounded-lg px-3 py-1.5 text-sm font-semibold text-bridge-900 bg-bridge-50 hover:bg-bridge-100 transition">Close</button>
+    </div>
+    <div id="cbPreviewBody" class="cb-prev-body"></div>
+  </div>
+</div>
 
 </Layout>

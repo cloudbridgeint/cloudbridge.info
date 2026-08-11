@@ -10,7 +10,7 @@ export const POST: APIRoute = async (context) => {
     utm_source, utm_medium, utm_campaign,
     residence_country, destination_country, degree_level, subject_interested, english_test, test_score,
     dob, gender, nationality, address, institute_name, course_studied, graduation_year,
-    preferred_study_level, intake_month, intake_year,
+    preferred_study_level, intake_month, intake_year, residence_city,
     doc_academic_cert, doc_transcript, doc_english_cert, doc_cv, doc_personal_statement,
   } = body || {};
 
@@ -23,16 +23,16 @@ export const POST: APIRoute = async (context) => {
       (name, email, phone, message, source_page, utm_source, utm_medium, utm_campaign, referrer, country, city, ip, status,
        residence_country, destination_country, degree_level, subject_interested, english_test, test_score,
        dob, gender, nationality, address, institute_name, course_studied, graduation_year,
-       preferred_study_level, intake_month, intake_year,
+       preferred_study_level, intake_month, intake_year, residence_city,
        doc_academic_cert, doc_transcript, doc_english_cert, doc_cv, doc_personal_statement)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     name || '', email || '', phone || '', message || '', source_page || '',
     utm_source || '', utm_medium || '', utm_campaign || '', referrer,
     cf.country || '', cf.city || '', ip,
     residence_country || '', destination_country || '', degree_level || '', subject_interested || '', english_test || '', test_score || '',
     dob || '', gender || '', nationality || '', address || '', institute_name || '', course_studied || '', graduation_year || '',
-    preferred_study_level || '', intake_month || '', intake_year || '',
+    preferred_study_level || '', intake_month || '', intake_year || '', residence_city || '',
     doc_academic_cert || '', doc_transcript || '', doc_english_cert || '', doc_cv || '', doc_personal_statement || ''
   ).run();
 
