@@ -4,6 +4,22 @@ import { verifySessionCookie } from './lib/auth';
 const PUBLIC_ADMIN_PATHS = ['/cbc-admin/login', '/api/login'];
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  const response = await handleRequest(context, next);
+
+  // Once cloudbridge.info serves this same build, the *.pages.dev deployments
+  // (staging + every preview) become duplicate content competing with the real
+  // domain in search. Keep them out of the index.
+  if (context.url.hostname.endsWith('.pages.dev')) {
+    try {
+      response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    } catch {
+      // some responses are immutable — not worth failing the request over
+    }
+  }
+  return response;
+});
+
+async function handleRequest(context: any, next: any) {
   const { pathname } = context.url;
   const isAdminArea = pathname.startsWith('/cbc-admin') || pathname.startsWith('/api/');
   if (!isAdminArea) return next();
@@ -35,4 +51,4 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   (context.locals as any).user = session;
   return next();
-});
+}
