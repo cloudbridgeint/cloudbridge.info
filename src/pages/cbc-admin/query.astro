@@ -31,122 +31,165 @@ const rows = queries.map((q: any) => ({ ...q, stamp: splitStamp(q.created_at) })
   <h1 class="text-2xl font-bold text-bridge-950">Query</h1>
   <p class="text-slate-500 mt-1 text-sm">Submissions from the Contact Us form.</p>
 
-  <div class="mt-8 space-y-4">
+  <div class="qlist mt-8 space-y-6">
     {rows.length === 0 ? (
       <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-8 text-center">
         <p class="text-slate-400 text-sm">No queries yet — they'll show up here once someone submits the Contact Us form.</p>
       </div>
     ) : rows.map((q: any) => (
-      <div class="qcard card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden">
-        <div class="qgrid">
+      <div class="qcard card-soft">
+        <!-- Name sits in a raised tab that overhangs the top edge of the card -->
+        <div class="qname-tab">
+          <span class="qavatar">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="w-full h-full">
+              <circle cx="12" cy="12" r="12" fill="currentColor"/>
+              <circle cx="12" cy="9.3" r="3.1" fill="#fff"/>
+              <path d="M5.6 19.6c.9-3 3.4-4.6 6.4-4.6s5.5 1.6 6.4 4.6A11.9 11.9 0 0 1 12 24c-2.5 0-4.7-.8-6.4-2.1Z" fill="#fff"/>
+            </svg>
+          </span>
+          <p class="qname">{q.name || 'Anonymous'}</p>
+        </div>
 
+        <div class="qgrid">
           <div class="qcol qcol-contact">
-            <div class="flex items-center gap-3">
-              <span class="qavatar">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="w-5 h-5">
-                  <circle cx="12" cy="8" r="3.5"/><path d="M4.5 20c0-3.6 3.4-6 7.5-6s7.5 2.4 7.5 6"/>
+            <div class="qcontact-row">
+              <span class="qicon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="w-full h-full">
+                  <circle cx="12" cy="12" r="11"/>
+                  <path d="M8.6 6.6h1.9l1 2.6-1.3 1a7.7 7.7 0 0 0 3.7 3.7l1-1.3 2.6 1v1.9a1 1 0 0 1-1.1 1c-5.2-.4-8.6-3.8-9-9a1 1 0 0 1 1-1Z" stroke-width="1.5"/>
                 </svg>
               </span>
-              <p class="font-bold text-bridge-950 text-lg leading-tight truncate">{q.name || 'Anonymous'}</p>
+              {q.phone
+                ? <a href={`tel:${q.phone}`} class="qcontact-text hover:text-bridge-700 transition">{q.phone}</a>
+                : <span class="qcontact-text qcontact-empty">No phone provided</span>}
             </div>
-
-            <div class="mt-4">
-              <div class="qcontact-row">
-                <span class="qicon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="w-4 h-4">
-                    <path d="M6.5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6 6l1.5-2 4 1.5v3a1.5 1.5 0 0 1-1.6 1.5C10.6 18.7 5.3 13.4 5 4.9A1.5 1.5 0 0 1 6.5 3.5Z"/>
-                  </svg>
-                </span>
-                {q.phone
-                  ? <a href={`tel:${q.phone}`} class="qcontact-text hover:text-bridge-700 transition">{q.phone}</a>
-                  : <span class="qcontact-text text-slate-300">No phone provided</span>}
-              </div>
-              <div class="qcontact-row qcontact-row-last">
-                <span class="qicon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="w-4 h-4">
-                    <rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/>
-                  </svg>
-                </span>
-                {q.email
-                  ? <a href={`mailto:${q.email}`} class="qcontact-text hover:text-bridge-700 transition">{q.email}</a>
-                  : <span class="qcontact-text text-slate-300">No email provided</span>}
-              </div>
+            <div class="qcontact-divider"></div>
+            <div class="qcontact-row">
+              <span class="qicon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="w-full h-full">
+                  <circle cx="12" cy="12" r="11"/>
+                  <rect x="6.2" y="8.6" width="11.6" height="7.2" rx="1.6" stroke-width="1.5"/>
+                  <path d="m6.6 9.4 5.4 3.8 5.4-3.8" stroke-width="1.5"/>
+                </svg>
+              </span>
+              {q.email
+                ? <a href={`mailto:${q.email}`} class="qcontact-text hover:text-bridge-700 transition">{q.email}</a>
+                : <span class="qcontact-text qcontact-empty">No email provided</span>}
             </div>
           </div>
 
           <div class="qcol qcol-query">
             <span class="qtag">Query</span>
-            <p class="qmessage">{q.message || <span class="text-slate-300 italic">No message left</span>}</p>
+            <p class="qmessage">{q.message || <span class="qcontact-empty italic">No message left</span>}</p>
           </div>
 
           <div class="qcol qcol-date">
             <span class="qtag">Date &amp; Time</span>
             <div class="qdate-values">
-              <p class="text-sm font-semibold text-bridge-950 whitespace-nowrap">{q.stamp.date}</p>
-              <p class="text-xs text-slate-400 mt-0.5 whitespace-nowrap">{q.stamp.time}</p>
+              <p class="qdate-day">{q.stamp.date}</p>
+              <p class="qdate-time">{q.stamp.time}</p>
             </div>
           </div>
-
         </div>
       </div>
     ))}
   </div>
 
   <style is:global>
-    .qgrid {
-      display: grid;
-      grid-template-columns: 20rem minmax(0, 1fr) 11rem;
-      align-items: stretch;
-    }
-    .qcol { padding: 1.5rem 1.75rem; min-width: 0; }
-    /* Separators are borders, not a divider element, so they span the full card height */
-    .qcol-query, .qcol-date { border-left: 1px solid rgba(15, 28, 48, .08); }
-    .qavatar {
-      flex: none; width: 2.5rem; height: 2.5rem; border-radius: 9999px;
-      display: flex; align-items: center; justify-content: center;
-      background: #eef2f9; color: #1c3255;
-    }
-    .qcontact-row {
-      display: flex; align-items: center; gap: .7rem;
-      padding: .55rem 0; border-bottom: 1px solid rgba(15, 28, 48, .07);
-    }
-    .qcontact-row-last { border-bottom: none; }
-    .qicon {
-      flex: none; width: 1.85rem; height: 1.85rem; border-radius: 9999px;
-      display: flex; align-items: center; justify-content: center;
-      background: #eef2f9; color: #2f5182;
-    }
-    .qcontact-text {
-      font-size: .82rem; color: #475569; min-width: 0;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .qtag {
-      display: inline-block; background: #eef2f9; color: #1c3255;
-      font-size: .72rem; font-weight: 700; letter-spacing: .02em;
-      padding: .3rem .85rem; border-radius: .5rem;
-    }
-    .qdate-values { margin-top: .85rem; }
-    .qmessage {
-      margin-top: .85rem; font-size: .875rem; line-height: 1.65; color: #475569;
-      overflow-wrap: anywhere; word-break: break-word;
+    /* Extra top room on the list so the first card's raised name tab
+       doesn't collide with the page heading. */
+    .qlist { padding-top: 1.1rem; }
+
+    .qcard {
+      position: relative;
+      border-radius: 1rem;
+      box-shadow: 0 1px 2px rgba(15, 28, 48, .04);
+      /* overflow must stay visible — the name tab deliberately sits
+         above the card's own top edge */
+      overflow: visible;
     }
 
+    /* Raised white name tab overhanging the card's top-left corner */
+    .qname-tab {
+      position: absolute;
+      top: -1.15rem;
+      left: 0;
+      max-width: min(22rem, calc(100% - 2rem));
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      background: #fff;
+      border-radius: 1rem 1rem 1rem 0;
+      padding: .7rem 1.5rem .7rem 1.5rem;
+      box-shadow: 0 6px 16px -10px rgba(15, 28, 48, .35);
+    }
+    .qavatar { flex: none; width: 1.85rem; height: 1.85rem; color: #0f1c30; }
+    .qname {
+      font-size: 1.05rem; font-weight: 700; color: #0f1c30; line-height: 1.2;
+      min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .qgrid {
+      display: grid;
+      grid-template-columns: 21rem minmax(0, 1fr) 12rem;
+      align-items: stretch;
+    }
+    .qcol { padding: 1.4rem 1.75rem; min-width: 0; position: relative; }
+    /* Contact column clears the overhanging tab */
+    .qcol-contact { padding-top: 2.3rem; }
+    /* Column rules are inset pseudo-elements, not full-height borders */
+    .qcol-query::before, .qcol-date::before {
+      content: ''; position: absolute; left: 0; top: 1.4rem; bottom: 1.4rem;
+      width: 1px; background: rgba(15, 28, 48, .14);
+    }
+
+    .qcontact-row { display: flex; align-items: center; gap: .7rem; padding: .35rem 0; }
+    .qicon { flex: none; width: 1.4rem; height: 1.4rem; color: #0f1c30; }
+    .qcontact-text {
+      font-size: .9rem; color: #1f2937; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qcontact-empty { color: #cbd5e1; }
+    /* Divider is indented to line up with the text, not the icon */
+    .qcontact-divider {
+      height: 1px; background: rgba(15, 28, 48, .12);
+      margin: .15rem 0 .15rem 2.1rem;
+    }
+
+    .qtag {
+      display: inline-block; background: #e9eaef; color: #0f1c30;
+      font-size: .78rem; font-weight: 500;
+      padding: .28rem .8rem; border-radius: .5rem;
+    }
+    .qmessage {
+      margin-top: .8rem; font-size: .9rem; line-height: 1.6; color: #1f2937;
+      overflow-wrap: anywhere; word-break: break-word;
+    }
+    .qdate-values { margin-top: .8rem; }
+    .qdate-day { font-size: .85rem; font-weight: 600; color: #0f1c30; white-space: nowrap; }
+    .qdate-time { font-size: .75rem; color: #94a3b8; margin-top: .1rem; white-space: nowrap; }
+
     @media (max-width: 1100px) {
-      .qgrid { grid-template-columns: 17rem minmax(0, 1fr); }
-      .qcol-date {
-        grid-column: 1 / -1;
-        border-left: none;
-        border-top: 1px solid rgba(15, 28, 48, .08);
-        display: flex; align-items: center; gap: .9rem;
-        padding-top: 1rem; padding-bottom: 1rem;
+      .qgrid { grid-template-columns: 18rem minmax(0, 1fr); }
+      .qcol-date { grid-column: 1 / -1; display: flex; align-items: center; gap: .9rem;
+                   padding-top: 1rem; padding-bottom: 1rem; }
+      .qcol-date::before {
+        left: 1.75rem; right: 1.75rem; top: 0; bottom: auto;
+        width: auto; height: 1px;
       }
       .qcol-date .qdate-values { margin-top: 0; display: flex; align-items: baseline; gap: .5rem; }
-      .qcol-date .qdate-values p { margin-top: 0; }
+      .qcol-date .qdate-time { margin-top: 0; }
     }
     @media (max-width: 760px) {
       .qgrid { grid-template-columns: minmax(0, 1fr); }
-      .qcol { padding: 1.15rem 1.25rem; }
-      .qcol-query { border-left: none; border-top: 1px solid rgba(15, 28, 48, .08); }
+      .qcol { padding: 1.1rem 1.25rem; }
+      .qcol-contact { padding-top: 2.2rem; }
+      .qcol-query::before {
+        left: 1.25rem; right: 1.25rem; top: 0; bottom: auto;
+        width: auto; height: 1px;
+      }
+      .qcol-date::before { left: 1.25rem; right: 1.25rem; }
+      .qname-tab { max-width: calc(100% - 1rem); padding-left: 1.25rem; padding-right: 1.25rem; }
     }
   </style>
 </AdminLayout>
