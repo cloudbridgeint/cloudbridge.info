@@ -224,35 +224,35 @@ import '../styles/site.css';
 
 <!-- Header (static across all pages) -->
 <header id="siteHeader" class="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-black/5 shadow-md transition-transform duration-300">
-  <div class="w-full px-4 md:px-6 lg:px-8 xl:px-16 2xl:px-[198px] py-[7px] flex items-center justify-between gap-3 xl:gap-4">
+  <div class="w-full px-4 md:px-5 lg:px-6 xl:px-8 2xl:px-[198px] py-[7px] flex items-center justify-between gap-2 2xl:gap-4">
     <a href="/" class="flex items-center nav-link shrink-0">
-      <Image src={logo} alt="CloudBridge — Study Abroad Consultants" class="h-16 md:h-20 lg:h-24 w-auto object-contain" loading="eager" fetchpriority="high" widths={[128, 256, 384]} sizes="(min-width: 1024px) 96px, (min-width: 768px) 80px, 64px" />
+      <Image src={logo} alt="CloudBridge — Study Abroad Consultants" class="h-16 md:h-16 lg:h-20 2xl:h-24 w-auto object-contain" loading="eager" fetchpriority="high" widths={[128, 256, 384]} sizes="(min-width: 1024px) 96px, (min-width: 768px) 80px, 64px" />
     </a>
-    <nav class="hidden md:flex items-center gap-0.5 xl:gap-1 text-[15px] lg:text-[16px] xl:text-[18px] 2xl:text-[21px] font-medium font-display">
-      <a href="/" class="nav-link px-2 xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="home">Home</a>
+    <nav class="hidden min-[1120px]:flex items-center gap-0.5 xl:gap-1 text-[16px] xl:text-[18px] font-medium font-display">
+      <a href="/" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="home">Home</a>
       <div class="nav-drop">
-        <span class="nav-link px-2 xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block" data-page="about">About ▾</span>
+        <span class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block" data-page="about">About ▾</span>
         <div class="nav-drop-panel">
           <a href="/about" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">About Us</a>
           <a href="/our-team" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Our Team</a>
         </div>
       </div>
-      <a href="/university-college" class="nav-link px-2 xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="university-college">University &amp; College</a>
-      <a href="/destinations" class="nav-link px-2 xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="destinations">Study Destination</a>
-      <a href="/programs" class="nav-link px-2 xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Course</a>
-      <a href="/scholarship" class="nav-link px-2 xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="scholarship">Scholarship</a>
-      <a href="/events" class="nav-link px-2 xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="events">Events</a>
-      <a href="/apply-now" class="nav-link px-2 xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50">Apply Now</a>
-      <a href="/blogs" class="nav-link px-2 xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="blogs">Blogs</a>
-      <a href="/contact" class="nav-link px-2 xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="contact">Contact</a>
+      <a href="/university-college" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="university-college">University &amp; College</a>
+      <a href="/destinations" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="destinations">Study Destination</a>
+      <a href="/programs" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Course</a>
+      <a href="/scholarship" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="scholarship">Scholarship</a>
+      <a href="/events" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="events">Events</a>
+      <a href="/apply-now" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50">Apply Now</a>
+      <a href="/blogs" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="blogs">Blogs</a>
+      <a href="/contact" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="contact">Contact</a>
     </nav>
-    <div class="hidden md:flex items-center shrink-0">
-      <a href="/free-consultation" class="btn-primary !px-3 xl:!px-5 !py-2 text-[13px] xl:text-[16px] whitespace-nowrap inline-flex items-center gap-1.5 !rounded-lg !text-white transition hover:brightness-110" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%);font-weight:700;font-family:'Times New Roman', Times, serif">
+    <div class="hidden min-[1120px]:flex items-center shrink-0">
+      <a href="/free-consultation" class="btn-primary !px-3 2xl:!px-5 !py-2 text-[13px] 2xl:text-[16px] whitespace-nowrap inline-flex items-center gap-1.5 !rounded-lg !text-white transition hover:brightness-110" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%);font-weight:700;font-family:'Times New Roman', Times, serif">
         Free Consultation
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4" aria-hidden="true"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" /></svg>
       </a>
     </div>
-    <button id="mobileToggle" class="md:hidden w-10 h-10 flex items-center justify-center shrink-0">
+    <button id="mobileToggle" class="min-[1120px]:hidden w-10 h-10 flex items-center justify-center shrink-0">
       <div class="space-y-1.5">
         <span class="block w-6 h-0.5 bg-bridge-900"></span>
         <span class="block w-6 h-0.5 bg-bridge-900"></span>
@@ -260,7 +260,7 @@ import '../styles/site.css';
       </div>
     </button>
   </div>
-  <nav id="mobileMenu" class="hidden md:hidden border-t border-black/5">
+  <nav id="mobileMenu" class="hidden min-[1120px]:hidden border-t border-black/5">
     <div class="px-4 py-4 space-y-2.5">
       <a href="/" class="mobile-menu-item nav-link">Home</a>
       <div>
