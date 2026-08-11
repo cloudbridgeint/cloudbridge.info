@@ -95,18 +95,26 @@ check('no horizontal overflow', !layout.overflow);
 
 // ------------------------------------------------ interactive CSS behaviour
 await page.goto(BASE + '/apply-now', { waitUntil: 'networkidle' });
+// Wait for the form itself rather than assuming networkidle means rendered —
+// a missing element used to crash this check instead of reporting a failure.
+await page.waitForSelector('#applyStep4', { timeout: 20000 }).catch(() => {});
 const behaviour = await page.evaluate(() => {
+  const vis = id => {
+    const el = document.getElementById(id);
+    return el ? getComputedStyle(el).display !== 'none' : null;
+  };
   const modal = document.getElementById('cbPreviewModal');
-  const steps = [1, 2, 3, 4].map(i => getComputedStyle(document.getElementById('applyStep' + i)).display !== 'none');
+  const steps = [1, 2, 3, 4].map(i => vis('applyStep' + i));
   const panel = document.querySelector('#comboResidenceCountry [data-combo-panel]');
   return {
     modalHidden: modal ? getComputedStyle(modal).display === 'none' : null,
-    onlyFirstStep: steps[0] && !steps[1] && !steps[2] && !steps[3],
+    onlyFirstStep: steps[0] === true && steps[1] === false && steps[2] === false && steps[3] === false,
+    stepsFound: steps.filter(s => s !== null).length,
     panelHidden: panel ? getComputedStyle(panel).display === 'none' : null,
   };
 });
 check('preview modal is hidden (not swallowing clicks)', behaviour.modalHidden === true);
-check('only step 1 of the form is visible', behaviour.onlyFirstStep === true);
+check('only step 1 of the form is visible', behaviour.onlyFirstStep === true, `${behaviour.stepsFound}/4 steps found`);
 check('combobox panel starts closed', behaviour.panelHidden === true);
 
 // ------------------------------------------------------------ admin gate
