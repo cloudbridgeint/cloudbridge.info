@@ -22,6 +22,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   const response = await handleRequest(context, next);
 
+  // The zone serves a Cloudflare-managed robots.txt that overrides ours, so a
+  // Disallow rule can't be relied on here. Marking the admin area noindex at
+  // the header level is stronger anyway: robots.txt only asks crawlers not to
+  // fetch, while this keeps the URLs out of the index even if they are found.
+  if (url.pathname.startsWith('/cbc-admin') || url.pathname.startsWith('/api/')) {
+    try {
+      response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    } catch { /* immutable response — not worth failing the request over */ }
+  }
+
   // Once cloudbridge.info serves this same build, the *.pages.dev deployments
   // (staging + every preview) become duplicate content competing with the real
   // domain in search. Keep them out of the index.
