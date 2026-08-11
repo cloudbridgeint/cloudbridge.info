@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { clientIp, rateLimit, tooMany, checkUploadType } from '../../lib/guards';
 
 export const prerender = false;
 
@@ -18,6 +19,12 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 
 export const POST: APIRoute = async (context) => {
   const db = (context.locals as any).runtime.env.DB;
+
+  // Unauthenticated endpoint: cap how many files one address can push in.
+  const ip = clientIp(context.request);
+  const gate = await rateLimit(db, 'upload', ip, 30, 60);
+  if (!gate.allowed) return tooMany(gate.retryAfterMinutes);
+
   const form = await context.request.formData().catch(() => null);
   const file = form?.get('file') as File | null;
   if (!file) {
@@ -25,6 +32,13 @@ export const POST: APIRoute = async (context) => {
   }
   if (file.size > MAX_SIZE) {
     return new Response(JSON.stringify({ error: 'File too large — please use a file under about 1.4MB' }), { status: 400 });
+  }
+
+  const typeCheck = checkUploadType(file);
+  if (!typeCheck.ok) {
+    return new Response(JSON.stringify({ error: typeCheck.error }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   let base64: string;
@@ -36,7 +50,7 @@ export const POST: APIRoute = async (context) => {
   }
 
   const id = crypto.randomUUID();
-  const mimeType = file.type || 'application/octet-stream';
+  const mimeType = typeCheck.mime;
   try {
     await db.prepare(
       `INSERT INTO media (id, filename, mime_type, data, created_at) VALUES (?, ?, ?, ?, datetime('now'))`

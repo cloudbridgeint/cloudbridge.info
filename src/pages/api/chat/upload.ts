@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { clientIp, rateLimit, tooMany, checkUploadType } from '../../../lib/guards';
 
 export const prerender = false;
 
@@ -6,6 +7,11 @@ const MAX_SIZE = 8 * 1024 * 1024; // 8MB — a bit more headroom for voice notes
 
 export const POST: APIRoute = async (context) => {
   const db = (context.locals as any).runtime.env.DB;
+
+  const ip = clientIp(context.request);
+  const gate = await rateLimit(db, 'chat-upload', ip, 40, 60);
+  if (!gate.allowed) return tooMany(gate.retryAfterMinutes);
+
   const form = await context.request.formData().catch(() => null);
   const file = form?.get('file') as File | null;
   if (!file) {
@@ -15,6 +21,13 @@ export const POST: APIRoute = async (context) => {
     return new Response(JSON.stringify({ error: 'File too large (max 8MB)' }), { status: 400 });
   }
 
+  const typeCheck = checkUploadType(file, { allowAudio: true });
+  if (!typeCheck.ok) {
+    return new Response(JSON.stringify({ error: typeCheck.error }), {
+      status: 400, headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const buf = await file.arrayBuffer();
   const bytes = new Uint8Array(buf);
   let binary = '';
@@ -22,7 +35,7 @@ export const POST: APIRoute = async (context) => {
   const base64 = btoa(binary);
 
   const id = crypto.randomUUID();
-  const mimeType = file.type || 'application/octet-stream';
+  const mimeType = typeCheck.mime;
   await db.prepare(
     `INSERT INTO media (id, filename, mime_type, data, created_at) VALUES (?, ?, ?, ?, datetime('now'))`
   ).bind(id, file.name || 'attachment', mimeType, base64).run();

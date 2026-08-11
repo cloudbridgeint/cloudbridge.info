@@ -1,9 +1,15 @@
 import type { APIRoute } from 'astro';
+import { clientIp, rateLimit, tooMany } from '../../../lib/guards';
 
 export const prerender = false;
 
 export const POST: APIRoute = async (context) => {
   const db = (context.locals as any).runtime.env.DB;
+
+  const ip = clientIp(context.request);
+  const gate = await rateLimit(db, 'chat-send', ip, 60, 60);
+  if (!gate.allowed) return tooMany(gate.retryAfterMinutes);
+
   const body = await context.request.json().catch(() => ({}));
   const { session_id, message, name, email, phone, attachment_url, attachment_type, attachment_name } = body || {};
 

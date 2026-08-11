@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "verify": "node scripts/verify-site.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^11.2.0",
