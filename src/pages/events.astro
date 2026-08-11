@@ -36,15 +36,18 @@ function formatDate(dateStr: string) {
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.map((ev: any, i: number) => (
           <div class="bg-white rounded-2xl overflow-hidden ring-1 ring-black/5 flex flex-col">
+            {/* Sized to the 1200x630 banner ratio we ask for, so a correctly
+                sized image shows in full instead of losing its top and bottom. */}
             {ev.image ? (
-              <img src={mediaUrl(ev.image, '')} alt={ev.title} class="h-36 w-full object-cover">
+              <img src={mediaUrl(ev.image, '')} alt={ev.title} class="w-full aspect-[1200/630] object-cover">
             ) : (
-              <div class="h-36" style={`background:${gradients[i % gradients.length]}`}></div>
+              <div class="w-full aspect-[1200/630]" style={`background:${gradients[i % gradients.length]}`}></div>
             )}
             <div class="p-5 flex flex-col h-full">
-              <p class="text-xs text-ink/50">{formatDate(ev.event_date)}{ev.event_time ? ` · ${ev.event_time}` : ''}{ev.location ? ` · ${ev.location}` : ''}</p>
-              <h3 class="mt-1 font-display font-bold text-bridge-900"><a href={`/events/${ev.slug}/${eventPeriod(ev.event_date)}`} class="nav-link hover:text-sunrise-600 transition">{ev.title}</a></h3>
-              {ev.description && <p class="mt-2 text-sm text-ink/60 line-clamp-3">{eventExcerpt(ev.description, 160)}</p>}
+              <h3 class="font-display font-bold text-bridge-900 leading-snug"><a href={`/events/${ev.slug}/${eventPeriod(ev.event_date)}`} class="nav-link hover:text-sunrise-600 transition">{ev.title}</a></h3>
+              <p class="mt-2 text-xs text-ink/50">{formatDate(ev.event_date)}{ev.event_time ? ` · ${ev.event_time}` : ''}</p>
+              {ev.location && <p class="mt-0.5 text-xs text-ink/50">{ev.location}</p>}
+              {ev.description && <p class="mt-2 text-sm text-ink/60 line-clamp-1">{eventExcerpt(ev.description, 160)}</p>}
               <div class="mt-auto pt-4 border-t border-black/5 flex flex-wrap gap-2">
                 <button type="button" class="btn-primary !text-xs !px-4 !py-2 inline-flex"
                   data-ev-register
