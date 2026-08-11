@@ -22,7 +22,7 @@ const heroSrc = post.hero_image ? mediaUrl(post.hero_image, '') : '';
   </div>
 </section>
 <article class="py-10 md:py-14">
-  <div class="mx-auto px-4 md:px-8 max-w-3xl">
+  <div class="mx-auto px-4 md:px-8 max-w-container">
     {post.category && <p class="course-badge">{post.category}</p>}
     <h1 class="mt-4 text-3xl md:text-4xl font-extrabold text-bridge-950 leading-tight">{post.title}</h1>
     {heroSrc && (
