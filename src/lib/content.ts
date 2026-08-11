@@ -59,6 +59,20 @@ export async function getUniversities(db: D1Like, country?: string) {
   return results as any[];
 }
 
+/**
+ * The soonest published event that hasn't happened yet — used for the homepage
+ * banner. Returning only future events means the banner retires itself instead
+ * of advertising a date that has passed.
+ */
+export async function getNextEvent(db: D1Like) {
+  const row = await db.prepare(
+    `SELECT * FROM events
+     WHERE published = 1 AND event_date >= date('now')
+     ORDER BY event_date ASC LIMIT 1`
+  ).first();
+  return (row as any) || null;
+}
+
 export async function getFaqs(db: D1Like) {
   const { results } = await db.prepare('SELECT * FROM faqs WHERE active = 1 ORDER BY sort_order ASC, id ASC').all();
   return results as any[];

@@ -355,6 +355,45 @@ async function applySubmitForm() {
     }).catch(() => {});
   } catch (err) { /* never let lead capture break the UX */ }
 }
+
+/* ============================================================
+   EVENT REGISTRATION — the homepage banner sends visitors to the
+   lead form with ?event=<title>. Retag that submission so event
+   sign-ups are distinguishable from ordinary enquiries in the admin,
+   and show the visitor which event they are registering for.
+   ============================================================ */
+function initEventRegistration() {
+  let eventTitle = '';
+  try {
+    eventTitle = new URLSearchParams(window.location.search).get('event') || '';
+  } catch (e) { return; }
+  if (!eventTitle) return;
+
+  const form = document.querySelector('#lead-form form.demo-form');
+  if (!form) return;
+  form.dataset.source = 'event-registration';
+
+  const messageField = form.querySelector('[name="message"]');
+  if (messageField && !messageField.value) {
+    messageField.value = 'Event registration: ' + eventTitle;
+  } else if (!messageField) {
+    const hidden = document.createElement('input');
+    hidden.type = 'hidden';
+    hidden.name = 'message';
+    hidden.value = 'Event registration: ' + eventTitle;
+    form.appendChild(hidden);
+  }
+
+  const heading = document.querySelector('#lead-form .section-heading');
+  if (heading && !document.getElementById('eventRegNote')) {
+    const note = document.createElement('p');
+    note.id = 'eventRegNote';
+    note.className = 'mt-3 inline-flex items-center gap-2 rounded-full bg-sunrise-50 text-sunrise-700 px-4 py-1.5 text-sm font-semibold';
+    note.textContent = 'Registering for: ' + eventTitle;
+    heading.insertAdjacentElement('afterend', note);
+  }
+}
+
 window.applyNext = applyNext;
 window.applyBack = applyBack;
 
@@ -1007,6 +1046,7 @@ function initPageScripts() {
   resetTestiTimer();
 
   // Apply Now wizard (Apply Now page only)
+  initEventRegistration();
   if (document.getElementById('applyStep1')) {
     applyPopulateSubjects();
     applyShowStep(1);

@@ -163,7 +163,9 @@ if (isProd) {
 
   const homeHeaders = await fetch(BASE + '/').then(r => r.headers.get('x-robots-tag')).catch(() => 'error');
   check('public site is indexable', !homeHeaders, homeHeaders || '(no header)');
-} else {
+} else if (BASE.includes('.pages.dev')) {
+  // Only the pages.dev deployments carry the noindex header; a localhost run
+  // legitimately has none, so asserting it there would be a false failure.
   const stagingHeader = await fetch(BASE + '/').then(r => r.headers.get('x-robots-tag')).catch(() => null);
   check('non-production deployment is noindex', (stagingHeader || '').includes('noindex'), stagingHeader || 'missing');
 }
