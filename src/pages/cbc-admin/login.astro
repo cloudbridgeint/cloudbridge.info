@@ -11,43 +11,48 @@ import '../../styles/admin.css';
   <meta name="robots" content="noindex, nofollow">
   <title>Login — CloudBridge Admin</title>
   <style is:global>
-    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    .pill-input {
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.4);
-      color: #fff;
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-    }
-    .pill-input::placeholder { color: rgba(255,255,255,0.65); }
-    .pill-input:focus { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.7); outline: none; }
-    .btn-red-gradient { background-image: linear-gradient(90deg, #c0201f 0%, #aa1821 100%); }
-    .btn-red-gradient:hover { filter: brightness(1.1); }
+  /* Wrapped in a cascade layer so Tailwind's unlayered utilities keep winning
+     ties, exactly as they did when the Play CDN injected them last. */
+  @layer legacy {
+      body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      .pill-input {
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.4);
+        color: #fff;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+      }
+      .pill-input::placeholder { color: rgba(255,255,255,0.65); }
+      .pill-input:focus { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.7); outline: none; }
+      .btn-red-gradient { background-image: linear-gradient(90deg, #c0201f 0%, #aa1821 100%); }
+      .btn-red-gradient:hover { filter: brightness(1.1); }
 
-    .bg-kenburns {
-      animation: kenburns 26s ease-in-out infinite alternate;
-      transform-origin: 60% 40%;
-    }
-    @keyframes kenburns {
-      0%   { transform: scale(1) translate(0, 0); }
-      100% { transform: scale(1.12) translate(-1.5%, -1.5%); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .bg-kenburns { animation: none; }
-    }
+      .bg-kenburns {
+        animation: kenburns 26s ease-in-out infinite alternate;
+        transform-origin: 60% 40%;
+      }
+      @keyframes kenburns {
+        0%   { transform: scale(1) translate(0, 0); }
+        100% { transform: scale(1.12) translate(-1.5%, -1.5%); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .bg-kenburns { animation: none; }
+      }
 
-    .fade-up {
-      opacity: 0;
-      transform: translateY(16px);
-      animation: fadeUp 0.6s ease forwards;
-    }
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .fade-up { animation: none; opacity: 1; transform: none; }
-    }
-  </style>
+      .fade-up {
+        opacity: 0;
+        transform: translateY(16px);
+        animation: fadeUp 0.6s ease forwards;
+      }
+      @keyframes fadeUp {
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .fade-up { animation: none; opacity: 1; transform: none; }
+      }
+  
+  }
+</style>
 </head>
 <body class="min-h-screen relative flex items-center justify-center px-4 overflow-hidden">
 
