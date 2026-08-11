@@ -9,7 +9,8 @@
 
   const regModal = document.getElementById('evRegModal');
   const detModal = document.getElementById('evDetailsModal');
-  if (!regModal && !detModal) return;
+  const hasInlineForm = !!document.querySelector('.ev-join-form');
+  if (!regModal && !detModal && !hasInlineForm) return;
 
   let lastFocused = null;
 
@@ -99,6 +100,49 @@
   });
 
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
+
+  /* ---------- inline "Join Our Event" form on an event page ---------- */
+  const joinForm = document.querySelector('.ev-join-form');
+  if (joinForm) {
+    joinForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const wrap = joinForm.parentElement;
+      const errEl = joinForm.querySelector('.ev-form-error');
+      const btn = joinForm.querySelector('button[type="submit"]');
+      errEl.classList.add('hidden');
+
+      const val = n => (joinForm.querySelector(`[name="${n}"]`) || {}).value || '';
+      const payload = {
+        event_id: joinForm.getAttribute('data-event-id'),
+        name: val('name'), phone: val('phone'), email: val('email'),
+        city: val('city'), branch: val('branch'),
+      };
+
+      btn.disabled = true;
+      const label = btn.textContent;
+      btn.textContent = 'Registering…';
+
+      try {
+        const res = await fetch('/api/event-registrations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
+
+        joinForm.classList.add('hidden');
+        const done = wrap.querySelector('.ev-join-done');
+        if (done) done.classList.remove('hidden');
+      } catch (ex) {
+        errEl.textContent = ex.message || 'Something went wrong. Please try again.';
+        errEl.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = label;
+      }
+    });
+  }
 
   /* ---------- submit ---------- */
   const form = document.getElementById('evRegForm');

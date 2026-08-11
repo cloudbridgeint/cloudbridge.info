@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import EventModals from '../components/EventModals.astro';
 import { Image } from 'astro:assets';
-import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, mediaUrl } from '../lib/content';
+import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, mediaUrl, eventPeriod } from '../lib/content';
 import heroSlide1 from '../assets/hero/slide1.jpg';
 import heroSlide2 from '../assets/hero/slide2.jpg';
 import heroSlide3 from '../assets/hero/slide3.jpg';
@@ -166,7 +166,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
           data-ev-date={eventDateLabel}
           data-ev-location={monthEvent.location || ''}
           data-ev-description={monthEvent.description || ''}>{c(cm, 'home.event.button', 'Register Now')}</button>
-        <a href={`/events/${monthEvent.slug}`} class="btn-outline nav-link inline-flex">{c(cm, 'home.event.button_secondary', 'View Details')}</a>
+        <a href={`/events/${monthEvent.slug}/${eventPeriod(monthEvent.event_date)}`} class="btn-outline nav-link inline-flex">{c(cm, 'home.event.button_secondary', 'View Details')}</a>
       </div>
     </div>
   </div>

@@ -70,21 +70,22 @@ export const GET: APIRoute = async (context) => {
     // pages rather than a 500.
   }
 
-  // Event pages: one entry per recurring event, not per occurrence. The slug is
-  // reused each time the event runs, so this stays a stable, compounding URL
-  // rather than a new thin page every month.
+  // Event pages: one URL per occurrence, since each run now keeps its own
+  // permanent address.
   try {
     const db = (context.locals as any).runtime?.env?.DB;
     if (db) {
       const { results } = await db.prepare(
-        `SELECT slug, MAX(event_date) AS last_date FROM events
-         WHERE published = 1 AND slug IS NOT NULL AND slug != ''
-         GROUP BY slug`
+        `SELECT slug, event_date FROM events
+         WHERE published = 1 AND slug IS NOT NULL AND slug != ''`
       ).all();
       for (const row of results || []) {
-        if (!row?.slug) continue;
+        if (!row?.slug || !row?.event_date) continue;
+        const d = new Date(String(row.event_date) + 'T00:00:00');
+        if (isNaN(d.getTime())) continue;
+        const period = `${d.toLocaleDateString('en-GB', { month: 'long' }).toLowerCase()}-${d.getFullYear()}`;
         urls.push(
-          `  <url>\n    <loc>${SITE}/events/${esc(row.slug)}</loc>\n    <lastmod>${today}</lastmod>\n` +
+          `  <url>\n    <loc>${SITE}/events/${esc(row.slug)}/${period}</loc>\n    <lastmod>${today}</lastmod>\n` +
           `    <changefreq>weekly</changefreq>\n    <priority>0.6</priority>\n  </url>`);
       }
     }

@@ -124,6 +124,82 @@ export async function getEventSlugs(db: D1Like) {
   return (results || []) as any[];
 }
 
+/** "2026-08-15" -> "august-2026", the second half of an event's URL. */
+export function eventPeriod(dateStr: string): string {
+  const d = new Date(String(dateStr || '') + 'T00:00:00');
+  if (isNaN(d.getTime())) return 'tbc';
+  const month = d.toLocaleDateString('en-GB', { month: 'long' }).toLowerCase();
+  return `${month}-${d.getFullYear()}`;
+}
+
+/** Exact occurrence: /events/<slug>/<period>. Each run of a recurring event
+ *  keeps its own permanent URL this way. */
+export async function getEventBySlugPeriod(db: D1Like, slug: string, period: string) {
+  const { results } = await db.prepare(
+    'SELECT * FROM events WHERE published = 1 AND slug = ?'
+  ).bind(slug).all();
+  const match = (results || []).find((r: any) => eventPeriod(r.event_date) === period);
+  return (match as any) || null;
+}
+
+/** Newest occurrence of a slug — the soonest still to come, else the most
+ *  recent past one. Used to send a bare /events/<slug> somewhere useful. */
+export async function getLatestOccurrence(db: D1Like, slug: string) {
+  const upcoming = await db.prepare(
+    `SELECT * FROM events WHERE published = 1 AND slug = ? AND event_date >= date('now')
+     ORDER BY event_date ASC LIMIT 1`
+  ).bind(slug).first();
+  if (upcoming) return upcoming as any;
+  const previous = await db.prepare(
+    `SELECT * FROM events WHERE published = 1 AND slug = ? ORDER BY event_date DESC LIMIT 1`
+  ).bind(slug).first();
+  return (previous as any) || null;
+}
+
+/** Every published occurrence, for the sitemap — one URL per run. */
+export async function getAllEventOccurrences(db: D1Like) {
+  const { results } = await db.prepare(
+    `SELECT slug, event_date FROM events
+     WHERE published = 1 AND slug IS NOT NULL AND slug != '' ORDER BY event_date DESC`
+  ).all();
+  return (results || []) as any[];
+}
+
+/**
+ * Event descriptions are written in the admin as plain text. This renders a
+ * deliberately small markdown subset — "## heading", "- bullet", "**bold**" —
+ * so the office can structure a listing without the field ever accepting raw
+ * HTML, which would put script execution one paste away.
+ */
+export function renderEventDescription(raw: string): string {
+  const esc = (t: string) => String(t).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+  const inline = (t: string) => esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+  const lines = String(raw || '').split(/\r?\n/);
+  const out: string[] = [];
+  let listOpen = false;
+  const closeList = () => { if (listOpen) { out.push('</ul>'); listOpen = false; } };
+
+  for (const line of lines) {
+    const t = line.trim();
+    if (!t) { closeList(); continue; }
+
+    if (/^##\s+/.test(t)) {
+      closeList();
+      out.push(`<h3 class="ev-desc-h">${inline(t.replace(/^##\s+/, ''))}</h3>`);
+    } else if (/^[-•*]\s+/.test(t)) {
+      if (!listOpen) { out.push('<ul class="ev-desc-ul">'); listOpen = true; }
+      out.push(`<li>${inline(t.replace(/^[-•*]\s+/, ''))}</li>`);
+    } else {
+      closeList();
+      out.push(`<p>${inline(t)}</p>`);
+    }
+  }
+  closeList();
+  return out.join('\n');
+}
+
 export async function getFaqs(db: D1Like) {
   const { results } = await db.prepare('SELECT * FROM faqs WHERE active = 1 ORDER BY sort_order ASC, id ASC').all();
   return results as any[];
