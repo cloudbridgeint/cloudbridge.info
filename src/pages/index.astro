@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import EventModals from '../components/EventModals.astro';
 import { Image } from 'astro:assets';
-import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, mediaUrl, eventPeriod } from '../lib/content';
+import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, mediaUrl, eventPeriod, eventExcerpt } from '../lib/content';
 import heroSlide1 from '../assets/hero/slide1.jpg';
 import heroSlide2 from '../assets/hero/slide2.jpg';
 import heroSlide3 from '../assets/hero/slide3.jpg';
@@ -25,15 +25,7 @@ const faqs = await getFaqs(db);
 const eventSectionOn = c(cm, 'home.event.enabled', '1') !== '0';
 const monthEvent = eventSectionOn ? await getEventThisMonth(db) : null;
 
-// Banner excerpt: the full description is markdown-ish and long, so strip the
-// syntax and any heading/bullet lines and keep the opening prose. The rest is
-// on the event page behind View Details.
-const eventExcerpt = String(monthEvent?.description || '')
-  .split(/\r?\n/)
-  .filter(l => l.trim() && !/^\s*(##|[-•*])\s/.test(l))
-  .join(' ')
-  .replace(/\*\*(.+?)\*\*/g, '$1')
-  .trim();
+const eventBannerExcerpt = eventExcerpt(monthEvent?.description || '', 200);
 
 const eventDateLabel = monthEvent?.event_date
   ? new Date(monthEvent.event_date + 'T00:00:00').toLocaleDateString('en-GB',
@@ -179,7 +171,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
         )}
       </ul>
 
-      {eventExcerpt && <p class="mt-3 text-ink/60 line-clamp-2">{eventExcerpt}</p>}
+      {eventBannerExcerpt && <p class="mt-3 text-ink/60 line-clamp-2">{eventBannerExcerpt}</p>}
 
       <!-- mt-auto pins the buttons to the bottom of the column, level with the
            bottom of the image, however short the excerpt is. -->
@@ -190,7 +182,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
           data-ev-title={monthEvent.title}
           data-ev-date={eventDateLabel}
           data-ev-location={monthEvent.location || ''}
-          data-ev-description={eventExcerpt}>{c(cm, 'home.event.button', 'Register Now')}</button>
+          data-ev-description={eventBannerExcerpt}>{c(cm, 'home.event.button', 'Register Now')}</button>
         <a href={`/events/${monthEvent.slug}/${eventPeriod(monthEvent.event_date)}`} class="btn-outline nav-link inline-flex">{c(cm, 'home.event.button_secondary', 'View Details')}</a>
       </div>
     </div>

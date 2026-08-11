@@ -171,6 +171,24 @@ export async function getAllEventOccurrences(db: D1Like) {
  * so the office can structure a listing without the field ever accepting raw
  * HTML, which would put script execution one paste away.
  */
+/**
+ * Plain-text opening of an event description, for banners and cards. Drops the
+ * heading and bullet lines and strips the markdown marks, so "## Event Details"
+ * can never surface as raw text in a summary.
+ */
+export function eventExcerpt(raw: string, maxChars = 220): string {
+  const text = String(raw || '')
+    .split(/\r?\n/)
+    .filter(l => l.trim() && !/^\s*(##|[-•*])\s/.test(l))
+    .join(' ')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (text.length <= maxChars) return text;
+  const cut = text.slice(0, maxChars);
+  return cut.slice(0, cut.lastIndexOf(' ')) + '…';
+}
+
 export function renderEventDescription(raw: string): string {
   const esc = (t: string) => String(t).replace(/[&<>"']/g, c =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
