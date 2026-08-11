@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import EventModals from '../components/EventModals.astro';
 import { Image } from 'astro:assets';
 import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, mediaUrl } from '../lib/content';
 import heroSlide1 from '../assets/hero/slide1.jpg';
@@ -158,8 +159,20 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
       </div>
       {monthEvent.description && <p class="mt-4 text-ink/60">{monthEvent.description}</p>}
       <div class="mt-6 flex flex-wrap gap-3">
-        <a href={`/?event=${encodeURIComponent(monthEvent.title)}#lead-form`} class="btn-primary nav-link inline-flex">{c(cm, 'home.event.button', 'Register Now')}</a>
-        <a href="/events" class="btn-outline nav-link inline-flex">{c(cm, 'home.event.button_secondary', 'See all events')}</a>
+        <button type="button" class="btn-primary inline-flex"
+          data-ev-register
+          data-ev-id={monthEvent.id}
+          data-ev-title={monthEvent.title}
+          data-ev-date={eventDateLabel}
+          data-ev-location={monthEvent.location || ''}
+          data-ev-description={monthEvent.description || ''}>{c(cm, 'home.event.button', 'Register Now')}</button>
+        <button type="button" class="btn-outline inline-flex"
+          data-ev-details
+          data-ev-id={monthEvent.id}
+          data-ev-title={monthEvent.title}
+          data-ev-date={eventDateLabel}
+          data-ev-location={monthEvent.location || ''}
+          data-ev-description={monthEvent.description || ''}>{c(cm, 'home.event.button_secondary', 'View Details')}</button>
       </div>
     </div>
   </div>
@@ -661,5 +674,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
     </div>
   </div>
 </section>
+
+<EventModals />
 
 </Layout>

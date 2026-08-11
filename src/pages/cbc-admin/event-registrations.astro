@@ -1,0 +1,100 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare(
+  'SELECT * FROM event_registrations ORDER BY created_at DESC LIMIT 500'
+).all();
+const regs = results as any[];
+
+function formatDate(raw: string) {
+  if (!raw) return '—';
+  const m = String(raw).match(/^(\d{4})-(\d{2})-(\d{2})[ T]?(\d{2})?:?(\d{2})?/);
+  if (!m) return String(raw);
+  const [, y, mo, d, hh, mm] = m;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const date = `${parseInt(d, 10)} ${months[parseInt(mo, 10) - 1]} ${y}`;
+  if (!hh) return date;
+  const h = parseInt(hh, 10);
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${date}, ${h12}:${mm} ${h >= 12 ? 'PM' : 'AM'}`;
+}
+
+// Group by event so the office can see, at a glance, how many seats each one
+// has taken rather than reading a flat list.
+const byEvent = new Map<string, any[]>();
+for (const r of regs) {
+  const key = r.event_title || 'Not linked to an event';
+  if (!byEvent.has(key)) byEvent.set(key, []);
+  byEvent.get(key)!.push(r);
+}
+const eventGroups = [...byEvent.entries()];
+---
+<AdminLayout title="Event Registration" active="event-registrations">
+  <h1 class="text-2xl font-bold text-bridge-950">Event Registration</h1>
+  <p class="text-slate-500 mt-1 text-sm">Students who signed up through the Register Now button on an event.</p>
+
+  {regs.length > 0 && (
+    <div class="mt-6 flex flex-wrap gap-3">
+      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm px-5 py-4">
+        <p class="text-xs text-slate-400">Total registrations</p>
+        <p class="text-2xl font-bold text-bridge-950 mt-0.5">{regs.length}</p>
+      </div>
+      {eventGroups.map(([name, rows]) => (
+        <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm px-5 py-4">
+          <p class="text-xs text-slate-400 max-w-[16rem] truncate">{name}</p>
+          <p class="text-2xl font-bold text-bridge-950 mt-0.5">{rows.length}</p>
+        </div>
+      ))}
+    </div>
+  )}
+
+  <div class="mt-6">
+    {regs.length === 0 ? (
+      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-8 text-center">
+        <p class="text-slate-400 text-sm">No registrations yet — they'll appear here as students sign up for an event.</p>
+      </div>
+    ) : (
+      <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-xs uppercase tracking-wide text-slate-400 border-b border-black/5">
+                <th class="px-5 py-3 font-semibold">Student</th>
+                <th class="px-5 py-3 font-semibold">Contact</th>
+                <th class="px-5 py-3 font-semibold">City</th>
+                <th class="px-5 py-3 font-semibold">Branch</th>
+                <th class="px-5 py-3 font-semibold">Event</th>
+                <th class="px-5 py-3 font-semibold whitespace-nowrap">Registered</th>
+              </tr>
+            </thead>
+            <tbody>
+              {regs.map((r: any) => (
+                <tr class="border-b border-black/5 last:border-0 hover:bg-white/70">
+                  <td class="px-5 py-3.5 font-semibold text-bridge-950 whitespace-nowrap">{r.name || 'Anonymous'}</td>
+                  <td class="px-5 py-3.5 text-slate-600">
+                    {r.phone && <a href={`tel:${r.phone}`} class="block hover:text-bridge-700 whitespace-nowrap">{r.phone}</a>}
+                    {r.email && <a href={`mailto:${r.email}`} class="block text-xs text-slate-400 hover:text-bridge-700 break-all">{r.email}</a>}
+                    {!r.phone && !r.email && <span class="text-slate-300">—</span>}
+                  </td>
+                  <td class="px-5 py-3.5 text-slate-600 whitespace-nowrap">{r.city || '—'}</td>
+                  <td class="px-5 py-3.5 whitespace-nowrap">
+                    {r.branch
+                      ? <span class="inline-block rounded-full bg-bridge-50 text-bridge-800 text-xs font-semibold px-3 py-1">{r.branch}</span>
+                      : <span class="text-slate-300">—</span>}
+                  </td>
+                  <td class="px-5 py-3.5 text-slate-600">
+                    <span class="block font-medium text-bridge-950">{r.event_title || '—'}</span>
+                    {r.event_date && <span class="block text-xs text-slate-400">{formatDate(r.event_date)}</span>}
+                  </td>
+                  <td class="px-5 py-3.5 text-slate-500 whitespace-nowrap text-xs">{formatDate(r.created_at)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )}
+  </div>
+</AdminLayout>

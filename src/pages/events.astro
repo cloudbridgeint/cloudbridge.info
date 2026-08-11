@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import EventModals from '../components/EventModals.astro';
 import { getPublishedEvents, mediaUrl } from '../lib/content';
 export const prerender = false;
 const title = "Events | CloudBridge Study Abroad";
@@ -40,10 +41,26 @@ function formatDate(dateStr: string) {
             ) : (
               <div class="h-36" style={`background:${gradients[i % gradients.length]}`}></div>
             )}
-            <div class="p-5">
+            <div class="p-5 flex flex-col h-full">
               <p class="text-xs text-ink/50">{formatDate(ev.event_date)}{ev.location ? ` · ${ev.location}` : ''}</p>
               <h3 class="mt-1 font-display font-bold text-bridge-900">{ev.title}</h3>
               {ev.description && <p class="mt-2 text-sm text-ink/60">{ev.description}</p>}
+              <div class="mt-4 pt-4 border-t border-black/5 flex flex-wrap gap-2">
+                <button type="button" class="btn-primary !text-xs !px-4 !py-2 inline-flex"
+                  data-ev-register
+                  data-ev-id={ev.id}
+                  data-ev-title={ev.title}
+                  data-ev-date={formatDate(ev.event_date)}
+                  data-ev-location={ev.location || ''}
+                  data-ev-description={ev.description || ''}>Register Now</button>
+                <button type="button" class="btn-outline !text-xs !px-4 !py-2 inline-flex"
+                  data-ev-details
+                  data-ev-id={ev.id}
+                  data-ev-title={ev.title}
+                  data-ev-date={formatDate(ev.event_date)}
+                  data-ev-location={ev.location || ''}
+                  data-ev-description={ev.description || ''}>See Details</button>
+              </div>
             </div>
           </div>
         ))}
@@ -52,8 +69,9 @@ function formatDate(dateStr: string) {
       <p class="text-ink/60">No upcoming events right now — check back soon.</p>
     )}
     <p class="mt-8 text-sm text-ink/50">More events added regularly — check back soon.</p>
-    <div class="mt-8"><a href="/#lead-form" class="btn-primary nav-link inline-flex">Reserve Your Seat</a></div>
   </div>
 </section>
+
+<EventModals />
 
 </Layout>

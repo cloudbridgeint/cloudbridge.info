@@ -52,6 +52,7 @@ async function handleRequest(context: any, next: any) {
 
   const isPublic = PUBLIC_ADMIN_PATHS.some(p => pathname === p) ||
     (pathname === '/api/leads' && context.request.method === 'POST') || // public lead form submission
+    (pathname === '/api/event-registrations' && context.request.method === 'POST') || // public event sign-up
     (pathname.startsWith('/api/media/') && context.request.method === 'GET') || // public image serving
     (pathname === '/api/chat/send' && context.request.method === 'POST') || // public chat widget: send message
     (pathname === '/api/chat/poll' && context.request.method === 'GET') || // public chat widget: poll for replies
