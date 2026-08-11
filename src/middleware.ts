@@ -4,12 +4,28 @@ import { verifySessionCookie } from './lib/auth';
 const PUBLIC_ADMIN_PATHS = ['/cbc-admin/login', '/api/login'];
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  const url = context.url;
+
+  // www -> apex, permanently. Both hostnames point at this project, so without
+  // this they would serve identical pages and compete as duplicates in search.
+  if (url.hostname === 'www.cloudbridge.info') {
+    const target = new URL(url.toString());
+    target.hostname = 'cloudbridge.info';
+    return new Response(null, { status: 301, headers: { Location: target.toString() } });
+  }
+
+  // The pre-Astro site had a standalone /admin.html. It no longer exists, so
+  // send anyone with an old bookmark to the real admin instead of a 404.
+  if (url.pathname === '/admin.html') {
+    return new Response(null, { status: 301, headers: { Location: '/cbc-admin' } });
+  }
+
   const response = await handleRequest(context, next);
 
   // Once cloudbridge.info serves this same build, the *.pages.dev deployments
   // (staging + every preview) become duplicate content competing with the real
   // domain in search. Keep them out of the index.
-  if (context.url.hostname.endsWith('.pages.dev')) {
+  if (url.hostname.endsWith('.pages.dev')) {
     try {
       response.headers.set('X-Robots-Tag', 'noindex, nofollow');
     } catch {
