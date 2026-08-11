@@ -51,8 +51,7 @@ function formatDate(dateStr: string) {
                   data-ev-id={ev.id}
                   data-ev-title={ev.title}
                   data-ev-date={formatDate(ev.event_date)}
-                  data-ev-location={ev.location || ''}
-                  data-ev-description={ev.description || ''}>Register Now</button>
+                  data-ev-location={ev.location || ''}>Register Now</button>
                 <a href={`/events/${ev.slug}/${eventPeriod(ev.event_date)}`} class="btn-outline nav-link !text-xs !px-4 !py-2 inline-flex">See Details</a>
               </div>
             </div>
