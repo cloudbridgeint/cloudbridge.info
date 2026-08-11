@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Admin panel and API are not search results.
+Disallow: /cbc-admin
+Disallow: /api/
+
+Sitemap: https://cloudbridge.info/sitemap.xml
