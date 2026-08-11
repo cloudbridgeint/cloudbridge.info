@@ -97,96 +97,92 @@ const rows = queries.map((q: any) => ({ ...q, stamp: splitStamp(q.created_at) })
   </div>
 
   <style is:global>
-  /* Wrapped in a cascade layer so Tailwind's unlayered utilities keep winning
-     ties, exactly as they did when the Play CDN injected them last. */
-  @layer legacy {
-      /* Surface colour shared by the name tab and the card body — in the design
-         they are one fill, separated only by a shadow seam, not two tones. */
-      .qitem { --q-surface: #fafbff; position: relative; }
+    /* Surface colour shared by the name tab and the card body — in the design
+       they are one fill, separated only by a shadow seam, not two tones. */
+    .qitem { --q-surface: #fafbff; position: relative; }
 
-      /* Tab stacks directly on top of the card and hugs its content width.
-         Bottom-left stays square so it reads as one continuous shape. */
-      .qname-tab {
-        display: inline-flex;
-        align-items: center;
-        gap: .6rem;
-        max-width: min(24rem, 100%);
-        background: var(--q-surface);
-        border-radius: 1rem 1rem 1rem 0;
-        padding: .6rem 1.15rem;
-        box-shadow: 0 4px 10px -6px rgba(15, 28, 48, .35);
-        position: relative;
-        z-index: 1;
-      }
-      .qavatar { flex: none; width: 1.7rem; height: 1.7rem; color: #111827; }
-      .qname {
-        font-size: 1.02rem; font-weight: 600; color: #111827; line-height: 1.2;
-        min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      }
+    /* Tab stacks directly on top of the card and hugs its content width.
+       Bottom-left stays square so it reads as one continuous shape. */
+    .qname-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      max-width: min(24rem, 100%);
+      background: var(--q-surface);
+      border-radius: 1rem 1rem 1rem 0;
+      padding: .6rem 1.15rem;
+      box-shadow: 0 4px 10px -6px rgba(15, 28, 48, .35);
+      position: relative;
+      z-index: 1;
+    }
+    .qavatar { flex: none; width: 1.7rem; height: 1.7rem; color: #111827; }
+    .qname {
+      font-size: 1.02rem; font-weight: 600; color: #111827; line-height: 1.2;
+      min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
 
-      .qcard {
-        background: var(--q-surface);
-        /* top-left square — the tab sits on that corner */
-        border-radius: 0 1rem 1rem 1rem;
-        box-shadow: 0 6px 16px -12px rgba(15, 28, 48, .4);
-        margin-top: 3px;
-      }
+    .qcard {
+      background: var(--q-surface);
+      /* top-left square — the tab sits on that corner */
+      border-radius: 0 1rem 1rem 1rem;
+      box-shadow: 0 6px 16px -12px rgba(15, 28, 48, .4);
+      margin-top: 3px;
+    }
 
-      .qgrid {
-        display: grid;
-        grid-template-columns: 19rem minmax(0, 1fr) 12rem;
-        align-items: stretch;
-      }
-      .qcol { padding: .95rem 1.35rem; min-width: 0; position: relative; }
-      /* Column rules sit slightly inside the card's top and bottom edges */
-      .qcol-query::before, .qcol-date::before {
-        content: ''; position: absolute; left: 0; top: .6rem; bottom: .6rem;
-        width: 1px; background: rgba(15, 28, 48, .22);
-      }
+    .qgrid {
+      display: grid;
+      grid-template-columns: 19rem minmax(0, 1fr) 12rem;
+      align-items: stretch;
+    }
+    .qcol { padding: .95rem 1.35rem; min-width: 0; position: relative; }
+    /* Column rules sit slightly inside the card's top and bottom edges */
+    .qcol-query::before, .qcol-date::before {
+      content: ''; position: absolute; left: 0; top: .6rem; bottom: .6rem;
+      width: 1px; background: rgba(15, 28, 48, .22);
+    }
 
-      .qcontact-row { display: flex; align-items: center; gap: .65rem; padding: .28rem 0; }
-      .qicon { flex: none; width: 1.35rem; height: 1.35rem; color: #111827; }
-      .qcontact-text {
-        font-size: .9rem; color: #111827; min-width: 0;
-        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      }
-      .qcontact-empty { color: #cbd5e1; }
-      /* Hairline starts at the text, not the icon, and stops short of the column edge */
-      .qcontact-divider {
-        height: 1px; background: rgba(15, 28, 48, .16);
-        margin: .1rem 3.5rem .1rem 2.2rem;
-      }
+    .qcontact-row { display: flex; align-items: center; gap: .65rem; padding: .28rem 0; }
+    .qicon { flex: none; width: 1.35rem; height: 1.35rem; color: #111827; }
+    .qcontact-text {
+      font-size: .9rem; color: #111827; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .qcontact-empty { color: #cbd5e1; }
+    /* Hairline starts at the text, not the icon, and stops short of the column edge */
+    .qcontact-divider {
+      height: 1px; background: rgba(15, 28, 48, .16);
+      margin: .1rem 3.5rem .1rem 2.2rem;
+    }
 
-      .qtag {
-        display: inline-block; background: #d4d5d7; color: #111827;
-        font-size: .82rem; font-weight: 400;
-        padding: .22rem .8rem; border-radius: .45rem;
-      }
-      .qmessage {
-        margin-top: .6rem; font-size: .9rem; line-height: 1.55; color: #111827;
-        overflow-wrap: anywhere; word-break: break-word;
-      }
-      .qdate-values { margin-top: .7rem; }
-      .qdate-day { font-size: .9rem; font-weight: 600; color: #111827; white-space: nowrap; }
-      .qdate-time { font-size: .78rem; color: #8b93a3; margin-top: .1rem; white-space: nowrap; }
+    .qtag {
+      display: inline-block; background: #d4d5d7; color: #111827;
+      font-size: .82rem; font-weight: 400;
+      padding: .22rem .8rem; border-radius: .45rem;
+    }
+    .qmessage {
+      margin-top: .6rem; font-size: .9rem; line-height: 1.55; color: #111827;
+      overflow-wrap: anywhere; word-break: break-word;
+    }
+    .qdate-values { margin-top: .7rem; }
+    .qdate-day { font-size: .9rem; font-weight: 600; color: #111827; white-space: nowrap; }
+    .qdate-time { font-size: .78rem; color: #8b93a3; margin-top: .1rem; white-space: nowrap; }
 
-      @media (max-width: 1100px) {
-        .qgrid { grid-template-columns: 17rem minmax(0, 1fr); }
-        .qcol-date { grid-column: 1 / -1; display: flex; align-items: center; gap: .9rem;
-                     padding-top: .9rem; padding-bottom: .9rem; }
-        .qcol-date::before { left: 1.5rem; right: 1.5rem; top: 0; bottom: auto; width: auto; height: 1px; }
-        .qcol-date .qdate-values { margin-top: 0; display: flex; align-items: baseline; gap: .5rem; }
-        .qcol-date .qdate-time { margin-top: 0; }
-      }
-      @media (max-width: 760px) {
-        .qgrid { grid-template-columns: minmax(0, 1fr); }
-        .qcol { padding: 1rem 1.15rem; }
-        .qcol-query::before { left: 1.15rem; right: 1.15rem; top: 0; bottom: auto; width: auto; height: 1px; }
-        .qcol-date::before { left: 1.15rem; right: 1.15rem; }
-        .qname-tab { max-width: 100%; padding-left: 1.15rem; padding-right: 1.15rem; }
-        .qcontact-divider { margin-right: 1rem; }
-      }
-  
-  }
+    @media (max-width: 1100px) {
+      .qgrid { grid-template-columns: 17rem minmax(0, 1fr); }
+      .qcol-date { grid-column: 1 / -1; display: flex; align-items: center; gap: .9rem;
+                   padding-top: .9rem; padding-bottom: .9rem; }
+      .qcol-date::before { left: 1.5rem; right: 1.5rem; top: 0; bottom: auto; width: auto; height: 1px; }
+      .qcol-date .qdate-values { margin-top: 0; display: flex; align-items: baseline; gap: .5rem; }
+      .qcol-date .qdate-time { margin-top: 0; }
+    }
+    @media (max-width: 760px) {
+      .qgrid { grid-template-columns: minmax(0, 1fr); }
+      .qcol { padding: 1rem 1.15rem; }
+      .qcol-query::before { left: 1.15rem; right: 1.15rem; top: 0; bottom: auto; width: auto; height: 1px; }
+      .qcol-date::before { left: 1.15rem; right: 1.15rem; }
+      .qname-tab { max-width: 100%; padding-left: 1.15rem; padding-right: 1.15rem; }
+      .qcontact-divider { margin-right: 1rem; }
+    }
+
 </style>
 </AdminLayout>

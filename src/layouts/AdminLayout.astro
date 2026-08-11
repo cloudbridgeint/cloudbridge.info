@@ -39,38 +39,34 @@ import '../styles/admin.css';
   <title>{title} — CloudBridge Admin</title>
   
   <style is:global>
-  /* Wrapped in a cascade layer so Tailwind's unlayered utilities keep winning
-     ties, exactly as they did when the Play CDN injected them last. */
-  @layer legacy {
-      body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-      ::-webkit-scrollbar { width: 8px; height: 8px; }
-      ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 999px; }
-      .toast { animation: slideIn 0.25s ease; }
-      @keyframes slideIn { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 999px; }
+    .toast { animation: slideIn 0.25s ease; }
+    @keyframes slideIn { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-      .app-canvas {
-        height: 100vh;
-        overflow: hidden;
-        position: relative;
-        background: #fff;
-      }
-      .sidebar-solid {
-        background: linear-gradient(190deg, #1a2456 0%, #0f1642 55%, #050a31 100%);
-      }
-      .nav-active { background: #ffffff; color: #0f1642; box-shadow: 0 10px 20px -8px rgba(5,10,49,0.4); }
-      .nav-idle { color: rgba(255,255,255,0.78); }
-      .nav-idle:hover { background: rgba(255,255,255,0.12); color: #fff; }
-      .sub-active { background: rgba(255,255,255,0.16); color: #fff; }
-      .card-soft {
-        background: linear-gradient(160deg, rgba(255,255,255,0.95), rgba(248,249,255,0.85));
-      }
-      .badge-purple { background-image: linear-gradient(135deg, #a78bfa, #7c3aed); }
-      .badge-pink { background-image: linear-gradient(135deg, #f9a8d4, #db2777); }
-      .badge-blue { background-image: linear-gradient(135deg, #60a5fa, #1d4ed8); }
-      .badge-teal { background-image: linear-gradient(135deg, #5eead4, #0d9488); }
-      .ring-track { stroke: #eef0fb; }
-  
-  }
+    .app-canvas {
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      background: #fff;
+    }
+    .sidebar-solid {
+      background: linear-gradient(190deg, #1a2456 0%, #0f1642 55%, #050a31 100%);
+    }
+    .nav-active { background: #ffffff; color: #0f1642; box-shadow: 0 10px 20px -8px rgba(5,10,49,0.4); }
+    .nav-idle { color: rgba(255,255,255,0.78); }
+    .nav-idle:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    .sub-active { background: rgba(255,255,255,0.16); color: #fff; }
+    .card-soft {
+      background: linear-gradient(160deg, rgba(255,255,255,0.95), rgba(248,249,255,0.85));
+    }
+    .badge-purple { background-image: linear-gradient(135deg, #a78bfa, #7c3aed); }
+    .badge-pink { background-image: linear-gradient(135deg, #f9a8d4, #db2777); }
+    .badge-blue { background-image: linear-gradient(135deg, #60a5fa, #1d4ed8); }
+    .badge-teal { background-image: linear-gradient(135deg, #5eead4, #0d9488); }
+    .ring-track { stroke: #eef0fb; }
+
 </style>
 </head>
 <body class="app-canvas">
