@@ -69,6 +69,9 @@ import '../styles/admin.css';
     .ring-track { stroke: #eef0fb; }
 
 </style>
+  <!-- Loaded in <head> so the fetch wrapper is in place before any page
+       script can fire an upload. -->
+  <script src="/scripts/admin-image.js" is:inline></script>
 </head>
 <body class="app-canvas">
   <audio id="chatNotifySound" src="/sounds/notify.wav" preload="auto"></audio>
