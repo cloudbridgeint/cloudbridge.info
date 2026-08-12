@@ -34,7 +34,7 @@ export const GET: APIRoute = async ({ locals }) => {
   /* password_hash is deliberately never selected. It is a one-way PBKDF2 hash,
      so it could not be turned back into a password even if it were sent. */
   const { results } = await db.prepare(
-    'SELECT id, email, username, name, role, avatar, created_at FROM admin_users ORDER BY id ASC'
+    'SELECT id, email, username, name, role, avatar, is_super, created_at FROM admin_users ORDER BY id ASC'
   ).all();
 
   const users = results as any[];
@@ -61,6 +61,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const name = String(body?.name || '').trim().slice(0, 120) || null;
   const avatar = String(body?.avatar || '').trim() || null;
   const password = String(body?.password || '');
+  /* is_super is deliberately not accepted from the request: the protected
+     account is fixed, and nothing sent by a browser can create another. */
   const role = body?.role === 'editor' ? 'editor' : 'admin';
 
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {

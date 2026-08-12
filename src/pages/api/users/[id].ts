@@ -83,6 +83,11 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
   }
 
   if (body.role === 'admin' || body.role === 'editor') {
+    /* The super admin is the account that can always get back in. Demoting it
+       would be a slower way of losing it, so the role is fixed. */
+    if (target.is_super && body.role !== 'admin') {
+      return json({ error: 'The Super Admin role cannot be changed' }, 400);
+    }
     if (target.role === 'admin' && body.role === 'editor' && !(await otherAdminsExist(db, id))) {
       return json({ error: 'This is the only admin account — promote someone else first' }, 400);
     }
@@ -115,6 +120,12 @@ export const DELETE: APIRoute = async ({ params, locals }) => {
 
   const target = await db.prepare('SELECT * FROM admin_users WHERE id = ?').bind(id).first();
   if (!target) return json({ error: 'User not found' }, 404);
+
+  /* The super admin is the permanent way back into the panel — it cannot be
+     removed by anyone, including itself. */
+  if (target.is_super) {
+    return json({ error: 'The Super Admin account cannot be deleted' }, 400);
+  }
 
   /* Deleting the account you are signed in as would end your own session
      mid-request and leave the panel in a confusing state. */

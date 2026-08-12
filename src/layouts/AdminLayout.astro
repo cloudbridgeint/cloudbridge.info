@@ -81,6 +81,12 @@ import '../styles/admin.css';
     }
     /* #c90f14 is sampled from the logo itself rather than guessed - it is the
        red covering the overwhelming majority of the mark. */
+    /* #c90f14 is sampled from the logo. .text-logo-red and .btn-view are plain
+       CSS rather than Tailwind classes because they are written inside a JS
+       template string, which the Tailwind scanner cannot see. */
+    .text-logo-red { color: #c90f14; }
+    .btn-view { background: #254368; }
+    .btn-view:hover { background: #1c3255; }
     .logout-btn { background: #c90f14; }
     .logout-btn:hover { background: #e01319; }
     .logout-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
