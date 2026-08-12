@@ -1,0 +1,193 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+export const prerender = false;
+
+/* Belt and braces: the middleware already redirects editors away from this
+   path, but a page that hands out admin accounts should not rely on a single
+   list staying correct. */
+const me = (Astro.locals as any).user;
+if (!me || me.role !== 'admin') return Astro.redirect('/cbc-admin?denied=settings');
+---
+<AdminLayout title="Users" active="users">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Users</h1>
+      <p class="text-slate-500 mt-1 text-sm">Who can sign in to this panel, and what each of them can reach.</p>
+    </div>
+    <button id="addBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition">+ Add user</button>
+  </div>
+
+  <div class="mt-6 grid sm:grid-cols-2 gap-4">
+    <div class="rounded-xl border border-slate-200 bg-white p-5">
+      <p class="text-sm font-semibold text-slate-900">Admin</p>
+      <p class="mt-1 text-sm text-slate-500">Full access, including everything under Settings and this Users page.</p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-5">
+      <p class="text-sm font-semibold text-slate-900">Editor</p>
+      <p class="mt-1 text-sm text-slate-500">Messages, leads, event registrations, applications, queries and analytics. Settings stays locked.</p>
+    </div>
+  </div>
+
+  <div id="listContainer" class="mt-8 space-y-3"></div>
+
+  <div id="modal" class="hidden fixed inset-0 bg-black/40 z-40 flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6">
+      <h3 id="modalTitle" class="font-bold text-lg text-slate-900 mb-4">Add user</h3>
+      <input type="hidden" id="editId">
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Name</label>
+          <input id="fName" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Optional">
+        </div>
+        <div id="emailRow">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Email</label>
+          <input id="fEmail" type="email" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="name@cloudbridge.info">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Role</label>
+          <select id="fRole" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+            <option value="editor">Editor — no access to Settings</option>
+            <option value="admin">Admin — full access</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">
+            Password <span id="pwHint" class="text-slate-400 font-normal">(at least 12 characters)</span>
+          </label>
+          <div class="flex gap-2">
+            <input id="fPassword" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono" autocomplete="new-password">
+            <button type="button" id="genBtn" class="shrink-0 px-3 py-2 text-xs rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Generate</button>
+          </div>
+          <p class="mt-1.5 text-xs text-slate-400">
+            Shown in plain text so you can copy it before saving — it cannot be read back afterwards.
+            Send it to the person over something private, not a group chat.
+          </p>
+        </div>
+      </div>
+      <p id="modalError" class="hidden mt-4 text-sm text-red-600"></p>
+      <div class="flex justify-end gap-2 mt-6">
+        <button id="cancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Cancel</button>
+        <button id="saveBtn" class="px-4 py-2 text-sm rounded-lg bg-bridge-700 hover:bg-bridge-800 text-white font-semibold">Save</button>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script is:inline>
+  let users = [];
+  let myEmail = '';
+  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+
+  async function load() {
+    const data = await apiFetch('/api/users');
+    users = data.users || [];
+    myEmail = data.me || '';
+    render();
+  }
+
+  function render() {
+    const adminCount = users.filter(u => u.role === 'admin').length;
+    document.getElementById('listContainer').innerHTML = users.map(u => {
+      const isMe = u.email === myEmail;
+      const lastAdmin = u.role === 'admin' && adminCount === 1;
+      return `
+      <div class="rounded-xl border border-slate-200 bg-white p-4 flex items-center justify-between gap-4">
+        <div class="min-w-0">
+          <p class="font-semibold text-slate-900 truncate">
+            ${esc(u.name || u.email)}
+            ${isMe ? '<span class="ml-2 text-xs font-normal text-slate-400">you</span>' : ''}
+          </p>
+          <p class="text-sm text-slate-500 truncate">${esc(u.email)}</p>
+        </div>
+        <div class="flex items-center gap-3 shrink-0">
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${u.role === 'admin' ? 'bg-bridge-50 text-bridge-800' : 'bg-slate-100 text-slate-600'}">
+            ${u.role === 'admin' ? 'Admin' : 'Editor'}
+          </span>
+          <button data-edit="${u.id}" class="text-sm text-slate-600 hover:text-bridge-800 hover:underline">Edit</button>
+          <button data-del="${u.id}" class="text-sm text-red-600 hover:underline ${isMe || lastAdmin ? 'opacity-30 pointer-events-none' : ''}">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    document.querySelectorAll('[data-edit]').forEach(b =>
+      b.addEventListener('click', () => openModal(users.find(u => u.id == b.dataset.edit))));
+    document.querySelectorAll('[data-del]').forEach(b =>
+      b.addEventListener('click', () => remove(b.dataset.del)));
+  }
+
+  function generatePassword() {
+    const words = ['Bridge', 'Harbour', 'Compass', 'Lantern', 'Meridian', 'Anchor', 'Summit', 'Falcon', 'Beacon', 'Voyager'];
+    const r = n => crypto.getRandomValues(new Uint32Array(1))[0] % n;
+    let a = words[r(words.length)], b = words[r(words.length)];
+    while (b === a) b = words[r(words.length)];
+    const digits = String(r(9000) + 1000);
+    return `${a}-${b}-${digits}${'!@#$%&*'[r(7)]}`;
+  }
+
+  function openModal(user) {
+    const err = document.getElementById('modalError');
+    err.classList.add('hidden');
+    document.getElementById('editId').value = user ? user.id : '';
+    document.getElementById('modalTitle').textContent = user ? 'Edit user' : 'Add user';
+    document.getElementById('fName').value = user ? (user.name || '') : '';
+    document.getElementById('fEmail').value = user ? user.email : '';
+    document.getElementById('fEmail').disabled = !!user;
+    document.getElementById('fRole').value = user ? user.role : 'editor';
+    document.getElementById('fPassword').value = user ? '' : generatePassword();
+    document.getElementById('pwHint').textContent = user
+      ? '(leave blank to keep the current one)'
+      : '(at least 12 characters)';
+    document.getElementById('modal').classList.remove('hidden');
+  }
+
+  function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+  function showError(msg) {
+    const err = document.getElementById('modalError');
+    err.textContent = msg;
+    err.classList.remove('hidden');
+  }
+
+  async function save() {
+    const id = document.getElementById('editId').value;
+    const payload = {
+      name: document.getElementById('fName').value,
+      role: document.getElementById('fRole').value,
+      password: document.getElementById('fPassword').value,
+    };
+    if (!id) payload.email = document.getElementById('fEmail').value;
+
+    try {
+      const res = await fetch(id ? `/api/users/${id}` : '/api/users', {
+        method: id ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { showError(data.error || 'Could not save'); return; }
+      closeModal();
+      await load();
+      if (typeof toast === 'function') toast(id ? 'User updated' : 'User added');
+    } catch (e) {
+      showError('Network error — try again');
+    }
+  }
+
+  async function remove(id) {
+    const u = users.find(x => x.id == id);
+    if (!confirm(`Remove ${u.email}? They will lose access immediately.`)) return;
+    const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { alert(data.error || 'Could not remove that user'); return; }
+    await load();
+    if (typeof toast === 'function') toast('User removed');
+  }
+
+  document.getElementById('addBtn').addEventListener('click', () => openModal(null));
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+  document.getElementById('saveBtn').addEventListener('click', save);
+  document.getElementById('genBtn').addEventListener('click', () => {
+    document.getElementById('fPassword').value = generatePassword();
+  });
+  load();
+</script>

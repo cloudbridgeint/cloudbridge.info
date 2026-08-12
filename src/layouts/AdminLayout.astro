@@ -27,8 +27,17 @@ const settingsSubItems = [
   { key: 'events', label: 'Events', href: '/cbc-admin/events', icon: 'M8 2v4M16 2v4M3 9h18M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z' },
   { key: 'faq', label: 'FAQ', href: '/cbc-admin/faq', icon: 'M9 9a3 3 0 116 0c0 2-3 2-3 4m.1 4h.01M12 22a10 10 0 100-20 10 10 0 000 20z' },
   { key: 'footer', label: 'Footer', href: '/cbc-admin/footer', icon: 'M4 6h16M4 12h16M4 18h7' },
+  { key: 'users', label: 'Users', href: '/cbc-admin/users', icon: 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75' },
 ];
 const settingsActive = settingsSubItems.some(i => i.key === active);
+
+/* Editors keep Settings in the sidebar so the panel looks the same for
+   everyone, but it is inert: no chevron, no panel, and nothing inside it is
+   rendered — so the list of settings screens is not even readable from the
+   page source. The middleware blocks the routes regardless; this only stops
+   an editor being shown a door that will not open. */
+const role = (Astro.locals as any).user?.role === 'editor' ? 'editor' : 'admin';
+const canSettings = role === 'admin';
 import '../styles/admin.css';
 ---
 <!DOCTYPE html>
@@ -104,20 +113,28 @@ import '../styles/admin.css';
 
         <nav class="space-y-1">
           <button id="settingsToggle" type="button"
-             class={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition ${settingsActive ? 'nav-active' : 'nav-idle'}`}>
+             disabled={!canSettings}
+             title={canSettings ? undefined : 'Your account does not have access to settings'}
+             class={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition ${settingsActive ? 'nav-active' : 'nav-idle'} ${canSettings ? '' : 'opacity-45 cursor-not-allowed'}`}>
             <svg class="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
             <span class="flex-1 text-left">Settings</span>
-            <svg id="settingsChevron" class={`w-4 h-4 transition-transform ${settingsActive ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            {canSettings ? (
+              <svg id="settingsChevron" class={`w-4 h-4 transition-transform ${settingsActive ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            ) : (
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+            )}
           </button>
-          <div id="settingsPanel" class={`${settingsActive ? '' : 'hidden'} pl-4 space-y-1`}>
-            {settingsSubItems.map(item => (
-              <a href={item.href}
-                 class={`flex items-center gap-3 px-3.5 py-2 rounded-xl text-sm font-medium transition ${active === item.key ? 'sub-active' : 'nav-idle'}`}>
-                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={item.icon}/></svg>
-                {item.label}
-              </a>
-            ))}
-          </div>
+          {canSettings && (
+            <div id="settingsPanel" class={`${settingsActive ? '' : 'hidden'} pl-4 space-y-1`}>
+              {settingsSubItems.map(item => (
+                <a href={item.href}
+                   class={`flex items-center gap-3 px-3.5 py-2 rounded-xl text-sm font-medium transition ${active === item.key ? 'sub-active' : 'nav-idle'}`}>
+                  <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={item.icon}/></svg>
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          )}
         </nav>
 
         <div class="flex-1"></div>

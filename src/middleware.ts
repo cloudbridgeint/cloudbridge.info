@@ -3,6 +3,45 @@ import { verifySessionCookie } from './lib/auth';
 
 const PUBLIC_ADMIN_PATHS = ['/cbc-admin/login', '/api/login'];
 
+/* Everything an editor must not reach. Hiding the menu is not access control:
+   an editor who types the URL, or posts straight at the API, has to be stopped
+   here. The pages and the endpoints behind them are listed together so the two
+   cannot drift apart.
+
+   Anything not listed is allowed — that is the whole of the top-level nav
+   (dashboard, messages, leads, event registrations, applications, query,
+   analytics) plus the endpoints those screens use. */
+const SETTINGS_PAGES = [
+  '/cbc-admin/homepage',
+  '/cbc-admin/universities',
+  '/cbc-admin/university-directory',
+  '/cbc-admin/courses',
+  '/cbc-admin/blogs',
+  '/cbc-admin/events',
+  '/cbc-admin/faq',
+  '/cbc-admin/footer',
+  '/cbc-admin/users',
+];
+const SETTINGS_APIS = [
+  '/api/content',
+  '/api/universities',
+  '/api/university-directory',
+  '/api/courses',
+  '/api/blog-posts',
+  '/api/events',
+  '/api/faqs',
+  '/api/users',
+];
+
+function isSettingsPath(pathname: string, method: string): boolean {
+  if (SETTINGS_PAGES.some(p => pathname === p || pathname.startsWith(p + '/'))) return true;
+  if (SETTINGS_APIS.some(p => pathname === p || pathname.startsWith(p + '/'))) return true;
+  /* Media: reading an image is public and used all over the site, but adding or
+     deleting one is a settings action. */
+  if (pathname.startsWith('/api/media') && method !== 'GET') return true;
+  return false;
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const url = context.url;
 
@@ -77,5 +116,16 @@ async function handleRequest(context: any, next: any) {
   }
 
   (context.locals as any).user = session;
+
+  if (session.role === 'editor' && isSettingsPath(pathname, context.request.method)) {
+    if (pathname.startsWith('/api/')) {
+      return new Response(JSON.stringify({ error: 'Your account does not have access to settings.' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    return context.redirect('/cbc-admin?denied=settings');
+  }
+
   return next();
 }

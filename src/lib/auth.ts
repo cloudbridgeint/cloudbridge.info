@@ -49,14 +49,18 @@ async function hmacSign(data: string, secret: string): Promise<string> {
   return bytesToHex(new Uint8Array(sig));
 }
 
-export async function createSessionCookie(email: string, secret: string): Promise<string> {
-  const payload = JSON.stringify({ email, exp: Date.now() + 1000 * 60 * 60 * 24 * 7 }); // 7 days
+export type Role = 'admin' | 'editor';
+
+/* The role travels inside the signed payload, so a user cannot promote
+   themselves by editing the cookie — any change breaks the HMAC. */
+export async function createSessionCookie(email: string, secret: string, role: Role = 'admin'): Promise<string> {
+  const payload = JSON.stringify({ email, role, exp: Date.now() + 1000 * 60 * 60 * 24 * 7 }); // 7 days
   const b64 = btoa(payload);
   const sig = await hmacSign(b64, secret);
   return `${b64}.${sig}`;
 }
 
-export async function verifySessionCookie(cookieValue: string | undefined, secret: string): Promise<{ email: string } | null> {
+export async function verifySessionCookie(cookieValue: string | undefined, secret: string): Promise<{ email: string; role: Role } | null> {
   if (!cookieValue) return null;
   const [b64, sig] = cookieValue.split('.');
   if (!b64 || !sig) return null;
@@ -65,7 +69,10 @@ export async function verifySessionCookie(cookieValue: string | undefined, secre
   try {
     const payload = JSON.parse(atob(b64));
     if (!payload.exp || payload.exp < Date.now()) return null;
-    return { email: payload.email };
+    /* Sessions issued before roles existed carry no role. Treating those as
+       admin keeps existing logins working; treating them as editor would lock
+       the owner out of their own settings. */
+    return { email: payload.email, role: payload.role === 'editor' ? 'editor' : 'admin' };
   } catch {
     return null;
   }

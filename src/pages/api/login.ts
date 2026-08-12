@@ -80,7 +80,8 @@ export const POST: APIRoute = async (context) => {
     await db.prepare('DELETE FROM login_attempts WHERE ip = ? AND ok = 0').bind(ip).run();
   } catch { /* best effort */ }
 
-  const cookieValue = await createSessionCookie(email, secret);
+  const role = user.role === 'editor' ? 'editor' : 'admin';
+  const cookieValue = await createSessionCookie(email, secret, role);
   context.cookies.set('cb_session', cookieValue, {
     path: '/',
     httpOnly: true,
