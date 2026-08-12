@@ -38,6 +38,21 @@ const settingsActive = settingsSubItems.some(i => i.key === active);
    an editor being shown a door that will not open. */
 const role = (Astro.locals as any).user?.role === 'editor' ? 'editor' : 'admin';
 const canSettings = role === 'admin';
+
+/* The top bar used to show the logo and the word "Admin" for everyone. Look up
+   the signed-in account so it shows who is actually logged in. Best effort:
+   a database hiccup should not take the whole panel down. */
+let me: any = null;
+try {
+  const db = (Astro.locals as any).runtime?.env?.DB;
+  const email = (Astro.locals as any).user?.email;
+  if (db && email) {
+    me = await db.prepare('SELECT name, username, avatar, role FROM admin_users WHERE email = ?')
+      .bind(email).first();
+  }
+} catch { /* fall back to the generic label below */ }
+const meLabel = me?.name || me?.username || (role === 'editor' ? 'Editor' : 'Admin');
+const meInitial = String(meLabel).trim().charAt(0).toUpperCase();
 import '../styles/admin.css';
 ---
 <!DOCTYPE html>
@@ -109,7 +124,7 @@ import '../styles/admin.css';
           <div class="w-[88px] h-[88px] rounded-2xl border border-white/25 flex items-center justify-center shrink-0">
             <img src={logoWhite.src} alt="CloudBridge" class="w-[72px] h-[72px] rounded-xl object-cover">
           </div>
-          <span class="font-semibold text-white/60 text-xs tracking-[0.2em] uppercase">Admin</span>
+          <span class="font-semibold text-white/60 text-xs tracking-[0.2em] uppercase">{role === 'editor' ? 'Editor' : 'Admin'}</span>
         </div>
 
         <nav class="space-y-1">
@@ -190,8 +205,12 @@ import '../styles/admin.css';
           </button>
 
           <div class="flex items-center gap-2.5 pl-3 md:pl-4 border-l border-slate-100">
-            <img src={logo.src} alt="" class="w-8 h-8 rounded-full object-cover ring-2 ring-iris-100">
-            <span class="text-sm font-semibold text-bridge-950 hidden sm:block">Admin</span>
+            {me?.avatar ? (
+              <img src={me.avatar} alt="" class="w-8 h-8 rounded-full object-cover ring-2 ring-iris-100">
+            ) : (
+              <span class="w-8 h-8 rounded-full ring-2 ring-iris-100 bg-iris-50 text-iris-700 text-xs font-bold flex items-center justify-center">{meInitial}</span>
+            )}
+            <span class="text-sm font-semibold text-bridge-950 hidden sm:block">{meLabel}</span>
             <svg class="w-3.5 h-3.5 text-slate-400 hidden sm:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
           </div>
         </div>

@@ -3,13 +3,13 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 export const prerender = false;
 
 /* Belt and braces: the middleware already redirects editors away from this
-   path, but a page that hands out admin accounts should not rely on a single
+   path, but a page that hands out admin accounts should not depend on a single
    list staying correct. */
 const me = (Astro.locals as any).user;
 if (!me || me.role !== 'admin') return Astro.redirect('/cbc-admin?denied=settings');
 ---
 <AdminLayout title="Users" active="users">
-  <div class="flex items-center justify-between">
+  <div class="flex items-center justify-between flex-wrap gap-4">
     <div>
       <h1 class="text-2xl font-bold text-slate-900">Users</h1>
       <p class="text-slate-500 mt-1 text-sm">Who can sign in to this panel, and what each of them can reach.</p>
@@ -17,145 +17,245 @@ if (!me || me.role !== 'admin') return Astro.redirect('/cbc-admin?denied=setting
     <button id="addBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition">+ Add user</button>
   </div>
 
-  <div class="mt-6 grid sm:grid-cols-2 gap-4">
-    <div class="rounded-xl border border-slate-200 bg-white p-5">
-      <p class="text-sm font-semibold text-slate-900">Admin</p>
-      <p class="mt-1 text-sm text-slate-500">Full access, including everything under Settings and this Users page.</p>
+  <!-- Counts -->
+  <div class="mt-6 grid sm:grid-cols-2 gap-4 max-w-2xl">
+    <div class="rounded-2xl px-5 py-4 text-white flex items-center gap-4" style="background-image:linear-gradient(120deg,#4b45c6,#7a6ff0)">
+      <span class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 4.5-9 4.5-9-4.5L12 2z"/><path d="M3 12.5l9 4.5 9-4.5"/></svg>
+      </span>
+      <div><p id="countAdmin" class="text-2xl font-bold leading-none">—</p><p class="text-sm text-white/85 mt-1">Admins</p></div>
     </div>
-    <div class="rounded-xl border border-slate-200 bg-white p-5">
-      <p class="text-sm font-semibold text-slate-900">Editor</p>
-      <p class="mt-1 text-sm text-slate-500">Messages, leads, event registrations, applications, queries and analytics. Settings stays locked.</p>
+    <div class="rounded-2xl px-5 py-4 text-white flex items-center gap-4" style="background-image:linear-gradient(120deg,#e0563f,#f08a5f)">
+      <span class="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+      </span>
+      <div><p id="countEditor" class="text-2xl font-bold leading-none">—</p><p class="text-sm text-white/85 mt-1">Editors</p></div>
     </div>
   </div>
 
-  <div id="listContainer" class="mt-8 space-y-3"></div>
+  <section class="mt-10">
+    <h2 class="text-sm font-bold uppercase tracking-wide text-slate-400">Admins</h2>
+    <p class="text-xs text-slate-400 mt-1">Full access, including Settings and this page.</p>
+    <div id="adminGrid" class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </section>
 
-  <div id="modal" class="hidden fixed inset-0 bg-black/40 z-40 flex items-center justify-center px-4">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6">
-      <h3 id="modalTitle" class="font-bold text-lg text-slate-900 mb-4">Add user</h3>
-      <input type="hidden" id="editId">
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Name</label>
-          <input id="fName" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Optional">
+  <section class="mt-10">
+    <h2 class="text-sm font-bold uppercase tracking-wide text-slate-400">Editors</h2>
+    <p class="text-xs text-slate-400 mt-1">Messages, leads, registrations, applications, queries and analytics. Settings stays locked.</p>
+    <div id="editorGrid" class="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </section>
+
+  <!-- Modal -->
+  <div id="modal" class="hidden fixed inset-0 bg-slate-900/50 z-40 flex items-center justify-center px-4 py-8 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col md:flex-row overflow-hidden relative my-auto">
+      <button id="closeBtn" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center z-10">&times;</button>
+
+      <!-- Left: photo -->
+      <div class="md:w-64 shrink-0 bg-slate-50 p-6 flex flex-col items-center gap-4 border-b md:border-b-0 md:border-r border-slate-100">
+        <div class="relative">
+          <img id="avatarImg" src="" alt="" class="w-32 h-32 rounded-2xl object-cover bg-slate-200">
+          <div id="avatarEmpty" class="w-32 h-32 rounded-2xl bg-slate-200 items-center justify-center text-slate-400 text-3xl font-bold hidden">?</div>
         </div>
-        <div id="emailRow">
-          <label class="block text-xs font-medium text-slate-600 mb-1">Email</label>
-          <input id="fEmail" type="email" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="name@cloudbridge.info">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Role</label>
-          <select id="fRole" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-            <option value="editor">Editor — no access to Settings</option>
-            <option value="admin">Admin — full access</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">
-            Password <span id="pwHint" class="text-slate-400 font-normal">(at least 12 characters)</span>
+        <div id="avatarControls" class="hidden w-full space-y-2">
+          <label class="block w-full text-center text-xs font-semibold rounded-lg border border-slate-300 px-3 py-2 text-slate-600 hover:bg-white cursor-pointer">
+            Change photo
+            <input id="avatarInput" type="file" accept="image/*" class="hidden">
           </label>
-          <div class="flex gap-2">
-            <input id="fPassword" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono" autocomplete="new-password">
-            <button type="button" id="genBtn" class="shrink-0 px-3 py-2 text-xs rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Generate</button>
-          </div>
-          <p class="mt-1.5 text-xs text-slate-400">
-            Shown in plain text so you can copy it before saving — it cannot be read back afterwards.
-            Send it to the person over something private, not a group chat.
-          </p>
+          <button id="avatarRemove" type="button" class="w-full text-xs rounded-lg px-3 py-2 text-red-600 hover:bg-red-50">Remove photo</button>
+          <p id="avatarStatus" class="text-[11px] text-slate-400 text-center"></p>
+        </div>
+        <div class="text-center">
+          <p id="sideName" class="font-semibold text-slate-800 text-sm"></p>
+          <p id="sideRole" class="text-xs text-slate-400 mt-0.5"></p>
         </div>
       </div>
-      <p id="modalError" class="hidden mt-4 text-sm text-red-600"></p>
-      <div class="flex justify-end gap-2 mt-6">
-        <button id="cancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Cancel</button>
-        <button id="saveBtn" class="px-4 py-2 text-sm rounded-lg bg-bridge-700 hover:bg-bridge-800 text-white font-semibold">Save</button>
+
+      <!-- Right: fields -->
+      <div class="flex-1 p-6 min-w-0">
+        <h3 id="modalTitle" class="font-bold text-xl text-slate-900 mb-5">Account Details</h3>
+        <input type="hidden" id="editId">
+        <div class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Name</label>
+            <input id="fName" class="uf w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Username <span class="text-red-500">*</span></label>
+            <input id="fUsername" class="uf w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="lowercase, no spaces">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Email <span class="text-red-500">*</span></label>
+            <input id="fEmail" type="email" class="uf w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Role <span class="text-red-500">*</span></label>
+            <select id="fRole" class="uf w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+              <option value="editor">Editor — no access to Settings</option>
+              <option value="admin">Admin — full access</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">
+              Password <span id="pwHint" class="text-slate-400 font-normal">(8–12 characters)</span>
+            </label>
+            <div class="flex gap-2">
+              <input id="fPassword" type="text" class="uf w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono" autocomplete="new-password">
+              <button type="button" id="genBtn" class="uf shrink-0 px-3 py-2 text-xs rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Generate</button>
+            </div>
+            <p id="pwNote" class="mt-1.5 text-xs text-slate-400"></p>
+          </div>
+        </div>
+        <p id="modalError" class="hidden mt-4 text-sm text-red-600"></p>
+        <div class="flex justify-end gap-2 mt-6">
+          <button id="deleteBtn" class="hidden mr-auto px-4 py-2 text-sm rounded-lg text-red-600 hover:bg-red-50">Delete user</button>
+          <button id="cancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button id="editBtn" class="px-4 py-2 text-sm rounded-lg bg-bridge-700 hover:bg-bridge-800 text-white font-semibold">Edit</button>
+          <button id="saveBtn" class="hidden px-4 py-2 text-sm rounded-lg bg-bridge-700 hover:bg-bridge-800 text-white font-semibold">Save</button>
+        </div>
       </div>
     </div>
   </div>
 </AdminLayout>
 
 <script is:inline>
-  let users = [];
-  let myEmail = '';
-  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+  let users = [], myEmail = '', mode = 'view', avatarUrl = '';
+  const $ = id => document.getElementById(id);
+  const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
+  const initials = u => (u.name || u.username || u.email || '?').trim().charAt(0).toUpperCase();
 
   async function load() {
     const data = await apiFetch('/api/users');
     users = data.users || [];
     myEmail = data.me || '';
+    $('countAdmin').textContent = data.counts.admin;
+    $('countEditor').textContent = data.counts.editor;
     render();
   }
 
-  function render() {
-    const adminCount = users.filter(u => u.role === 'admin').length;
-    document.getElementById('listContainer').innerHTML = users.map(u => {
-      const isMe = u.email === myEmail;
-      const lastAdmin = u.role === 'admin' && adminCount === 1;
-      return `
-      <div class="rounded-xl border border-slate-200 bg-white p-4 flex items-center justify-between gap-4">
-        <div class="min-w-0">
-          <p class="font-semibold text-slate-900 truncate">
-            ${esc(u.name || u.email)}
-            ${isMe ? '<span class="ml-2 text-xs font-normal text-slate-400">you</span>' : ''}
-          </p>
-          <p class="text-sm text-slate-500 truncate">${esc(u.email)}</p>
+  function card(u) {
+    const isMe = u.email === myEmail;
+    const pic = u.avatar
+      ? `<img src="${esc(u.avatar)}" alt="" class="w-14 h-14 rounded-full object-cover bg-slate-100">`
+      : `<div class="w-14 h-14 rounded-full bg-slate-100 text-slate-500 font-bold text-lg flex items-center justify-center">${esc(initials(u))}</div>`;
+    return `
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 hover:shadow-md transition">
+      <div class="flex items-start gap-3">
+        ${pic}
+        <div class="min-w-0 flex-1">
+          <p class="font-semibold text-slate-900 truncate">${esc(u.name || u.username)}${isMe ? '<span class="ml-1.5 text-xs font-normal text-slate-400">you</span>' : ''}</p>
+          <p class="text-xs text-slate-500 truncate">@${esc(u.username)}</p>
+          <p class="text-xs text-slate-400 truncate mt-0.5">${esc(u.email)}</p>
         </div>
-        <div class="flex items-center gap-3 shrink-0">
-          <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${u.role === 'admin' ? 'bg-bridge-50 text-bridge-800' : 'bg-slate-100 text-slate-600'}">
-            ${u.role === 'admin' ? 'Admin' : 'Editor'}
-          </span>
-          <button data-edit="${u.id}" class="text-sm text-slate-600 hover:text-bridge-800 hover:underline">Edit</button>
-          <button data-del="${u.id}" class="text-sm text-red-600 hover:underline ${isMe || lastAdmin ? 'opacity-30 pointer-events-none' : ''}">Delete</button>
+      </div>
+      <div class="mt-4 flex items-center gap-2">
+        <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full ${u.role === 'admin' ? 'bg-iris-50 text-iris-700' : 'bg-amber-50 text-amber-700'}">${u.role === 'admin' ? 'Admin' : 'Editor'}</span>
+        <div class="ml-auto flex gap-2">
+          <button data-view="${u.id}" class="text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">View</button>
+          <button data-edit="${u.id}" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-bridge-700 hover:bg-bridge-800 text-white">Edit</button>
         </div>
-      </div>`;
-    }).join('');
+      </div>
+    </div>`;
+  }
 
+  function render() {
+    const admins = users.filter(u => u.role === 'admin');
+    const editors = users.filter(u => u.role === 'editor');
+    $('adminGrid').innerHTML = admins.map(card).join('') ||
+      '<p class="text-sm text-slate-400">No admins.</p>';
+    $('editorGrid').innerHTML = editors.map(card).join('') ||
+      '<p class="text-sm text-slate-400">No editors yet — add one to give someone access without Settings.</p>';
+    document.querySelectorAll('[data-view]').forEach(b =>
+      b.addEventListener('click', () => open(users.find(u => u.id == b.dataset.view), 'view')));
     document.querySelectorAll('[data-edit]').forEach(b =>
-      b.addEventListener('click', () => openModal(users.find(u => u.id == b.dataset.edit))));
-    document.querySelectorAll('[data-del]').forEach(b =>
-      b.addEventListener('click', () => remove(b.dataset.del)));
+      b.addEventListener('click', () => open(users.find(u => u.id == b.dataset.edit), 'edit')));
   }
 
   function generatePassword() {
-    const words = ['Bridge', 'Harbour', 'Compass', 'Lantern', 'Meridian', 'Anchor', 'Summit', 'Falcon', 'Beacon', 'Voyager'];
+    // 12 characters, inside the 8-12 rule, avoiding lookalike glyphs
+    const cs = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*';
     const r = n => crypto.getRandomValues(new Uint32Array(1))[0] % n;
-    let a = words[r(words.length)], b = words[r(words.length)];
-    while (b === a) b = words[r(words.length)];
-    const digits = String(r(9000) + 1000);
-    return `${a}-${b}-${digits}${'!@#$%&*'[r(7)]}`;
+    return Array.from({ length: 12 }, () => cs[r(cs.length)]).join('');
   }
 
-  function openModal(user) {
-    const err = document.getElementById('modalError');
-    err.classList.add('hidden');
-    document.getElementById('editId').value = user ? user.id : '';
-    document.getElementById('modalTitle').textContent = user ? 'Edit user' : 'Add user';
-    document.getElementById('fName').value = user ? (user.name || '') : '';
-    document.getElementById('fEmail').value = user ? user.email : '';
-    document.getElementById('fEmail').disabled = !!user;
-    document.getElementById('fRole').value = user ? user.role : 'editor';
-    document.getElementById('fPassword').value = user ? '' : generatePassword();
-    document.getElementById('pwHint').textContent = user
-      ? '(leave blank to keep the current one)'
-      : '(at least 12 characters)';
-    document.getElementById('modal').classList.remove('hidden');
+  function setMode(m) {
+    mode = m;
+    const editable = m !== 'view';
+    document.querySelectorAll('.uf').forEach(el => {
+      el.disabled = !editable;
+      el.classList.toggle('bg-slate-50', !editable);
+      el.classList.toggle('text-slate-500', !editable);
+      el.classList.toggle('cursor-default', !editable);
+    });
+    $('avatarControls').classList.toggle('hidden', !editable);
+    $('editBtn').classList.toggle('hidden', m !== 'view');
+    $('saveBtn').classList.toggle('hidden', m === 'view');
+    $('modalTitle').textContent = m === 'create' ? 'Add user' : m === 'edit' ? 'Edit user' : 'Account Details';
   }
 
-  function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+  function paintAvatar(url) {
+    avatarUrl = url || '';
+    $('avatarImg').src = avatarUrl || '';
+    $('avatarImg').classList.toggle('hidden', !avatarUrl);
+    $('avatarEmpty').classList.toggle('hidden', !!avatarUrl);
+    $('avatarEmpty').classList.toggle('flex', !avatarUrl);
+  }
 
-  function showError(msg) {
-    const err = document.getElementById('modalError');
-    err.textContent = msg;
-    err.classList.remove('hidden');
+  function open(user, m) {
+    $('modalError').classList.add('hidden');
+    $('avatarStatus').textContent = '';
+    $('editId').value = user ? user.id : '';
+    $('fName').value = user ? (user.name || '') : '';
+    $('fUsername').value = user ? user.username : '';
+    $('fEmail').value = user ? user.email : '';
+    $('fRole').value = user ? user.role : 'editor';
+    $('fPassword').value = user ? '' : generatePassword();
+    $('sideName').textContent = user ? (user.name || user.username) : 'New user';
+    $('sideRole').textContent = user ? (user.role === 'admin' ? 'Admin' : 'Editor') : '';
+    $('avatarEmpty').textContent = user ? initials(user) : '?';
+    paintAvatar(user ? (user.avatar || '') : '');
+
+    const existing = !!user;
+    $('pwHint').textContent = existing ? '(leave blank to keep the current one)' : '(8–12 characters)';
+    $('pwNote').textContent = existing
+      ? 'Passwords are stored as one-way hashes and cannot be read back. Set a new one here and share it with the person.'
+      : 'Copy this before saving — it cannot be read back afterwards.';
+    $('fPassword').placeholder = existing && m === 'view' ? '••••••••' : '';
+    $('deleteBtn').classList.toggle('hidden', !existing || m === 'view' || (user && user.email === myEmail));
+
+    setMode(m);
+    $('modal').classList.remove('hidden');
+  }
+
+  function close() { $('modal').classList.add('hidden'); }
+  function showError(msg) { const e = $('modalError'); e.textContent = msg; e.classList.remove('hidden'); }
+
+  async function uploadAvatar(file) {
+    $('avatarStatus').textContent = 'Uploading…';
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) { $('avatarStatus').textContent = data.error || 'Upload failed'; return; }
+      paintAvatar(data.url);
+      $('avatarStatus').textContent = 'Photo ready — save to apply';
+    } catch {
+      $('avatarStatus').textContent = 'Upload failed';
+    }
   }
 
   async function save() {
-    const id = document.getElementById('editId').value;
+    const id = $('editId').value;
     const payload = {
-      name: document.getElementById('fName').value,
-      role: document.getElementById('fRole').value,
-      password: document.getElementById('fPassword').value,
+      name: $('fName').value,
+      username: $('fUsername').value,
+      email: $('fEmail').value,
+      role: $('fRole').value,
+      avatar: avatarUrl,
     };
-    if (!id) payload.email = document.getElementById('fEmail').value;
+    const pw = $('fPassword').value;
+    if (pw) payload.password = pw;
+    if (!id && !pw) { showError('Set a password for the new account'); return; }
 
     try {
       const res = await fetch(id ? `/api/users/${id}` : '/api/users', {
@@ -165,29 +265,33 @@ if (!me || me.role !== 'admin') return Astro.redirect('/cbc-admin?denied=setting
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) { showError(data.error || 'Could not save'); return; }
-      closeModal();
+      close();
       await load();
       if (typeof toast === 'function') toast(id ? 'User updated' : 'User added');
-    } catch (e) {
-      showError('Network error — try again');
-    }
+    } catch { showError('Network error — try again'); }
   }
 
-  async function remove(id) {
+  async function remove() {
+    const id = $('editId').value;
     const u = users.find(x => x.id == id);
-    if (!confirm(`Remove ${u.email}? They will lose access immediately.`)) return;
+    if (!u || !confirm(`Remove ${u.email}? They will lose access immediately.`)) return;
     const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) { alert(data.error || 'Could not remove that user'); return; }
+    if (!res.ok) { showError(data.error || 'Could not remove that user'); return; }
+    close();
     await load();
     if (typeof toast === 'function') toast('User removed');
   }
 
-  document.getElementById('addBtn').addEventListener('click', () => openModal(null));
-  document.getElementById('cancelBtn').addEventListener('click', closeModal);
-  document.getElementById('saveBtn').addEventListener('click', save);
-  document.getElementById('genBtn').addEventListener('click', () => {
-    document.getElementById('fPassword').value = generatePassword();
-  });
+  $('addBtn').addEventListener('click', () => open(null, 'create'));
+  $('cancelBtn').addEventListener('click', close);
+  $('closeBtn').addEventListener('click', close);
+  $('editBtn').addEventListener('click', () => setMode('edit'));
+  $('saveBtn').addEventListener('click', save);
+  $('deleteBtn').addEventListener('click', remove);
+  $('genBtn').addEventListener('click', () => { $('fPassword').value = generatePassword(); });
+  $('avatarInput').addEventListener('change', e => { if (e.target.files[0]) uploadAvatar(e.target.files[0]); });
+  $('avatarRemove').addEventListener('click', () => { paintAvatar(''); $('avatarStatus').textContent = 'Photo cleared — save to apply'; });
+  $('modal').addEventListener('click', e => { if (e.target === $('modal')) close(); });
   load();
 </script>

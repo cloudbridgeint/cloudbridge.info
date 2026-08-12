@@ -3,7 +3,8 @@ import { hashPassword } from '../../../lib/auth';
 
 export const prerender = false;
 
-const MIN_PASSWORD = 12;
+const MIN_PASSWORD = 8;
+const MAX_PASSWORD = 12;
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -20,8 +21,8 @@ function requireAdmin(locals: any) {
 }
 
 /* Guard against an account that can log in but change nothing: if the last
-   admin is demoted or deleted, the settings area becomes unreachable for
-   everyone and only a direct database edit can undo it. */
+   admin is demoted or deleted, Settings becomes unreachable for everyone and
+   only a direct database edit can undo it. */
 async function otherAdminsExist(db: any, excludeId: number): Promise<boolean> {
   const row = await db.prepare(
     "SELECT COUNT(*) AS n FROM admin_users WHERE role = 'admin' AND id != ?"
@@ -51,6 +52,36 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
     values.push(body.name.trim().slice(0, 120) || null);
   }
 
+  /* avatar: '' clears the picture, a string sets it, absent leaves it alone */
+  if (typeof body.avatar === 'string') {
+    updates.push('avatar = ?');
+    values.push(body.avatar.trim() || null);
+  }
+
+  if (typeof body.username === 'string' && body.username.trim()) {
+    const username = body.username.trim().toLowerCase();
+    if (!/^[a-z0-9._-]{3,32}$/.test(username)) {
+      return json({ error: 'Username must be 3-32 characters: letters, numbers, dot, dash or underscore' }, 400);
+    }
+    const taken = await db.prepare('SELECT id FROM admin_users WHERE username = ? AND id != ?')
+      .bind(username, id).first();
+    if (taken) return json({ error: 'That username is taken' }, 409);
+    updates.push('username = ?');
+    values.push(username);
+  }
+
+  if (typeof body.email === 'string' && body.email.trim()) {
+    const email = body.email.trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return json({ error: 'Enter a valid email address' }, 400);
+    }
+    const taken = await db.prepare('SELECT id FROM admin_users WHERE email = ? AND id != ?')
+      .bind(email, id).first();
+    if (taken) return json({ error: 'An account with that email already exists' }, 409);
+    updates.push('email = ?');
+    values.push(email);
+  }
+
   if (body.role === 'admin' || body.role === 'editor') {
     if (target.role === 'admin' && body.role === 'editor' && !(await otherAdminsExist(db, id))) {
       return json({ error: 'This is the only admin account — promote someone else first' }, 400);
@@ -60,8 +91,8 @@ export const PATCH: APIRoute = async ({ params, request, locals }) => {
   }
 
   if (typeof body.password === 'string' && body.password.length > 0) {
-    if (body.password.length < MIN_PASSWORD) {
-      return json({ error: `Password must be at least ${MIN_PASSWORD} characters` }, 400);
+    if (body.password.length < MIN_PASSWORD || body.password.length > MAX_PASSWORD) {
+      return json({ error: `Password must be between ${MIN_PASSWORD} and ${MAX_PASSWORD} characters` }, 400);
     }
     updates.push('password_hash = ?');
     values.push(await hashPassword(body.password));
