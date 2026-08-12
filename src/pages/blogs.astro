@@ -15,7 +15,7 @@ function postHref(slug: string) {
   return `/blogs/${slug}`;
 }
 ---
-<Layout title={title} description={description}>
+<Layout title={title} description={description} breadcrumbs={[{ name: 'Blogs', url: '/blogs' }]}>
 
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">

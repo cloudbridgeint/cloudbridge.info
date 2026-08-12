@@ -45,7 +45,10 @@ const articleSchema = [{
   publisher: { '@id': 'https://cloudbridge.info/#organization' },
 }];
 ---
-<Layout title={`${post.title} | CloudBridge`} description={post.description || ''} schema={articleSchema}>
+<Layout title={`${post.title} | CloudBridge`} description={post.description || ''} schema={articleSchema}
+        image={heroSrc || undefined} ogType="article"
+        publishedTime={published} modifiedTime={modified || published} section={post.category}
+        breadcrumbs={[{ name: 'Blogs', url: '/blogs' }, { name: post.title, url: pageUrl }]}>
 
 <section class="py-10 bg-white border-b border-black/5">
   <div class="max-w-container mx-auto px-4 md:px-8">

@@ -50,7 +50,9 @@ const eventSchema = isPast ? null : {
   url: canonical,
 };
 ---
-<Layout title={title} description={description}>
+<Layout title={title} description={description}
+        image={ev.image ? mediaUrl(ev.image, '') : undefined}
+        breadcrumbs={[{ name: 'Events', url: '/events' }, { name: ev.title, url: canonical }]}>
 
   {eventSchema && <script type="application/ld+json" set:html={JSON.stringify(eventSchema)} is:inline />}
   <link rel="canonical" href={canonical} slot="head" />

@@ -9,9 +9,32 @@ export interface Props {
   description: string;
   /* Extra schema.org nodes for this page, merged into the site-wide @graph. */
   schema?: Record<string, any>[];
+  /* Share image for this page. Falls back to the logo when a page has no
+     picture of its own. */
+  image?: string;
+  /* 'article' for anything with an author and a publish date. */
+  ogType?: 'website' | 'article';
+  /* Trail shown at the top of the page; also emitted as BreadcrumbList so the
+     same path can appear under the result in search. Home is added here, so
+     pages only pass what comes after it. */
+  breadcrumbs?: Array<{ name: string; url: string }>;
+  /* Article timestamps, already ISO 8601. */
+  publishedTime?: string;
+  modifiedTime?: string;
+  section?: string;
 }
-const { title, description, schema = [] } = Astro.props;
+const {
+  title, description, schema = [], image, ogType = 'website',
+  breadcrumbs = [], publishedTime, modifiedTime, section,
+} = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+const SITE = 'https://cloudbridge.info';
+const toAbs = (u: string) => (u.startsWith('http') ? u : new URL(u, SITE).href);
+const shareImage = image ? toAbs(image) : `${SITE}/assets/logo.png`;
+/* A page with a real picture deserves the large card; the bare logo looks
+   better in the small one. */
+const twitterCard = image ? 'summary_large_image' : 'summary';
 
 export const prerender = false;
 const db = (Astro.locals as any).runtime?.env?.DB;
@@ -137,6 +160,16 @@ const graph: Record<string, any>[] = [
     inLanguage: 'en',
     publisher: { '@id': ORG_ID },
   },
+  ...(breadcrumbs.length ? [{
+    '@type': 'BreadcrumbList',
+    '@id': canonicalURL.href + '#breadcrumbs',
+    itemListElement: [{ name: 'Home', url: SITE + '/' }, ...breadcrumbs].map((b, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: b.name,
+      item: toAbs(b.url),
+    })),
+  }] : []),
   ...schema,
 ];
 
@@ -156,13 +189,18 @@ import '../styles/site.css';
 <title>{title}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonicalURL}>
-<meta property="og:type" content="website">
+<meta property="og:type" content={ogType}>
 <meta property="og:site_name" content="CloudBridge">
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
 <meta property="og:url" content={canonicalURL}>
-<meta property="og:image" content="https://cloudbridge.info/assets/logo.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content={shareImage}>
+<meta property="og:image:alt" content={title}>
+{ogType === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+{ogType === 'article' && modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+{ogType === 'article' && section && <meta property="article:section" content={section} />}
+<meta name="twitter:card" content={twitterCard}>
+<meta name="twitter:image" content={shareImage}>
 <meta name="twitter:title" content={title}>
 <meta name="twitter:description" content={description}>
 <script type="application/ld+json" is:inline set:html={jsonLd}></script>
