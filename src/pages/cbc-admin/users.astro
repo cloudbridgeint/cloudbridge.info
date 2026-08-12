@@ -118,7 +118,7 @@ if (!me || me.role !== 'admin') return Astro.redirect('/cbc-admin?denied=setting
 </AdminLayout>
 
 <script is:inline>
-  let users = [], myEmail = '', mode = 'view', avatarUrl = '';
+  let users = [], myEmail = '', mode = 'view', avatarUrl = '', current = null;
   const $ = id => document.getElementById(id);
   const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
   const initials = u => (u.name || u.username || u.email || '?').trim().charAt(0).toUpperCase();
@@ -189,6 +189,10 @@ if (!me || me.role !== 'admin') return Astro.redirect('/cbc-admin?denied=setting
     $('avatarControls').classList.toggle('hidden', !editable);
     $('editBtn').classList.toggle('hidden', m !== 'view');
     $('saveBtn').classList.toggle('hidden', m === 'view');
+    /* Delete only makes sense on an existing account, while editing, and never
+       on the account you are signed in with. */
+    const canDelete = !!current && editable && current.email !== myEmail;
+    $('deleteBtn').classList.toggle('hidden', !canDelete);
     $('modalTitle').textContent = m === 'create' ? 'Add user' : m === 'edit' ? 'Edit user' : 'Account Details';
   }
 
@@ -220,8 +224,8 @@ if (!me || me.role !== 'admin') return Astro.redirect('/cbc-admin?denied=setting
       ? 'Passwords are stored as one-way hashes and cannot be read back. Set a new one here and share it with the person.'
       : 'Copy this before saving — it cannot be read back afterwards.';
     $('fPassword').placeholder = existing && m === 'view' ? '••••••••' : '';
-    $('deleteBtn').classList.toggle('hidden', !existing || m === 'view' || (user && user.email === myEmail));
 
+    current = user || null;
     setMode(m);
     $('modal').classList.remove('hidden');
   }
