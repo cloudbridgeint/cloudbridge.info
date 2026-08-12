@@ -4,17 +4,48 @@ import { mediaUrl } from '../lib/content';
 
 export interface Props {
   post: {
+    slug?: string;
     title: string;
     description?: string;
     hero_image?: string;
     category?: string;
     body: string;
+    created_at?: string;
+    updated_at?: string;
   };
 }
 const { post } = Astro.props;
 const heroSrc = post.hero_image ? mediaUrl(post.hero_image, '') : '';
+
+/* D1 stores timestamps as "YYYY-MM-DD HH:MM:SS"; schema.org wants ISO 8601.
+   Anything unparseable is left out rather than guessed at. */
+const iso = (v?: string) => {
+  if (!v) return undefined;
+  const d = new Date(v.includes('T') ? v : v.replace(' ', 'T') + 'Z');
+  return isNaN(d.getTime()) ? undefined : d.toISOString();
+};
+const abs = (u: string) => (u.startsWith('http') ? u : new URL(u, 'https://cloudbridge.info').href);
+const pageUrl = new URL(Astro.url.pathname, 'https://cloudbridge.info').href;
+
+const published = iso(post.created_at);
+const modified = iso(post.updated_at);
+
+const articleSchema = [{
+  '@type': 'BlogPosting',
+  '@id': pageUrl + '#article',
+  headline: post.title,
+  ...(post.description ? { description: post.description } : {}),
+  ...(heroSrc ? { image: abs(heroSrc) } : {}),
+  ...(post.category ? { articleSection: post.category } : {}),
+  ...(published ? { datePublished: published } : {}),
+  ...(modified || published ? { dateModified: modified || published } : {}),
+  inLanguage: 'en',
+  mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+  author: { '@id': 'https://cloudbridge.info/#organization' },
+  publisher: { '@id': 'https://cloudbridge.info/#organization' },
+}];
 ---
-<Layout title={`${post.title} | CloudBridge`} description={post.description || ''}>
+<Layout title={`${post.title} | CloudBridge`} description={post.description || ''} schema={articleSchema}>
 
 <section class="py-10 bg-white border-b border-black/5">
   <div class="max-w-container mx-auto px-4 md:px-8">
