@@ -8,14 +8,11 @@ const description = "Study abroad tips, visa updates, and university guides from
 const db = (Astro.locals as any).runtime.env.DB;
 const posts = await getPublishedBlogPosts(db);
 
-// These 6 slugs live at their own dedicated URL (e.g. /study-in-uk) for historical/SEO
-// reasons; any other post uses the generic /blogs/<slug> route.
-const dedicatedSlugs = new Set([
-  'study-in-uk', 'study-in-usa', 'study-in-europe',
-  'visa-interview-tips', 'find-scholarships', 'first-month-abroad',
-]);
+// Every article lives at /blogs/<slug>. Six of them used to be linked at
+// /<slug> as well, which left search engines choosing between two identical
+// pages; those paths now redirect here.
 function postHref(slug: string) {
-  return dedicatedSlugs.has(slug) ? `/${slug}` : `/blogs/${slug}`;
+  return `/blogs/${slug}`;
 }
 ---
 <Layout title={title} description={description}>

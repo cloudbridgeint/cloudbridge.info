@@ -28,8 +28,7 @@ export const prerender = false;
     render();
   }
 
-  const DEDICATED_SLUGS = new Set(['study-in-uk','study-in-usa','study-in-europe','visa-interview-tips','find-scholarships','first-month-abroad']);
-  function postHref(slug) { return DEDICATED_SLUGS.has(slug) ? `/${slug}` : `/blogs/${slug}`; }
+  function postHref(slug) { return `/blogs/${slug}`; }
 
   function render() {
     const container = document.getElementById('listContainer');
