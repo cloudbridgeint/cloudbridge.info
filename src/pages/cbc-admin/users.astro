@@ -164,8 +164,8 @@ if (!me || me.role !== 'admin') return Astro.redirect('/cbc-admin?denied=setting
         ${pic}
         <button data-menu="${u.id}" aria-label="More" class="text-slate-300 hover:text-slate-500 -mt-1 px-1 leading-none text-lg">&#8943;</button>
       </div>
-      <p class="mt-4 font-bold text-slate-900 truncate">
-        ${esc(u.name || u.username)} <span class="${accent} font-semibold">&middot; ${roleLabel(u)}</span>
+      <p class="mt-4 font-bold truncate ${(u.name || u.username) === roleLabel(u) ? accent : 'text-slate-900'}">
+        ${esc(u.name || u.username)}${(u.name || u.username) === roleLabel(u) ? '' : ` <span class="${accent} font-semibold">&middot; ${roleLabel(u)}</span>`}
         ${isMe ? '<span class="ml-1 text-xs font-normal text-slate-400">you</span>' : ''}
       </p>
       <p class="text-sm text-slate-500 truncate">@${esc(u.username)}</p>
