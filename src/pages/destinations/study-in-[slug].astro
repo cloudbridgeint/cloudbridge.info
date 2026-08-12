@@ -1,0 +1,199 @@
+---
+/*
+ * One template renders all ten country guides at
+ * /destinations/study-in-<slug>. Content lives in src/data/destinations.ts.
+ *
+ * The section order follows what students actually search for — cost, then
+ * entry requirements, then the visa, then scholarships — rather than what a
+ * brochure would lead with. The short answer block near the top exists so an
+ * AI assistant quoting this page gets the cost, the length and the English
+ * requirement in one lift, without needing the rest of the page for context.
+ */
+import Layout from '../../layouts/Layout.astro';
+import { DESTINATIONS, getDestination } from '../../data/destinations';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+const d = slug ? getDestination(slug) : undefined;
+if (!d) return new Response(null, { status: 404 });
+
+const url = `https://cloudbridge.info/destinations/study-in-${d.slug}`;
+const title = `Study in ${d.country} from Bangladesh — Cost, Requirements & Visa | CloudBridge`;
+const description = `${d.answer.slice(0, 150)}`;
+
+const faqSchema = [{
+  '@type': 'FAQPage',
+  '@id': url + '#faq',
+  mainEntity: d.faqs.map(f => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+}];
+
+const others = DESTINATIONS.filter(x => x.slug !== d.slug);
+---
+<Layout
+  title={title}
+  description={description}
+  schema={faqSchema}
+  breadcrumbs={[
+    { name: 'Destinations', url: '/destinations' },
+    { name: `Study in ${d.short}`, url },
+  ]}>
+
+<section class="text-white py-16 md:py-20" style="background-image:linear-gradient(160deg,#0f1c30,#2e4a7a)">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <p class="crumb"><a href="/">Home</a> / <a href="/destinations">Destinations</a> / {d.short}</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">
+      <span class="mr-2">{d.flag}</span>Study in {d.country} from Bangladesh
+    </h1>
+    <p class="mt-4 max-w-2xl text-white/80">{d.tagline}</p>
+    <a href="/free-consultation" class="btn-primary mt-8 inline-flex">Talk to a counsellor — free</a>
+  </div>
+</section>
+
+<!-- The 40-60 word answer. Kept first and self-contained on purpose. -->
+<section class="py-10 bg-bridge-50/60 border-b border-black/5">
+  <div class="max-w-container mx-auto px-4 md:px-8">
+    <div class="max-w-3xl rounded-2xl bg-white border border-black/10 shadow-sm p-6 md:p-8">
+      <h2 class="font-display text-sm font-bold uppercase tracking-wide text-sunrise-600">In short</h2>
+      <p class="mt-3 text-lg text-ink/80 leading-relaxed">{d.answer}</p>
+    </div>
+    <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl">
+      {[
+        { k: 'Tuition', v: d.tuition },
+        { k: 'Living costs', v: d.living },
+        { k: 'Intakes', v: d.intakes },
+        { k: 'After graduating', v: d.postStudy },
+      ].map(x => (
+        <div class="rounded-xl bg-white border border-black/10 p-4">
+          <p class="text-xs font-semibold uppercase tracking-wide text-ink/45">{x.k}</p>
+          <p class="mt-1 text-sm text-ink/75 leading-snug">{x.v}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="py-14">
+  <div class="max-w-container mx-auto px-4 md:px-8 grid lg:grid-cols-3 gap-10">
+    <div class="lg:col-span-2 space-y-12">
+
+      <div>
+        <h2 class="section-heading">Why Bangladeshi students choose {d.short}</h2>
+        <p class="mt-4 text-ink/70 leading-relaxed">{d.intro}</p>
+        <ul class="mt-5 space-y-3">
+          {d.why.map(w => (
+            <li class="flex gap-3 text-ink/75"><span class="text-sunrise-600 font-bold shrink-0">›</span><span>{w}</span></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="section-heading">Cost of studying in {d.short}</h2>
+        <div class="mt-4 overflow-hidden rounded-xl border border-black/10">
+          <table class="w-full text-sm">
+            <tbody>
+              <tr class="border-b border-black/5"><th scope="row" class="text-left align-top font-semibold text-bridge-900 p-4 w-40 bg-bridge-50/50">Tuition</th><td class="p-4 text-ink/75">{d.tuition}</td></tr>
+              <tr class="border-b border-black/5"><th scope="row" class="text-left align-top font-semibold text-bridge-900 p-4 bg-bridge-50/50">Living costs</th><td class="p-4 text-ink/75">{d.living}</td></tr>
+              <tr class="border-b border-black/5"><th scope="row" class="text-left align-top font-semibold text-bridge-900 p-4 bg-bridge-50/50">Currency</th><td class="p-4 text-ink/75">{d.currency}</td></tr>
+              <tr><th scope="row" class="text-left align-top font-semibold text-bridge-900 p-4 bg-bridge-50/50">Work while studying</th><td class="p-4 text-ink/75">{d.workRights}</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="mt-3 text-xs text-ink/50">
+          Figures are indicative and move with exchange rates and policy. Confirm current amounts on
+          <a href={d.officialSource.url} target="_blank" rel="noopener noreferrer" class="underline">{d.officialSource.label}</a>
+          before you budget or transfer funds.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="section-heading">Entry requirements</h2>
+        <div class="mt-4 space-y-4">
+          <div class="rounded-xl border border-black/10 p-5">
+            <h3 class="font-display font-bold text-bridge-900">Academic</h3>
+            <p class="mt-2 text-sm text-ink/70">{d.academicReq}</p>
+          </div>
+          <div class="rounded-xl border border-black/10 p-5">
+            <h3 class="font-display font-bold text-bridge-900">English language</h3>
+            <p class="mt-2 text-sm text-ink/70">{d.englishReq}</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-heading">{d.visaName}: step by step</h2>
+        <ol class="mt-5 space-y-4">
+          {d.visaSteps.map((s, i) => (
+            <li class="flex gap-4">
+              <span class="shrink-0 w-8 h-8 rounded-full bg-sunrise-600 text-white font-bold text-sm flex items-center justify-center">{i + 1}</span>
+              <span class="text-ink/75 pt-1">{s}</span>
+            </li>
+          ))}
+        </ol>
+        <p class="mt-4 text-xs text-ink/50">
+          Official guidance: <a href={d.officialSource.url} target="_blank" rel="noopener noreferrer" class="underline">{d.officialSource.label}</a>
+        </p>
+      </div>
+
+      <div>
+        <h2 class="section-heading">Scholarships</h2>
+        <ul class="mt-4 space-y-3">
+          {d.scholarships.map(s => (
+            <li class="flex gap-3 text-ink/75"><span class="text-sunrise-600 font-bold shrink-0">›</span><span>{s}</span></li>
+          ))}
+        </ul>
+      </div>
+
+      {d.universities.length > 0 && (
+        <div>
+          <h2 class="section-heading">Universities we work with in {d.short}</h2>
+          <div class="mt-4 flex flex-wrap gap-2">
+            {d.universities.map(u => (
+              <span class="rounded-full border border-black/10 bg-white px-4 py-2 text-sm text-ink/75">{u}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <h2 class="section-heading">Frequently asked questions</h2>
+        <div class="mt-5 space-y-4">
+          {d.faqs.map(f => (
+            <div class="rounded-xl border border-black/10 overflow-hidden">
+              <h3 class="px-5 py-4 font-display font-semibold text-bridge-900 bg-bridge-50/40">{f.q}</h3>
+              <p class="px-5 py-4 text-sm text-ink/70 leading-relaxed">{f.a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <aside class="lg:col-span-1">
+      <div class="lg:sticky lg:top-28 space-y-6">
+        <div class="rounded-2xl p-6 text-white shadow-xl" style="background-image:linear-gradient(140deg,#2f5182,#aa1821)">
+          <h2 class="font-display text-lg font-bold">Not sure if {d.short} is right for you?</h2>
+          <p class="mt-2 text-sm text-white/85">Our counsellors compare destinations against your grades, budget and plans — free, with no obligation.</p>
+          <a href="/free-consultation" class="mt-5 inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-bridge-900">Book a free consultation</a>
+        </div>
+        <div class="rounded-2xl border border-black/10 p-6">
+          <h2 class="font-display font-bold text-bridge-900">Other destinations</h2>
+          <ul class="mt-3 space-y-2">
+            {others.map(o => (
+              <li>
+                <a href={`/destinations/study-in-${o.slug}`} class="text-sm text-ink/70 hover:text-bridge-800 hover:underline">
+                  <span class="mr-1.5">{o.flag}</span>Study in {o.short}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+</Layout>
