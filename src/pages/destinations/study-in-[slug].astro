@@ -19,7 +19,10 @@ const d = slug ? getDestination(slug) : undefined;
 if (!d) return new Response(null, { status: 404 });
 
 const url = `https://cloudbridge.info/destinations/study-in-${d.slug}`;
-const title = `Study in ${d.country} from Bangladesh — Cost, Requirements & Visa | CloudBridge`;
+/* Google truncates a title around 60 characters, so the keywords come first and
+   the brand is left to og:site_name and the h1. d.short rather than d.country
+   keeps "the United Kingdom" and "the Netherlands" from eating the budget. */
+const title = `Study in ${d.short} from Bangladesh — Cost, Visa & Requirements`;
 const description = `${d.answer.slice(0, 150)}`;
 
 const faqSchema = [{
