@@ -20,6 +20,18 @@ const cm = await getAllContent(db);
 const universities = await getUniversities(db);
 const faqs = await getFaqs(db);
 
+/* FAQPage schema — only the questions actually rendered below, which is what
+   Google requires for an FAQ rich result. */
+const faqSchema = faqs.length ? [{
+  '@type': 'FAQPage',
+  '@id': 'https://cloudbridge.info/#faq',
+  mainEntity: faqs.map((f: any) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.answer },
+  })),
+}] : [];
+
 // The banner can be switched off from the admin panel even when an event
 // exists — e.g. while a date is still being confirmed.
 const eventSectionOn = c(cm, 'home.event.enabled', '1') !== '0';
@@ -54,11 +66,13 @@ const orderedCountries = Object.keys(grouped).sort((a, b) => {
 const uniByCountry: Record<string, any[]> = {};
 for (const country of orderedCountries) uniByCountry[country] = grouped[country];
 ---
-<Layout title={title} description={description}>
+<Layout title={title} description={description} schema={faqSchema}>
 
 <section class="relative overflow-hidden bg-bridge-950 text-white" id="heroSlider">
 
-  <div class="slider-slide relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="0">
+  <div class="slider-track">
+
+  <div class="slider-slide relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="0" style="--x:0%">
     {cm['home.hero.slide1.image'] ? (
       <img src={cImage(cm, 'home.hero.slide1.image', '')} alt={c(cm, 'home.hero.slide1.heading', 'Your Bridge to Studying Abroad')} class="absolute inset-0 w-full h-full object-cover hero-img-1" loading="eager" fetchpriority="high">
     ) : (
@@ -75,7 +89,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
     </div>
   </div>
 
-  <div class="slider-slide hidden relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="1">
+  <div class="slider-slide relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="1" inert>
     {cm['home.hero.slide2.image'] ? (
       <img src={cImage(cm, 'home.hero.slide2.image', '')} alt={c(cm, 'home.hero.slide2.heading', 'Fall 2026 Intake Open Now')} class="absolute inset-0 w-full h-full object-cover" style="object-position:76% center">
     ) : (
@@ -92,7 +106,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
     </div>
   </div>
 
-  <div class="slider-slide hidden relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="2">
+  <div class="slider-slide relative min-h-[480px] md:min-h-[560px] flex items-center" data-slide="2" inert>
     {cm['home.hero.slide3.image'] ? (
       <img src={cImage(cm, 'home.hero.slide3.image', '')} alt={c(cm, 'home.hero.slide3.heading', 'Scholarships at 500+ Universities')} class="absolute inset-0 w-full h-full object-cover hero-img-3">
     ) : (
@@ -107,6 +121,8 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
         <a href="/apply-now" class="btn-primary nav-link mt-7 inline-flex">Apply Now</a>
       </div>
     </div>
+  </div>
+
   </div>
 
   <div class="hidden lg:flex absolute right-10 top-1/2 -translate-y-1/2 z-20 flex-col items-center justify-center w-52 aspect-square rounded-2xl text-center shadow-2xl px-5" style="background-image:linear-gradient(135deg,#2f5182,#aa1821)">

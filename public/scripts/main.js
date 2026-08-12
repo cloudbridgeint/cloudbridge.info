@@ -12,22 +12,84 @@
 let sliderIndex = 0;
 let sliderTimer = null;
 let uniCarouselTimers = [];
-function sliderShow(i) {
-  const slides = document.querySelectorAll('#heroSlider .slider-slide');
-  if (!slides.length) return;
-  sliderIndex = (i + slides.length) % slides.length;
-  slides.forEach((s, idx) => s.classList.toggle('hidden', idx !== sliderIndex));
+const SLIDE_MS = 650; // must match the transition in Layout.astro
+
+/* Move a slide to a horizontal position. Without `animate` the move is applied
+   with transitions off, so a slide can be sent back to its parking spot
+   without the viewer seeing it fly across. */
+function sliderSetX(el, x, animate) {
+  if (animate) { el.style.setProperty('--x', x); return; }
+  el.classList.add('no-anim');
+  el.style.setProperty('--x', x);
+  void el.offsetWidth; // flush the change while transitions are still off
+  el.classList.remove('no-anim');
+}
+
+function sliderPaintDots(active) {
   document.querySelectorAll('#heroSlider .slider-dot').forEach((d, idx) => {
-    d.classList.toggle('bg-sunrise-400', idx === sliderIndex);
-    d.classList.toggle('bg-white/30', idx !== sliderIndex);
+    d.classList.toggle('bg-sunrise-400', idx === active);
+    d.classList.toggle('bg-white/30', idx !== active);
   });
 }
-function sliderMove(delta) { sliderShow(sliderIndex + delta); resetSliderTimer(); }
-function sliderGoTo(i) { sliderShow(i); resetSliderTimer(); }
+
+/* dir = 1 sends the new slide in from the right (the auto-rotate direction),
+   dir = -1 brings it in from the left for the "previous" arrow. */
+function sliderShow(i, dir) {
+  const slides = Array.from(document.querySelectorAll('#heroSlider .slider-slide'));
+  if (!slides.length) return;
+
+  const from = sliderIndex;
+  const to = ((i % slides.length) + slides.length) % slides.length;
+  sliderPaintDots(to);
+
+  if (to === from) {
+    slides.forEach((s, idx) => {
+      sliderSetX(s, idx === to ? '0%' : '100%', false);
+      s.inert = idx !== to;
+    });
+    sliderIndex = to;
+    return;
+  }
+
+  const step = dir === -1 ? -1 : 1;
+  const incoming = slides[to];
+  const outgoing = slides[from];
+
+  // Park the incoming slide on the far side first, so it always travels in the
+  // requested direction — including when wrapping from the last slide to the first.
+  sliderSetX(incoming, step === 1 ? '100%' : '-100%', false);
+  sliderSetX(incoming, '0%', true);
+  incoming.inert = false;
+
+  sliderSetX(outgoing, step === 1 ? '-100%' : '100%', true);
+  outgoing.inert = true;
+
+  // Once it is off screen, return it to the right-hand parking spot silently.
+  clearTimeout(outgoing._parkTimer);
+  outgoing._parkTimer = setTimeout(() => {
+    if (outgoing.style.getPropertyValue('--x') === '0%') return; // re-selected meanwhile
+    sliderSetX(outgoing, '100%', false);
+  }, SLIDE_MS + 50);
+
+  sliderIndex = to;
+}
+
+/* The parked slides sit outside the viewport, so a lazy image on them may not
+   be fetched before its first turn — which is what made the change flash.
+   Warm them once the page is idle. */
+function sliderWarmImages() {
+  document.querySelectorAll('#heroSlider .slider-slide img').forEach(img => {
+    if (img.loading === 'lazy') img.loading = 'eager';
+    if (img.decode) img.decode().catch(() => {});
+  });
+}
+
+function sliderMove(delta) { sliderShow(sliderIndex + delta, delta < 0 ? -1 : 1); resetSliderTimer(); }
+function sliderGoTo(i) { sliderShow(i, i < sliderIndex ? -1 : 1); resetSliderTimer(); }
 function resetSliderTimer() {
   if (sliderTimer) clearInterval(sliderTimer);
   if (!document.getElementById('heroSlider')) return;
-  sliderTimer = setInterval(() => sliderShow(sliderIndex + 1), 5000);
+  sliderTimer = setInterval(() => sliderShow(sliderIndex + 1, 1), 5000);
 }
 window.sliderMove = sliderMove;
 window.sliderGoTo = sliderGoTo;
@@ -1037,7 +1099,11 @@ function initCourseDirectory() {
 function initPageScripts() {
   // Hero slider (home page only)
   sliderIndex = 0;
-  sliderShow(0);
+  sliderShow(0, 1);
+  if (document.getElementById('heroSlider')) {
+    if (window.requestIdleCallback) requestIdleCallback(sliderWarmImages, { timeout: 3000 });
+    else setTimeout(sliderWarmImages, 1500);
+  }
   resetSliderTimer();
 
   // Testimonial carousel (Contact page only)

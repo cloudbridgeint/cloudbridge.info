@@ -7,8 +7,10 @@ import { getAllContent, c } from '../lib/content';
 export interface Props {
   title: string;
   description: string;
+  /* Extra schema.org nodes for this page, merged into the site-wide @graph. */
+  schema?: Record<string, any>[];
 }
-const { title, description } = Astro.props;
+const { title, description, schema = [] } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 export const prerender = false;
@@ -30,6 +32,93 @@ if (db) {
     // never let analytics logging break the page
   }
 }
+/* ---- Structured data ----------------------------------------------------
+   Organization + WebSite on every page, so search engines can tie the brand,
+   the two offices and the contact details together. Values come from the same
+   content keys the footer renders, so editing them in the admin updates both.
+   Nothing here is asserted that is not already visible on the site. */
+const ORG_ID = 'https://cloudbridge.info/#organization';
+const SITE_ID = 'https://cloudbridge.info/#website';
+
+const office = (name: string, street: string, locality: string, postal: string, phone: string) => ({
+  '@type': 'Place',
+  name,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: street,
+    addressLocality: locality,
+    postalCode: postal,
+    addressCountry: 'BD',
+  },
+  telephone: phone,
+});
+
+const dhakaAddr = c(cm, 'footer.address_dhaka', 'Lift 3, House 27, Road 21, Nikunjo-2, Dhaka 1229');
+const sylhetAddr = c(cm, 'footer.address_sylhet', '405-406 Manru Shopping City, 4th Floor, Chowhatta, Sylhet 3100');
+const dhakaPhone = c(cm, 'footer.phone_dhaka', '+880 1686 007004');
+const sylhetPhone = c(cm, 'footer.phone_sylhet', '+880 1619 130469');
+
+const graph: Record<string, any>[] = [
+  {
+    '@type': ['Organization', 'EducationalOrganization'],
+    '@id': ORG_ID,
+    name: 'CloudBridge',
+    legalName: 'Cloud Bridge — International Student Consultancy',
+    alternateName: 'CBC',
+    url: 'https://cloudbridge.info/',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://cloudbridge.info/assets/logo.png',
+    },
+    description: c(cm, 'footer.description', 'Your trusted partner for studying abroad — from university shortlisting to visa approval.'),
+    email: c(cm, 'footer.email_info', 'info@cloudbridge.info'),
+    telephone: dhakaPhone,
+    areaServed: { '@type': 'Country', name: 'Bangladesh' },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: dhakaAddr,
+      addressLocality: 'Dhaka',
+      addressCountry: 'BD',
+    },
+    location: [
+      office('CloudBridge Dhaka', dhakaAddr, 'Dhaka', '1229', dhakaPhone),
+      office('CloudBridge Sylhet', sylhetAddr, 'Sylhet', '3100', sylhetPhone),
+    ],
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        contactType: 'admissions',
+        email: c(cm, 'footer.email_apply', 'apply@cloudbridge.info'),
+        telephone: dhakaPhone,
+        areaServed: 'BD',
+        availableLanguage: ['en', 'bn'],
+      },
+      {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: c(cm, 'footer.email_info', 'info@cloudbridge.info'),
+        telephone: sylhetPhone,
+        areaServed: 'BD',
+        availableLanguage: ['en', 'bn'],
+      },
+    ],
+  },
+  {
+    '@type': 'WebSite',
+    '@id': SITE_ID,
+    url: 'https://cloudbridge.info/',
+    name: 'CloudBridge',
+    inLanguage: 'en',
+    publisher: { '@id': ORG_ID },
+  },
+  ...schema,
+];
+
+/* set:html does not escape, so close off any "</script>" that could appear in
+   admin-entered text. */
+const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })
+  .replace(/</g, '\\u003c');
+
 import '../styles/site.css';
 ---
 <!DOCTYPE html>
@@ -50,6 +139,7 @@ import '../styles/site.css';
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content={title}>
 <meta name="twitter:description" content={description}>
+<script type="application/ld+json" is:inline set:html={jsonLd}></script>
 <link rel="icon" type="image/png" href="/assets/logo.png">
 <link rel="shortcut icon" type="image/png" href="/assets/logo.png">
 <link rel="apple-touch-icon" href="/assets/logo.png">
@@ -184,6 +274,25 @@ import '../styles/site.css';
   #cbPreviewModal .cb-prev-body { flex:1; overflow:auto; background:#f3f4f6; display:flex; align-items:center; justify-content:center; min-height:18rem; }
   #cbPreviewModal .cb-prev-body img { max-width:100%; max-height:78vh; display:block; }
   #cbPreviewModal .cb-prev-body iframe { width:100%; height:78vh; border:none; background:#fff; }
+  /* Hero slides are stacked in one grid cell rather than toggled with .hidden,
+     so the section keeps the height of the tallest slide and a slide can move
+     across instead of blinking in. --x is the slide's horizontal position:
+     0% is centre stage, 100% is parked off to the right, -100% off to the left.
+     JS only ever changes --x, so the transition is a plain GPU transform. */
+  #heroSlider .slider-track { display:grid; }
+  #heroSlider .slider-slide {
+    grid-area: 1 / 1;
+    transform: translateX(var(--x, 100%));
+    transition: transform 650ms cubic-bezier(.45,.05,.25,1);
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+  /* Set while a slide is repositioned behind the scenes, so the jump back to
+     the parking spot is never animated. */
+  #heroSlider .slider-slide.no-anim { transition:none; }
+  @media (prefers-reduced-motion: reduce) {
+    #heroSlider .slider-slide { transition:none; }
+  }
   #heroSlider .slider-arrow { position:absolute; bottom:1.35rem; width:2.5rem; height:2.5rem; border-radius:9999px; background:#fff; border:none; color:#1c3255; font-size:1.5rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:20; transition:.15s; box-shadow:0 2px 10px rgba(15,28,48,.18); }
   #heroSlider .slider-arrow:hover { background:#f1f4fa; }
   .slider-dot { transition:.2s; cursor:pointer; border:none; }
