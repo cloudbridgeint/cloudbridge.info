@@ -1,17 +1,10 @@
 ---
-import BlogPost from "../layouts/BlogPost.astro";
-import Layout from "../layouts/Layout.astro";
-import { getBlogPostBySlug } from "../lib/content";
+/* This article used to live here as well as at /blogs/study-in-europe, with
+   both URLs self-canonicalising — so search engines saw two copies of the
+   same page and had to split the ranking between them. The blog URL is now
+   the single address; this one redirects permanently so any existing link,
+   bookmark or search result still lands on the article and passes its
+   standing over. */
 export const prerender = false;
-const db = (Astro.locals as any).runtime.env.DB;
-const post = await getBlogPostBySlug(db, "study-in-europe");
+return Astro.redirect('/blogs/study-in-europe', 301);
 ---
-{post ? <BlogPost post={post} /> : (
-  <Layout title="Article not found | CloudBridge" description="This article is no longer available.">
-    <div class="max-w-container mx-auto px-4 md:px-8 py-24 text-center">
-      <h1 class="text-2xl font-bold text-bridge-950">Article not found</h1>
-      <p class="mt-2 text-ink/60">This article may have been unpublished or removed.</p>
-      <a href="/blogs" class="btn-primary nav-link inline-flex mt-6">Browse all articles</a>
-    </div>
-  </Layout>
-)}

@@ -24,12 +24,10 @@ const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }
   { path: '/free-consultation', priority: '0.9', changefreq: 'monthly' },
   { path: '/contact', priority: '0.7', changefreq: 'monthly' },
   { path: '/blogs', priority: '0.7', changefreq: 'weekly' },
-  { path: '/study-in-uk', priority: '0.6', changefreq: 'monthly' },
-  { path: '/study-in-usa', priority: '0.6', changefreq: 'monthly' },
-  { path: '/study-in-europe', priority: '0.6', changefreq: 'monthly' },
-  { path: '/visa-interview-tips', priority: '0.6', changefreq: 'monthly' },
-  { path: '/find-scholarships', priority: '0.6', changefreq: 'monthly' },
-  { path: '/first-month-abroad', priority: '0.6', changefreq: 'monthly' },
+  // The six article paths that used to sit here (/study-in-uk and friends)
+  // are gone: they now 301 to /blogs/<slug>, and the block below already
+  // lists every published article straight from the database. Listing a
+  // redirect in a sitemap only asks crawlers to fetch a page twice.
 ];
 
 function esc(s: string) {
