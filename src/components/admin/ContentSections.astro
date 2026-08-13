@@ -1,11 +1,16 @@
 ---
 /*
- * Editable text/image fields for one page, grouped into sections.
+ * The editing surface for a page: a numbered walk down the public page from
+ * top to bottom, with a jump list beside it.
  *
- * The Homepage screen grew this pattern first; About, Destinations and
- * Scholarships need exactly the same thing, so it lives here once. Values are
- * read from the content table and written back through PUT /api/content.
+ * It started as a flat stack of identical boxes, which read as one long wall
+ * of fields — someone opening it for the first time could not tell where the
+ * top of the page ended and the footer began, and the lists that belong to a
+ * section sat far below it. So each section now carries its position, a plain
+ * sentence saying what it controls, and its own list where it has one.
  */
+import ListEditor from './ListEditor.astro';
+
 export interface Field {
   key: string;
   label: string;
@@ -15,57 +20,115 @@ export interface Field {
   help?: string;
   rows?: number;
 }
-export interface Section {
+export interface ListConfig {
+  group: string;
   title: string;
   note?: string;
+  fields: string[];
+  labels?: Record<string, string>;
+}
+export interface Section {
+  title: string;
+  /** One sentence: what the reader sees on the public page. */
+  description?: string;
+  note?: string;
   fields: Field[];
+  /** A repeatable list belonging to this section. */
+  list?: ListConfig;
 }
 export interface Props {
   sections: Section[];
   values: Record<string, string>;
+  /** Sticky jump list beside the sections. Off for short screens. */
+  nav?: boolean;
 }
-const { sections, values: cm } = Astro.props;
+const { sections, values: cm, nav = true } = Astro.props;
 
 function resolveImg(v: string | undefined, fallback = '') {
   if (!v) return fallback;
   if (v.startsWith('media:')) return `/api/media/${v.slice(6)}`;
   return v;
 }
+const slug = (i: number) => `section-${i + 1}`;
 ---
-<div class="space-y-6">
-  {sections.map(section => (
-    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
-      <h2 class="font-semibold text-slate-900 mb-1">{section.title}</h2>
-      {section.note && <p class="text-xs text-slate-400 mb-4">{section.note}</p>}
-      <div class="space-y-4 mt-4">
-        {section.fields.map(f => (
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1">{f.label}</label>
-            {f.help && <p class="text-xs text-slate-400 mb-1.5">{f.help}</p>}
-            {f.type === 'toggle' ? (
-              <select class="field-input w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" data-key={f.key}>
-                <option value="1" selected={(cm[f.key] ?? f.default ?? '1') !== '0'}>Show</option>
-                <option value="0" selected={(cm[f.key] ?? f.default ?? '1') === '0'}>Hide</option>
-              </select>
-            ) : f.type === 'image' ? (
-              <div class="flex items-center gap-4 flex-wrap">
-                <img class="img-preview h-16 w-24 object-cover rounded-lg border bg-slate-50"
-                     data-key={f.key}
-                     src={resolveImg(cm[f.key], f.fallback || '/assets/logo.png')} alt="" />
-                <input type="file" accept="image/*" class="img-file text-sm" data-key={f.key} />
-                <input type="hidden" class="field-input" data-key={f.key} value={cm[f.key] ?? ''} />
-                <button type="button" class="img-clear text-xs text-slate-500 hover:text-red-600 underline" data-key={f.key}>Remove</button>
-              </div>
-            ) : f.type === 'textarea' ? (
-              <textarea class="field-input w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                        rows={f.rows ?? 3} data-key={f.key}>{cm[f.key] ?? f.default ?? ''}</textarea>
-            ) : (
-              <input class="field-input w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                     data-key={f.key} value={cm[f.key] ?? f.default ?? ''} />
-            )}
-          </div>
+<div class={nav ? 'lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-8 lg:items-start' : ''}>
+
+  {nav && (
+    <nav aria-label="Sections on this page" class="hidden lg:block sticky top-0 py-1">
+      <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">On this page</p>
+      <ol id="sectionNav" class="space-y-0.5">
+        {sections.map((s, i) => (
+          <li>
+            <a href={`#${slug(i)}`} data-nav-link={slug(i)}
+               class="group flex items-start gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition">
+              <span class="mt-0.5 shrink-0 w-5 h-5 rounded-md bg-slate-100 text-slate-500 text-[11px] font-bold flex items-center justify-center group-hover:bg-white">{i + 1}</span>
+              <span class="leading-snug">{s.title}</span>
+            </a>
+          </li>
         ))}
-      </div>
-    </div>
-  ))}
+      </ol>
+    </nav>
+  )}
+
+  <div class="space-y-6 min-w-0">
+    {sections.map((section, i) => (
+      <section id={slug(i)} data-section class="scroll-mt-4 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden">
+        <header class="flex items-start gap-4 px-5 md:px-6 py-5 border-b border-slate-100 bg-slate-50/70">
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-white ring-1 ring-slate-200 text-slate-500 font-bold flex items-center justify-center">{i + 1}</span>
+          <div class="min-w-0">
+            <h2 class="text-lg md:text-xl font-bold text-slate-900 leading-tight">{section.title}</h2>
+            {section.description && <p class="text-sm text-slate-500 mt-1">{section.description}</p>}
+          </div>
+        </header>
+
+        {section.note && (
+          <p class="px-5 md:px-6 pt-4 text-xs text-slate-500 bg-amber-50/60 border-b border-amber-100 pb-4">{section.note}</p>
+        )}
+
+        <div class="px-5 md:px-6 py-5 space-y-5">
+          {section.fields.map(f => (
+            <div>
+              <label class="block text-sm font-semibold text-slate-800 mb-1">{f.label}</label>
+              {f.help && <p class="text-xs text-slate-500 mb-2">{f.help}</p>}
+              {f.type === 'toggle' ? (
+                <select class="field-input w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-bridge-500 focus:ring-2 focus:ring-bridge-100 outline-none" data-key={f.key}>
+                  <option value="1" selected={(cm[f.key] ?? f.default ?? '1') !== '0'}>Show</option>
+                  <option value="0" selected={(cm[f.key] ?? f.default ?? '1') === '0'}>Hide</option>
+                </select>
+              ) : f.type === 'image' ? (
+                <div class="flex items-center gap-4 flex-wrap rounded-xl border border-dashed border-slate-300 p-3 bg-slate-50/60">
+                  <img class="img-preview h-20 w-28 object-cover rounded-lg border border-slate-200 bg-white"
+                       data-key={f.key}
+                       src={resolveImg(cm[f.key], f.fallback || '/assets/logo.png')} alt="" />
+                  <div class="min-w-0">
+                    <input type="file" accept="image/*" class="img-file block text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-bridge-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-bridge-800" data-key={f.key} />
+                    <button type="button" class="img-clear mt-2 text-xs text-slate-500 hover:text-red-600 underline" data-key={f.key}>Remove image</button>
+                  </div>
+                  <input type="hidden" class="field-input" data-key={f.key} value={cm[f.key] ?? ''} />
+                </div>
+              ) : f.type === 'textarea' ? (
+                <textarea class="field-input w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm leading-relaxed focus:border-bridge-500 focus:ring-2 focus:ring-bridge-100 outline-none"
+                          rows={f.rows ?? 3} data-key={f.key}>{cm[f.key] ?? f.default ?? ''}</textarea>
+              ) : (
+                <input class="field-input w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-bridge-500 focus:ring-2 focus:ring-bridge-100 outline-none"
+                       data-key={f.key} value={cm[f.key] ?? f.default ?? ''} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {section.list && (
+          <div class="border-t border-slate-100 bg-slate-50/50 px-5 md:px-6 py-5">
+            <ListEditor
+              group={section.list.group}
+              title={section.list.title}
+              note={section.list.note}
+              fields={section.list.fields}
+              labels={section.list.labels}
+              bare={true} />
+          </div>
+        )}
+      </section>
+    ))}
+  </div>
 </div>

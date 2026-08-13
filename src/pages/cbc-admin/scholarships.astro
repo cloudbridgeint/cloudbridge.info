@@ -1,7 +1,11 @@
 ---
+/*
+ * The Scholarship page in the order a visitor meets it. The named awards come
+ * first regardless: that is the part the office actually changes week to week,
+ * and burying it under nine sections of page furniture would hide it.
+ */
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import ContentSections from '../../components/admin/ContentSections.astro';
-import ListEditor from '../../components/admin/ListEditor.astro';
 import type { Section } from '../../components/admin/ContentSections.astro';
 
 export const prerender = false;
@@ -13,152 +17,171 @@ for (const row of results as any[]) cm[row.key] = row.value;
 
 const sections: Section[] = [
   {
-    title: 'Search result (title & description)',
-    fields: [
-      { key: 'scholarship.meta_title', label: 'Page title', default: 'Scholarships | CloudBridge Study Abroad' },
-      { key: 'scholarship.meta_description', label: 'Meta description', type: 'textarea', rows: 2, default: 'Find scholarships at 500+ universities — CloudBridge counsellors match you with funding you actually qualify for.' },
-    ],
-  },
-  {
     title: 'Top banner',
+    description: 'The dark blue band at the top, with the two buttons.',
     fields: [
       { key: 'scholarship.hero.badge', label: 'Small badge', default: 'Free Scholarship Guidance' },
-      { key: 'scholarship.hero.heading', label: 'Main heading (H1)', default: 'Scholarships at 500+ Universities' },
+      { key: 'scholarship.hero.heading', label: 'Main heading', default: 'Scholarships at 500+ Universities' },
       { key: 'scholarship.hero.text', label: 'Intro paragraph', type: 'textarea', rows: 3, default: 'Let our counsellors match you with funding you actually qualify for — most students never even check. From merit awards to country-specific grants, we help you find real money for your degree.' },
-      { key: 'scholarship.hero.cta1_label', label: 'Button 1 text', default: 'Check My Eligibility' },
-      { key: 'scholarship.hero.cta1_url', label: 'Button 1 link', default: '/#lead-form' },
-      { key: 'scholarship.hero.cta2_label', label: 'Button 2 text', default: 'Talk to a Counsellor' },
-      { key: 'scholarship.hero.cta2_url', label: 'Button 2 link', default: '/contact' },
+      { key: 'scholarship.hero.cta1_label', label: 'Left button — text', default: 'Check My Eligibility' },
+      { key: 'scholarship.hero.cta1_url', label: 'Left button — where it goes', default: '/#lead-form' },
+      { key: 'scholarship.hero.cta2_label', label: 'Right button — text', default: 'Talk to a Counsellor' },
+      { key: 'scholarship.hero.cta2_url', label: 'Right button — where it goes', default: '/contact' },
     ],
   },
   {
-    title: 'Three counters in the banner',
-    note: 'Numbers only — they count up as the page loads. A number with commas or a plus sign will not animate.',
+    title: 'The three counters',
+    description: 'The numbers that count up beside the banner.',
+    note: 'Numbers only — a value with a comma or a plus sign will not count up.',
     fields: [
-      { key: 'scholarship.stat1_number', label: 'Counter 1 — number', default: '500' },
-      { key: 'scholarship.stat1_label', label: 'Counter 1 — label', default: 'Partner Universities' },
-      { key: 'scholarship.stat2_number', label: 'Counter 2 — number', default: '10000' },
-      { key: 'scholarship.stat2_label', label: 'Counter 2 — label', default: 'Students Placed' },
-      { key: 'scholarship.stat3_number', label: 'Counter 3 — number', default: '13' },
-      { key: 'scholarship.stat3_label', label: 'Counter 3 — label', default: 'Years of Experience' },
+      { key: 'scholarship.stat1_number', label: 'First — number', default: '500' },
+      { key: 'scholarship.stat1_label', label: 'First — label', default: 'Partner Universities' },
+      { key: 'scholarship.stat2_number', label: 'Second — number', default: '10000' },
+      { key: 'scholarship.stat2_label', label: 'Second — label', default: 'Students Placed' },
+      { key: 'scholarship.stat3_number', label: 'Third — number', default: '13' },
+      { key: 'scholarship.stat3_label', label: 'Third — label', default: 'Years of Experience' },
     ],
   },
   {
-    title: 'Types of Funding — heading and dark card',
-    note: 'The funding cards themselves are in the list further down.',
+    title: 'Types of Funding',
+    description: 'The grid of white cards, plus the dark card at the end.',
     fields: [
-      { key: 'scholarship.types.heading', label: 'Section heading', default: 'Types of Funding' },
-      { key: 'scholarship.types.text', label: 'Subtext', type: 'textarea', rows: 2, default: 'Scholarships and funding come in more forms than most students realise — our counsellors check every option that applies to your profile.' },
+      { key: 'scholarship.types.heading', label: 'Heading', default: 'Types of Funding' },
+      { key: 'scholarship.types.text', label: 'Line under the heading', type: 'textarea', rows: 2, default: 'Scholarships and funding come in more forms than most students realise — our counsellors check every option that applies to your profile.' },
       { key: 'scholarship.types.cta_heading', label: 'Dark card — heading', default: 'Not sure what you qualify for?' },
       { key: 'scholarship.types.cta_text', label: 'Dark card — text', type: 'textarea', rows: 3, default: "Share your academic profile once — we'll check every scholarship route across our partner universities for you, free of charge." },
       { key: 'scholarship.types.cta_label', label: 'Dark card — button text', default: 'Get My Free Match' },
-      { key: 'scholarship.types.cta_url', label: 'Dark card — button link', default: '/#lead-form' },
+      { key: 'scholarship.types.cta_url', label: 'Dark card — where the button goes', default: '/#lead-form' },
     ],
+    list: {
+      group: 'scholarship.types',
+      title: 'The funding cards',
+      note: 'The dark card is always last and is edited above, not here.',
+      fields: ['title', 'subtitle', 'body', 'icon'],
+      labels: { title: 'Card title', subtitle: 'Small badge', body: 'Description' },
+    },
   },
   {
     title: 'Scholarships Open Now — heading',
-    note: 'This section only appears once you have added at least one scholarship in the list at the bottom of this page.',
+    description: 'The wording above the list of awards. The awards themselves are at the top of this screen.',
+    note: 'This whole section stays hidden on the website until at least one scholarship is added.',
     fields: [
-      { key: 'scholarship.list.heading', label: 'Section heading', default: 'Scholarships Open Now' },
-      { key: 'scholarship.list.text', label: 'Subtext', type: 'textarea', rows: 3, default: 'Named awards our counsellors are currently helping students apply for. Deadlines and amounts are set by the provider — confirm on their own page before you apply.' },
+      { key: 'scholarship.list.heading', label: 'Heading', default: 'Scholarships Open Now' },
+      { key: 'scholarship.list.text', label: 'Line under the heading', type: 'textarea', rows: 3, default: 'Named awards our counsellors are currently helping students apply for. Deadlines and amounts are set by the provider — confirm on their own page before you apply.' },
     ],
   },
   {
-    title: 'How Scholarship Support Works — heading',
+    title: 'How Scholarship Support Works',
+    description: 'The numbered timeline of steps.',
     fields: [
-      { key: 'scholarship.steps.heading', label: 'Section heading', default: 'How Scholarship Support Works' },
-      { key: 'scholarship.steps.text', label: 'Subtext', type: 'textarea', rows: 2, default: 'Four simple steps from your first message to a confirmed funding offer.' },
+      { key: 'scholarship.steps.heading', label: 'Heading', default: 'How Scholarship Support Works' },
+      { key: 'scholarship.steps.text', label: 'Line under the heading', type: 'textarea', rows: 2, default: 'Four simple steps from your first message to a confirmed funding offer.' },
     ],
+    list: {
+      group: 'scholarship.steps',
+      title: 'The steps',
+      note: 'They alternate left and right down the timeline, in the order shown here.',
+      fields: ['subtitle', 'title', 'body'],
+      labels: { subtitle: 'Step label', title: 'Step name', body: 'What happens' },
+    },
   },
   {
-    title: 'Scholarships by Destination — heading',
+    title: 'Scholarships by Destination',
+    description: 'The three cards with a coloured strip on top.',
     fields: [
-      { key: 'scholarship.destinations.heading', label: 'Section heading', default: 'Scholarships by Destination' },
-      { key: 'scholarship.destinations.text', label: 'Subtext', type: 'textarea', rows: 2, default: "Funding rules and amounts vary by country — explore what's available where you want to study." },
+      { key: 'scholarship.destinations.heading', label: 'Heading', default: 'Scholarships by Destination' },
+      { key: 'scholarship.destinations.text', label: 'Line under the heading', type: 'textarea', rows: 2, default: "Funding rules and amounts vary by country — explore what's available where you want to study." },
     ],
+    list: {
+      group: 'scholarship.destinations',
+      title: 'The country cards',
+      note: 'Link each card to its country guide, for example /destinations/study-in-uk.',
+      fields: ['title', 'body', 'link_url', 'link_label', 'accent'],
+      labels: { title: 'Country', body: 'Description', accent: 'Top strip colour' },
+    },
   },
   {
-    title: 'FAQ — heading',
+    title: 'Frequently asked questions',
+    description: 'The expanding question list near the bottom.',
     fields: [
-      { key: 'scholarship.faqs.heading', label: 'Section heading', default: 'Scholarship FAQs' },
+      { key: 'scholarship.faqs.heading', label: 'Heading', default: 'Scholarship FAQs' },
     ],
+    list: {
+      group: 'scholarship.faqs',
+      title: 'The questions',
+      note: 'These are also published in a form Google understands, so they can appear as expandable questions under the page in search results.',
+      fields: ['title', 'body'],
+      labels: { title: 'Question', body: 'Answer' },
+    },
   },
   {
     title: 'Closing call to action',
+    description: 'The last block on the page, above the footer.',
     fields: [
       { key: 'scholarship.cta.heading', label: 'Heading', default: 'Find Out What You Qualify For' },
       { key: 'scholarship.cta.text', label: 'Text', type: 'textarea', rows: 2, default: "Tell us your academic background and destination — we'll match you with real funding options, free of charge." },
-      { key: 'scholarship.cta.cta1_label', label: 'Button 1 text', default: 'Check Scholarship Eligibility' },
-      { key: 'scholarship.cta.cta1_url', label: 'Button 1 link', default: '/#lead-form' },
-      { key: 'scholarship.cta.cta2_label', label: 'Button 2 text', default: 'Talk to a Counsellor' },
-      { key: 'scholarship.cta.cta2_url', label: 'Button 2 link', default: '/contact' },
+      { key: 'scholarship.cta.cta1_label', label: 'Left button — text', default: 'Check Scholarship Eligibility' },
+      { key: 'scholarship.cta.cta1_url', label: 'Left button — where it goes', default: '/#lead-form' },
+      { key: 'scholarship.cta.cta2_label', label: 'Right button — text', default: 'Talk to a Counsellor' },
+      { key: 'scholarship.cta.cta2_url', label: 'Right button — where it goes', default: '/contact' },
+    ],
+  },
+  {
+    title: 'Google search result',
+    description: 'Not on the page itself — the title and grey text people see in Google.',
+    fields: [
+      { key: 'scholarship.meta_title', label: 'Title in Google', help: 'Around 60 characters.', default: 'Scholarships | CloudBridge Study Abroad' },
+      { key: 'scholarship.meta_description', label: 'Description in Google', type: 'textarea', rows: 3, help: 'Around 155 characters.', default: 'Find scholarships at 500+ universities — CloudBridge counsellors match you with funding you actually qualify for.' },
     ],
   },
 ];
 ---
 <AdminLayout title="Scholarships" active="scholarships">
-  <div class="flex items-start justify-between gap-4 flex-wrap">
+  <div class="flex items-start justify-between gap-4 flex-wrap mb-2">
     <div>
       <h1 class="text-2xl font-bold text-slate-900">Scholarships</h1>
-      <p class="text-slate-500 mt-1 text-sm">Everything on the public Scholarship page — the wording, the cards, and the individual scholarships students can apply for.</p>
+      <p class="text-slate-500 mt-1 text-sm max-w-2xl">
+        The awards students can apply for are first. Below them, the rest of the page in the order it appears.
+        Press Save once at the bottom when you are done.
+      </p>
     </div>
-    <a href="/scholarship" target="_blank" rel="noopener" class="text-sm font-semibold text-bridge-700 hover:underline">View page ↗</a>
+    <a href="/scholarship" target="_blank" rel="noopener"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+      View the live page ↗
+    </a>
   </div>
 
-  <!-- Named awards first: this is the part that changes most often -->
-  <div class="mt-8 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
-    <div class="flex items-start justify-between gap-4">
-      <div>
-        <h2 class="font-semibold text-slate-900">Scholarships students can apply for</h2>
-        <p class="text-xs text-slate-400 mt-1 max-w-2xl">
-          Real, named awards with amounts and deadlines. These appear in the “Scholarships Open Now” section.
-          Amounts and closing dates are set by the provider and change — add the official link so a student can confirm before applying.
-        </p>
+  <!-- Named awards: saved individually, because each one is a record in its
+       own right rather than a piece of page wording. -->
+  <div class="mt-6 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden">
+    <header class="flex items-start justify-between gap-4 px-5 md:px-6 py-5 border-b border-slate-100 bg-slate-50/70">
+      <div class="flex items-start gap-4 min-w-0">
+        <span class="shrink-0 w-9 h-9 rounded-xl bg-white ring-1 ring-slate-200 text-sunrise-600 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 4.5-9 4.5-9-4.5L12 3zm-5.5 6.2V15c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3V9.2"/></svg>
+        </span>
+        <div class="min-w-0">
+          <h2 class="text-lg md:text-xl font-bold text-slate-900 leading-tight">Scholarships students can apply for</h2>
+          <p class="text-sm text-slate-500 mt-1 max-w-2xl">
+            Real, named awards with amounts and deadlines. Each one saves on its own, straight away.
+            Add the official link so a student can confirm the amount and closing date before applying — those are set by the provider and change.
+          </p>
+        </div>
       </div>
       <button id="schAdd" class="shrink-0 bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition">+ Add scholarship</button>
-    </div>
-    <div id="schList" class="mt-5 space-y-3"><p class="text-sm text-slate-400">Loading…</p></div>
+    </header>
+    <div id="schList" class="px-5 md:px-6 py-5 space-y-3"><p class="text-sm text-slate-400">Loading…</p></div>
   </div>
 
-  <h2 class="mt-12 text-lg font-bold text-slate-900">Card lists on this page</h2>
-  <p class="text-slate-500 mt-1 text-sm">Each list saves on its own.</p>
-  <div class="mt-5 space-y-6">
-    <ListEditor
-      group="scholarship.types"
-      title="Types of Funding cards"
-      note="The dark “Not sure what you qualify for?” card is always last and is edited in the wording section below."
-      fields={['title', 'subtitle', 'body', 'icon']}
-      labels={{ title: 'Card title', subtitle: 'Badge text', body: 'Description' }} />
-
-    <ListEditor
-      group="scholarship.steps"
-      title="How Scholarship Support Works — steps"
-      note="Steps alternate left and right down the timeline in the order shown here."
-      fields={['subtitle', 'title', 'body']}
-      labels={{ subtitle: 'Step label', title: 'Step name', body: 'What happens' }} />
-
-    <ListEditor
-      group="scholarship.destinations"
-      title="Scholarships by Destination cards"
-      note="Link each card to its country guide, e.g. /destinations/study-in-uk."
-      fields={['title', 'body', 'link_url', 'link_label', 'accent']}
-      labels={{ title: 'Country', body: 'Description', accent: 'Top bar colour' }} />
-
-    <ListEditor
-      group="scholarship.faqs"
-      title="Scholarship FAQs"
-      note="Published as structured data too, so these can appear as expandable questions under the page in Google."
-      fields={['title', 'body']}
-      labels={{ title: 'Question', body: 'Answer' }} />
-  </div>
-
-  <h2 class="mt-12 text-lg font-bold text-slate-900">Page wording</h2>
-  <div class="mt-5">
+  <div class="mt-8 pb-24">
     <ContentSections sections={sections} values={cm} />
   </div>
 
-  <div class="sticky bottom-4 mt-6 flex justify-end">
-    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-6 py-3 shadow-lg transition">Save page wording</button>
+  <div class="sticky bottom-0 -mx-5 md:-mx-9 px-5 md:px-9 py-4 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center justify-end gap-4">
+    <span id="saveHint" class="text-xs text-slate-400">All changes saved</span>
+    <button id="saveContentBtn"
+            class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-7 py-3 shadow-lg transition">
+      Save changes
+    </button>
   </div>
 
   <!-- Add/edit one scholarship -->
@@ -171,45 +194,45 @@ const sections: Section[] = [
       <div class="p-6 grid sm:grid-cols-2 gap-4">
         <input type="hidden" id="sId">
         <div class="sm:col-span-2">
-          <label class="block text-xs font-medium text-slate-600 mb-1">Scholarship name *</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Scholarship name *</label>
           <input id="sName" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Chevening Scholarship">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Offered by</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Offered by</label>
           <input id="sProvider" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="UK Government">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Country</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Country</label>
           <input id="sCountry" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="United Kingdom">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Study level</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Study level</label>
           <input id="sLevel" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Master's">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Amount</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Amount</label>
           <input id="sAmount" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Full tuition + stipend">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">What it covers</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">What it covers</label>
           <input id="sCoverage" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Tuition, flights, living costs">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Deadline</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Deadline</label>
           <input id="sDeadline" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="5 November 2026">
         </div>
         <div class="sm:col-span-2">
-          <label class="block text-xs font-medium text-slate-600 mb-1">Description</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Description</label>
           <textarea id="sDescription" rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
         </div>
         <div class="sm:col-span-2">
-          <label class="block text-xs font-medium text-slate-600 mb-1">Who can apply</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Who can apply</label>
           <textarea id="sEligibility" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Bangladeshi nationals with a Bachelor's degree and two years' work experience."></textarea>
         </div>
         <div class="sm:col-span-2">
-          <label class="block text-xs font-medium text-slate-600 mb-1">Official page</label>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Official page</label>
           <input id="sApplyUrl" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="https://www.chevening.org/">
-          <p class="text-xs text-slate-400 mt-1">Must start with https:// — anything else is not saved.</p>
+          <p class="text-xs text-slate-500 mt-1">Must start with https:// — anything else is not saved.</p>
         </div>
         <div class="sm:col-span-2 flex flex-wrap items-center gap-6 pt-2 border-t border-slate-200">
           <label class="flex items-center gap-2 text-sm text-slate-600 mt-3"><input type="checkbox" id="sFeatured"> Show a “Featured” tag</label>

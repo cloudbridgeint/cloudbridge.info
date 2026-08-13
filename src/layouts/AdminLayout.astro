@@ -68,8 +68,14 @@ import '../styles/admin.css';
   
   <style is:global>
     body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.4); border-radius: 999px; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    /* This used to be white, which was right for the dark sidebar and invisible
+       everywhere else — the content pane is white, so a long page looked like
+       it had no scrollbar at all. The sidebar keeps its own rule below. */
+    ::-webkit-scrollbar-thumb { background: rgba(15,28,48,0.25); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(15,28,48,0.4); }
+    ::-webkit-scrollbar-track { background: transparent; }
+    .content-scroll { scrollbar-width: thin; scrollbar-color: rgba(15,28,48,0.28) transparent; }
     .toast { animation: slideIn 0.25s ease; }
     @keyframes slideIn { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -225,7 +231,7 @@ import '../styles/admin.css';
         </div>
 
         <!-- Page content -->
-        <div class="flex-1 overflow-y-auto px-5 md:px-9 py-6 md:py-8">
+        <div id="adminContent" class="content-scroll flex-1 overflow-y-auto px-5 md:px-9 py-6 md:py-8">
           <slot />
         </div>
       </main>

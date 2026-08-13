@@ -12,22 +12,23 @@ for (const row of results as any[]) cm[row.key] = row.value;
 
 const sections: Section[] = [
   {
-    title: 'Search result (title & description)',
-    note: 'What Google shows for /destinations.',
-    fields: [
-      { key: 'destinations.meta_title', label: 'Page title', default: 'Study Abroad Destinations for Bangladeshi Students | CloudBridge' },
-      { key: 'destinations.meta_description', label: 'Meta description', type: 'textarea', rows: 2, default: 'Compare study destinations on tuition, living costs, visa route and post-study work — written for students applying from Bangladesh.' },
-    ],
-  },
-  {
     title: 'Destinations page — heading and intro',
+    description: 'The dark banner and the text under the country cards.',
     fields: [
-      { key: 'destinations.heading', label: 'Main heading (H1)', default: 'Choose Your Destination' },
-      { key: 'destinations.intro', label: 'Intro paragraph', type: 'textarea', rows: 4, default: '' , help: 'Leave empty to use the default wording, which counts your countries automatically.' },
+      { key: 'destinations.heading', label: 'Main heading', default: 'Choose Your Destination' },
+      { key: 'destinations.intro', label: 'Intro paragraph', type: 'textarea', rows: 4, help: 'Leave empty to use the default wording, which counts your countries automatically.', default: '' },
       { key: 'destinations.help_heading', label: '"Not sure which country fits?" heading', default: 'Not sure which country fits?' },
       { key: 'destinations.help_text', label: 'Closing paragraphs', type: 'textarea', rows: 6, help: 'A blank line starts a new paragraph.', default: '' },
       { key: 'destinations.cta_label', label: 'Button text', default: 'Book a free consultation' },
-      { key: 'destinations.cta_url', label: 'Button link', default: '/free-consultation' },
+      { key: 'destinations.cta_url', label: 'Where the button goes', default: '/free-consultation' },
+    ],
+  },
+  {
+    title: 'Google search result',
+    description: 'Not on the page itself — the title and grey text people see in Google.',
+    fields: [
+      { key: 'destinations.meta_title', label: 'Page title', default: 'Study Abroad Destinations for Bangladeshi Students | CloudBridge' },
+      { key: 'destinations.meta_description', label: 'Meta description', type: 'textarea', rows: 2, default: 'Compare study destinations on tuition, living costs, visa route and post-study work — written for students applying from Bangladesh.' },
     ],
   },
 ];
@@ -51,13 +52,15 @@ const sections: Section[] = [
     <p class="text-sm text-slate-400">Loading…</p>
   </div>
 
-  <h2 class="mt-12 text-lg font-bold text-slate-900">Destinations page wording</h2>
-  <p class="text-slate-500 mt-1 text-sm">The headings and text around the country cards.</p>
-  <div class="mt-5">
-    <ContentSections sections={sections} values={cm} />
+  <h2 class="mt-12 text-xl font-bold text-slate-900">Wording on the destinations page</h2>
+  <p class="text-slate-500 mt-1 text-sm">The headings and text around the country cards above.</p>
+  <div class="mt-5 pb-24">
+    <ContentSections sections={sections} values={cm} nav={false} />
   </div>
-  <div class="sticky bottom-4 mt-6 flex justify-end">
-    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-6 py-3 shadow-lg transition">Save page wording</button>
+
+  <div class="sticky bottom-0 -mx-5 md:-mx-9 px-5 md:px-9 py-4 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center justify-end gap-4">
+    <span id="saveHint" class="text-xs text-slate-400">All changes saved</span>
+    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-7 py-3 shadow-lg transition">Save changes</button>
   </div>
 
   <!-- Full-screen editor for one country -->
