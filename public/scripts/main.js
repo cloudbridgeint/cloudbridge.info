@@ -874,7 +874,7 @@ function initUniversityDirectory() {
           </div>
           <div class="flex items-center justify-between">
             <span class="text-ink font-medium">Find Courses</span>
-            <a href="/programs" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View All</a>
+            <a href="/programs?university=${encodeURIComponent(u.name)}" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View All</a>
           </div>
         </div>
         <div class="mt-3 flex flex-wrap gap-1.5">${intakeBadges}</div>
@@ -1049,8 +1049,21 @@ function initCourseDirectory() {
     deliverySel.value = '';
     durationSel.value = '';
     searchInput.value = '';
+    /* Drop ?university= too, or a refresh would quietly bring the filter back
+       after the visitor had cleared it. */
+    if (location.search && history.replaceState) {
+      history.replaceState(null, '', location.pathname + location.hash);
+    }
     applyFilters();
   }
+
+  /* Arriving from a university card: /programs?university=<name> puts the name
+     in the search box and filters to it, so "Find Courses → View All" lands on
+     that university's courses rather than on all eighty. The search box already
+     matches the university name, so this is the same filter the visitor could
+     have typed — they can widen or clear it from here like any other. */
+  const fromUniversity = new URLSearchParams(location.search).get('university');
+  if (fromUniversity && searchInput) searchInput.value = fromUniversity;
 
   /* Same as the university directory: choosing a filter shows the result. */
   [subjectSel, levelSel, deliverySel, durationSel].forEach(el => {
