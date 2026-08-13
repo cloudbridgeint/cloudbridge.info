@@ -29,6 +29,15 @@ const {
 } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
+/* Imported as URLs so the build fingerprints them. These were served with a
+   four-hour cache, so a change could reach a visitor's markup while their
+   browser still held the previous script — which is exactly why the course
+   filters kept behaving like the old version after auto-apply shipped. A
+   hashed filename cannot go stale. */
+import mainScriptUrl from '../scripts/main.js?url';
+import applyFormScriptUrl from '../scripts/apply-form.js?url';
+import eventsScriptUrl from '../scripts/events.js?url';
+
 /* Which menu entry the page belongs to, so the header can show where you are.
    Matched by prefix, because a country guide, an article and an event all live
    under a menu entry rather than being one: /destinations/study-in-uk belongs
@@ -712,8 +721,8 @@ import '../styles/site.css';
   </button>
 </div>
 
-<script src="/scripts/main.js" is:inline></script>
-<script src="/scripts/apply-form.js" is:inline></script>
-<script src="/scripts/events.js" is:inline></script>
+<script src={mainScriptUrl} is:inline></script>
+<script src={applyFormScriptUrl} is:inline></script>
+<script src={eventsScriptUrl} is:inline></script>
 </body>
 </html>

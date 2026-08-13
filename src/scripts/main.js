@@ -952,6 +952,12 @@ function initUniversityDirectory() {
   }
   searchInput.addEventListener('input', filterUniversityCheckboxList);
 
+  const uniApplyBtn = document.getElementById('uniApplyFilters');
+  if (uniApplyBtn) uniApplyBtn.addEventListener('click', () => {
+    applyFilters();
+    scrollToResults('uniResultsCount');
+  });
+
   const clearBtn = document.getElementById('uniClearFilters');
   if (clearBtn) clearBtn.addEventListener('click', clearAll);
   const emptyClearBtn = document.getElementById('uniEmptyClear');
@@ -969,6 +975,24 @@ function initUniversityDirectory() {
 
   updateDependentFilters();
   applyFilters();
+}
+
+
+/**
+ * Take the visitor back to the top of a results list.
+ *
+ * The filter panel on a desktop screen is taller than the window, so after
+ * choosing the last filter you are level with the bottom of the list and have
+ * to scroll back up to see what changed. The header is sticky, so the offset
+ * keeps the first result clear of it rather than hidden behind it.
+ */
+function scrollToResults(anchorId) {
+  const el = document.getElementById(anchorId);
+  if (!el) return;
+  const header = document.querySelector('header');
+  const offset = (header ? header.getBoundingClientRect().height : 0) + 16;
+  const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+  window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
 }
 
 function initCourseDirectory() {
@@ -1077,6 +1101,12 @@ function initCourseDirectory() {
       searchTimer = setTimeout(applyFilters, 200);
     });
   }
+
+  const applyBtn = document.getElementById('courseApplyFilters');
+  if (applyBtn) applyBtn.addEventListener('click', () => {
+    applyFilters();
+    scrollToResults('courseResultsCount');
+  });
 
   const resetBtn = document.getElementById('courseResetFilters');
   if (resetBtn) resetBtn.addEventListener('click', clearAll);
