@@ -35,6 +35,20 @@ export const ICONS: Record<string, { label: string; path: string }> = {
 
 export const ICON_KEYS = Object.keys(ICONS);
 
+/**
+ * An icon may also be a picture the office uploaded, stored as "media:<id>" or
+ * a path. Returns its URL, or '' when the value names one of the built-in
+ * icons above. Uploads go through /api/media, which only accepts real image
+ * types — SVG is refused there precisely because it can carry script.
+ */
+export function iconImage(value: string | null | undefined): string {
+  const v = String(value || '').trim();
+  if (!v) return '';
+  if (v.startsWith('media:')) return `/api/media/${v.slice(6)}`;
+  if (v.startsWith('/') || /^https?:\/\//i.test(v)) return v;
+  return '';
+}
+
 export function iconPath(key: string | null | undefined, fallback = 'check'): string {
   const k = String(key || '').trim();
   return (ICONS[k] || ICONS[fallback]).path;

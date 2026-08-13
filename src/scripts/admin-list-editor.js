@@ -42,6 +42,15 @@
     link_label: { label: 'Link text', type: 'text' },
   };
 
+  const isImageIcon = (v) => {
+    const s = String(v || '');
+    return s.startsWith('media:') || s.startsWith('/') || /^https?:\/\//i.test(s);
+  };
+  const iconImageUrl = (v) => {
+    const s = String(v || '');
+    return s.startsWith('media:') ? `/api/media/${s.slice(6)}` : s;
+  };
+
   function initEditor(root) {
     const group = root.dataset.group;
     const fields = (root.dataset.fields || 'title,body').split(',').map(s => s.trim()).filter(Boolean);
@@ -82,14 +91,31 @@
       const label = `<label class="block text-xs font-semibold text-slate-700 mb-1">${esc(fieldLabel(name))}</label>`;
       const input = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-bridge-500 focus:ring-2 focus:ring-bridge-100 outline-none';
       if (name === 'icon') {
+        /* Two ways to set an icon: pick one of the built-in line icons, which
+           keeps the page visually consistent, or upload a picture when the set
+           has nothing close enough. An uploaded value is "media:<id>"; the
+           dropdown then reads "Uploaded picture" and the preview shows it. */
+        const uploaded = isImageIcon(v);
         const path = (icons[v] || icons[Object.keys(icons)[0]] || { path: '' }).path;
+        const previewImg = uploaded
+          ? `<img src="${esc(iconImageUrl(v))}" alt="" class="w-6 h-6 object-contain" data-icon-img>`
+          : `<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-icon-preview><path d="${esc(path)}"></path></svg>`;
         return `<div>${label}
           <div class="flex items-center gap-2">
-            <span class="shrink-0 w-9 h-9 rounded-lg bg-white ring-1 ring-slate-200 flex items-center justify-center text-slate-600">
-              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-icon-preview><path d="${esc(path)}"></path></svg>
+            <span class="shrink-0 w-9 h-9 rounded-lg bg-white ring-1 ring-slate-200 flex items-center justify-center text-slate-600 overflow-hidden" data-icon-box>
+              ${previewImg}
             </span>
-            <select class="flex-1 ${input}" data-field="icon">${iconOptions(v)}</select>
-          </div></div>`;
+            <select class="flex-1 ${input}" data-field="icon">
+              ${uploaded ? `<option value="${esc(v)}" selected>Uploaded picture</option>` : ''}
+              ${iconOptions(v)}
+            </select>
+            <label class="shrink-0 cursor-pointer rounded-lg border border-slate-300 px-2.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50" title="Upload your own icon">
+              Upload
+              <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden" data-icon-upload>
+            </label>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-1">Pick one above, or upload a square PNG — around 128&times;128 with a transparent background works best.</p>
+        </div>`;
       }
       if (name === 'accent') {
         return `<div>${label}<select class="${input}" data-field="accent">${accentOptions(v)}</select></div>`;
@@ -164,6 +190,29 @@
     }
 
     listEl.addEventListener('input', markDirty);
+
+    /* Uploading an icon: store it on the row like any other value, then swap
+       the preview so the choice is visible before saving. */
+    listEl.addEventListener('change', async (e) => {
+      const input = e.target.closest('[data-icon-upload]');
+      if (!input || !input.files || !input.files[0]) return;
+      const card = input.closest('[data-index]');
+      const row = rows[Number(card.dataset.index)];
+      const fd = new FormData();
+      fd.append('file', input.files[0]);
+      try {
+        const res = await fetch('/api/media', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Upload failed');
+        collect();
+        row.icon = `media:${data.id}`;
+        markDirty();
+        render();
+        showToast('Icon uploaded — press Save to publish it');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
     listEl.addEventListener('change', (e) => {
       markDirty();
       const sel = e.target.closest('select[data-field="icon"]');

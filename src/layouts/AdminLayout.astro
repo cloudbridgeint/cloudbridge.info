@@ -57,6 +57,12 @@ try {
 const meLabel = me?.name || me?.username || (role === 'editor' ? 'Editor' : 'Admin');
 const meInitial = String(meLabel).trim().charAt(0).toUpperCase();
 import '../styles/admin.css';
+/* Imported as a URL rather than hardcoded, so the build fingerprints the file.
+   These scripts were served with a four-hour cache: after a change, a browser
+   could hold the old script and receive the new markup, and the two would not
+   agree — which is exactly how the About lists stopped appearing. A hashed
+   filename cannot go stale. */
+import adminImageUrl from '../scripts/admin-image.js?url';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -119,7 +125,7 @@ import '../styles/admin.css';
 </style>
   <!-- Loaded in <head> so the fetch wrapper is in place before any page
        script can fire an upload. -->
-  <script src="/scripts/admin-image.js" is:inline></script>
+  <script src={adminImageUrl} is:inline></script>
 </head>
 <body class="app-canvas">
   <audio id="chatNotifySound" src="/sounds/notify.wav" preload="auto"></audio>

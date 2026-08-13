@@ -76,26 +76,47 @@
       });
     });
 
-    /* Jump list: highlight whichever section is currently in view. */
+    /* One section at a time. The menu is the position: picking a section shows
+       that one and hides the rest, and the chosen entry is marked so it is
+       obvious where you are.
+
+       Hidden sections stay in the page rather than being removed, so their
+       fields are still collected by Save — an edit made in one section is not
+       lost by moving to another before saving. */
     const links = Array.from(document.querySelectorAll('[data-nav-link]'));
-    if (links.length) {
-      const setActive = (id) => links.forEach(a => {
+    const panes = Array.from(document.querySelectorAll('[data-section]'));
+
+    function showSection(id) {
+      if (!panes.some(p => p.id === id)) id = panes[0] && panes[0].id;
+      panes.forEach(p => p.classList.toggle('hidden', p.id !== id));
+      links.forEach(a => {
         const on = a.dataset.navLink === id;
         a.classList.toggle('bg-bridge-50', on);
         a.classList.toggle('text-bridge-800', on);
         a.classList.toggle('font-semibold', on);
+        a.setAttribute('aria-current', on ? 'true' : 'false');
+        const num = a.querySelector('.nav-num');
+        if (num) {
+          num.classList.toggle('bg-bridge-700', on);
+          num.classList.toggle('text-white', on);
+          num.classList.toggle('bg-slate-100', !on);
+          num.classList.toggle('text-slate-500', !on);
+        }
       });
-      const seen = new Map();
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(en => seen.set(en.target.id, en.intersectionRatio));
-        let best = null, bestRatio = 0;
-        seen.forEach((ratio, id) => { if (ratio > bestRatio) { bestRatio = ratio; best = id; } });
-        if (best) setActive(best);
-      }, {
-        root: document.getElementById('adminContent') || null,
-        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+      /* Back to the top of the pane, or section 7 opens halfway down. */
+      const scroller = document.getElementById('adminContent');
+      if (scroller) scroller.scrollTop = 0;
+      if (history.replaceState) history.replaceState(null, '', '#' + id);
+    }
+
+    if (links.length && panes.length) {
+      links.forEach(a => a.addEventListener('click', () => showSection(a.dataset.navLink)));
+      /* Reopen on the same section after a reload. */
+      const fromHash = (location.hash || '').replace('#', '');
+      showSection(fromHash || panes[0].id);
+      window.addEventListener('hashchange', () => {
+        showSection((location.hash || '').replace('#', ''));
       });
-      document.querySelectorAll('[data-section]').forEach(s => io.observe(s));
     }
 
     /* Leaving with unsaved edits loses them silently otherwise. */

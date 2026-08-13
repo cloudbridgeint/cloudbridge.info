@@ -10,6 +10,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 import ContentSections from '../../components/admin/ContentSections.astro';
 import type { Section } from '../../components/admin/ContentSections.astro';
 
+import content_fieldsUrl from '../../scripts/admin-content-fields.js?url';
+import list_editorUrl from '../../scripts/admin-list-editor.js?url';
+
 export const prerender = false;
 
 const db = (Astro.locals as any).runtime.env.DB;
@@ -177,5 +180,5 @@ const sections: Section[] = [
   </div>
 </AdminLayout>
 
-<script src="/scripts/admin-content-fields.js" is:inline></script>
-<script src="/scripts/admin-list-editor.js" is:inline></script>
+<script src={content_fieldsUrl} is:inline></script>
+<script src={list_editorUrl} is:inline></script>

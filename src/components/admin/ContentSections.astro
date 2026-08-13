@@ -1,7 +1,11 @@
 ---
 /*
- * The editing surface for a page: a numbered walk down the public page from
- * top to bottom, with a jump list beside it.
+ * The editing surface for a page: one section at a time, chosen from a list of
+ * the page's parts in the order a visitor meets them.
+
+ * Showing all eleven at once meant scrolling past ten sections to reach the
+ * one you wanted and losing your place on the way back. Now the menu is the
+ * position: pick "Our Mission" and the screen holds only Our Mission.
  *
  * It started as a flat stack of identical boxes, which read as one long wall
  * of fields — someone opening it for the first time could not tell where the
@@ -54,16 +58,18 @@ const slug = (i: number) => `section-${i + 1}`;
 <div class={nav ? 'lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-8 lg:items-start' : ''}>
 
   {nav && (
-    <nav aria-label="Sections on this page" class="hidden lg:block sticky top-0 py-1">
-      <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">On this page</p>
-      <ol id="sectionNav" class="space-y-0.5">
+    <nav aria-label="Sections on this page" class="lg:sticky lg:top-0 py-1 mb-4 lg:mb-0">
+      <p class="hidden lg:block text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">Page sections</p>
+      {/* On a narrow screen the list becomes a row you swipe through, so the
+          same control works without eating the whole first screen. */}
+      <ol id="sectionNav" class="flex gap-2 overflow-x-auto pb-2 lg:block lg:space-y-0.5 lg:gap-0 lg:overflow-visible lg:pb-0">
         {sections.map((s, i) => (
-          <li>
-            <a href={`#${slug(i)}`} data-nav-link={slug(i)}
-               class="group flex items-start gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition">
-              <span class="mt-0.5 shrink-0 w-5 h-5 rounded-md bg-slate-100 text-slate-500 text-[11px] font-bold flex items-center justify-center group-hover:bg-white">{i + 1}</span>
+          <li class="shrink-0 lg:shrink">
+            <button type="button" data-nav-link={slug(i)}
+                    class="nav-item group w-full flex items-start gap-2.5 rounded-lg px-3 py-2 text-sm text-left text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition whitespace-nowrap lg:whitespace-normal">
+              <span class="nav-num mt-0.5 shrink-0 w-5 h-5 rounded-md bg-slate-100 text-slate-500 text-[11px] font-bold flex items-center justify-center">{i + 1}</span>
               <span class="leading-snug">{s.title}</span>
-            </a>
+            </button>
           </li>
         ))}
       </ol>
@@ -72,7 +78,7 @@ const slug = (i: number) => `section-${i + 1}`;
 
   <div class="space-y-6 min-w-0">
     {sections.map((section, i) => (
-      <section id={slug(i)} data-section class="scroll-mt-4 bg-white rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden">
+      <section id={slug(i)} data-section class:list={["bg-white rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden", { hidden: i !== 0 }]}>
         <header class="flex items-start gap-4 px-5 md:px-6 py-5 border-b border-slate-100 bg-slate-50/70">
           <span class="shrink-0 w-9 h-9 rounded-xl bg-white ring-1 ring-slate-200 text-slate-500 font-bold flex items-center justify-center">{i + 1}</span>
           <div class="min-w-0">

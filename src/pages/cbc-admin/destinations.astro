@@ -3,6 +3,9 @@ import AdminLayout from '../../layouts/AdminLayout.astro';
 import ContentSections from '../../components/admin/ContentSections.astro';
 import type { Section } from '../../components/admin/ContentSections.astro';
 
+import content_fieldsUrl from '../../scripts/admin-content-fields.js?url';
+import destinationsUrl from '../../scripts/admin-destinations.js?url';
+
 export const prerender = false;
 
 const db = (Astro.locals as any).runtime.env.DB;
@@ -233,5 +236,5 @@ const sections: Section[] = [
   </div>
 </AdminLayout>
 
-<script src="/scripts/admin-content-fields.js" is:inline></script>
-<script src="/scripts/admin-destinations.js" is:inline></script>
+<script src={content_fieldsUrl} is:inline></script>
+<script src={destinationsUrl} is:inline></script>
