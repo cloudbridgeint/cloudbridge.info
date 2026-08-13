@@ -2,13 +2,16 @@
 /*
  * One university's profile at /universities/<slug>.
  *
- * The layout follows what a student actually wants in order — who they are,
- * the facts at a glance, what they teach, then rankings, support and living —
- * rather than what a prospectus would lead with.
+ * Laid out like the profiles students compare us against: a menu of sections
+ * pinned on the left, the content on the right. The earlier version put a
+ * counselling card and a website box in a right-hand column, which pushed the
+ * reading column narrow and gave the page no way to navigate — on a profile
+ * this long, a student needs to jump to Programmes or Accommodation rather
+ * than scroll for them.
  *
- * Fees and entry requirements are deliberately not stated as settled figures.
- * They move, and only the university's own page is authoritative, so the page
- * shows a band, says when it was last checked, and links to the source.
+ * Fees and entry requirements are given as the usual range and labelled as
+ * such. They move, and only the university's own page is authoritative, so
+ * every profile records when it was last checked and links to the source.
  */
 import Layout from '../../layouts/Layout.astro';
 import { getUniversityBySlug, getCoursesByUniversity, paragraphs } from '../../lib/content';
@@ -32,15 +35,25 @@ const feeRange = u.fee_min && u.fee_max
   ? `$${Number(u.fee_min).toLocaleString()} – $${Number(u.fee_max).toLocaleString()}`
   : '';
 
-/* Only claim what is filled in: an empty section heading with nothing under it
-   makes a profile look abandoned. */
+/* Bulleted lists are stored one entry per line. */
+const bullets = (raw: string | null | undefined) =>
+  String(raw || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+
+/* Only sections with something in them are listed or rendered — an empty
+   heading makes a profile look abandoned, and a menu entry that jumps to
+   nothing is worse than no menu entry. */
 const sections = [
-  { id: 'overview', label: 'Overview', show: !!u.overview },
-  { id: 'courses', label: 'Courses', show: courses.length > 0 },
-  { id: 'rankings', label: 'Rankings', show: !!(u.rankings_note || u.ranking) },
-  { id: 'services', label: 'Student services', show: !!u.services },
-  { id: 'student-life', label: 'Student life', show: !!u.student_life },
+  { id: 'overview', label: 'University Overview', show: !!u.overview },
+  { id: 'why', label: 'Why Choose This University', show: bullets(u.why_choose).length > 0 },
+  { id: 'programmes', label: 'University Programmes', show: courses.length > 0 },
+  { id: 'entry', label: 'Entry Requirements', show: !!u.entry_requirements },
+  { id: 'fees', label: 'Fees & Scholarships', show: !!(feeRange || u.scholarships_info) },
+  { id: 'rankings', label: 'University Rankings', show: !!(u.rankings_note || (u.ranking && u.ranking !== 'Not Ranked')) },
+  { id: 'facilities', label: 'Campus & Facilities', show: !!u.facilities },
+  { id: 'services', label: 'Services', show: !!u.services },
+  { id: 'student-life', label: 'Student Life', show: !!u.student_life },
   { id: 'accommodation', label: 'Accommodation', show: !!u.accommodation },
+  { id: 'apply', label: 'How to Apply', show: true },
 ].filter(s => s.show);
 
 const schema = [{
@@ -55,6 +68,15 @@ const schema = [{
 const verified = u.last_verified_at
   ? new Date(u.last_verified_at + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
   : '';
+
+const facts = [
+  { k: 'Founded', v: u.founded || '—' },
+  { k: 'Location', v: [u.city, u.country].filter(Boolean).join(', ') || '—' },
+  { k: 'Students', v: u.student_count || '—' },
+  { k: 'International', v: u.international_count || '—' },
+  { k: 'Tuition range (per year)', v: feeRange || 'Ask a counsellor' },
+  { k: 'Scholarships', v: u.scholarship ? 'Available' : 'Ask a counsellor' },
+];
 ---
 <Layout title={title} description={description} schema={schema}
         image={u.coverUrl || undefined}
@@ -68,7 +90,7 @@ const verified = u.last_verified_at
   {u.coverUrl && (
     <img src={u.coverUrl} alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover opacity-45" />
   )}
-  <div class="relative max-w-container mx-auto px-4 md:px-8 py-14 md:py-20">
+  <div class="relative max-w-container mx-auto px-4 md:px-8 py-12 md:py-16">
     <p class="crumb"><a href="/">Home</a> / <a href="/university-college">Universities</a> / {u.name}</p>
     <div class="mt-5 flex items-start gap-5 flex-wrap">
       {u.logoUrl && (
@@ -81,134 +103,196 @@ const verified = u.last_verified_at
         <p class="mt-2 text-white/80">{u.city}{u.city && u.country ? ', ' : ''}{u.country}</p>
       </div>
     </div>
-    <div class="mt-8 flex flex-wrap gap-3">
+    <div class="mt-7 flex flex-wrap gap-3">
       <a href={`/programs?university=${encodeURIComponent(u.name)}`} class="btn-primary inline-flex">View courses</a>
       <a href="/free-consultation" class="btn-secondary inline-flex">Talk to a counsellor — free</a>
+      {u.website && (
+        <a href={u.website} target="_blank" rel="noopener noreferrer"
+           class="inline-flex items-center rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white/90 hover:bg-white/10 transition">
+          Official website ↗
+        </a>
+      )}
     </div>
   </div>
 </section>
 
 <!-- Facts at a glance -->
-<section class="py-10 bg-bridge-50/60 border-b border-black/5">
+<section class="py-8 bg-bridge-50/60 border-b border-black/5">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
-      {[
-        { k: 'Founded', v: u.founded || '—' },
-        { k: 'Location', v: [u.city, u.country].filter(Boolean).join(', ') || '—' },
-        { k: 'Tuition range (per year)', v: feeRange || 'Ask a counsellor' },
-        { k: 'Scholarships', v: u.scholarship ? 'Available' : 'Ask a counsellor' },
-      ].map(x => (
+    <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 items-stretch">
+      {facts.map(x => (
         <div class="h-full flex flex-col rounded-xl bg-white border border-black/10 overflow-hidden">
-          <p class="bg-bridge-50 border-b border-black/10 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-ink/55">{x.k}</p>
-          <p class="flex-1 px-4 py-3 text-sm text-ink/75 leading-snug">{x.v}</p>
+          <p class="bg-bridge-50 border-b border-black/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-ink/55">{x.k}</p>
+          <p class="flex-1 px-3 py-2.5 text-sm text-ink/75 leading-snug">{x.v}</p>
         </div>
       ))}
     </div>
 
-    {(u.intakeList.length > 0 || u.studyLevelList.length > 0) && (
-      <div class="mt-4 flex flex-wrap gap-2">
+    {(u.intakeList.length > 0 || u.studyLevelList.length > 0 || u.facultyList.length > 0) && (
+      <div class="mt-3 flex flex-wrap gap-2">
         {u.intakeList.map((i: string) => (
           <span class="rounded-full bg-white border border-black/10 px-3 py-1.5 text-xs text-ink/70">Intake: {i}</span>
         ))}
         {u.studyLevelList.map((s: string) => (
           <span class="rounded-full bg-white border border-black/10 px-3 py-1.5 text-xs text-ink/70">{s}</span>
         ))}
+        {u.facultyList.map((f: string) => (
+          <span class="rounded-full bg-white border border-black/10 px-3 py-1.5 text-xs text-ink/70">{f}</span>
+        ))}
       </div>
-    )}
-
-    {verified && (
-      <p class="mt-4 text-xs text-ink/50 max-w-3xl">
-        Tuition, intakes and entry requirements are set by the university and change.
-        Last checked {verified} —
-        {u.source_url
-          ? <a href={u.source_url} target="_blank" rel="noopener noreferrer" class="underline"> confirm on {u.name}’s own pages</a>
-          : <span> confirm with the university before you budget or apply</span>}.
-      </p>
     )}
   </div>
 </section>
 
-<section class="py-14">
-  <div class="max-w-container mx-auto px-4 md:px-8 grid lg:grid-cols-3 gap-10">
-    <div class="lg:col-span-2 space-y-12 min-w-0">
+<section class="py-10 md:py-14">
+  <div class="max-w-container mx-auto px-4 md:px-8 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-10 lg:items-start">
 
-      {sections.length > 1 && (
-        <nav aria-label="On this page" class="flex flex-wrap gap-2 lg:hidden">
-          {sections.map(s => (
-            <a href={`#${s.id}`} class="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-semibold text-bridge-800">{s.label}</a>
-          ))}
-        </nav>
-      )}
+    <!-- Section menu. On a narrow screen it becomes a strip you swipe, so it
+         does not eat the whole first screen. -->
+    <nav aria-label="Sections on this page" class="lg:sticky lg:top-24 mb-6 lg:mb-0">
+      <p class="hidden lg:block text-[11px] font-bold uppercase tracking-wider text-ink/40 px-4 mb-2">On this page</p>
+      <ul id="uniSectionNav" class="flex gap-2 overflow-x-auto pb-2 lg:block lg:space-y-1 lg:overflow-visible lg:pb-0">
+        {sections.map(s => (
+          <li class="shrink-0 lg:shrink">
+            <a href={`#${s.id}`} data-uni-nav={s.id}
+               class="block rounded-xl border border-black/10 bg-white px-4 py-3 text-sm font-medium text-bridge-900 hover:border-bridge-800/40 hover:bg-bridge-50 transition whitespace-nowrap lg:whitespace-normal">
+              {s.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="space-y-10 min-w-0">
 
       {u.overview && (
-        <div id="overview" class="scroll-mt-24">
-          <h2 class="section-heading">About {u.name}</h2>
-          {paragraphs(u.overview).map(p => <p class="mt-4 text-ink/70 leading-relaxed">{p}</p>)}
+        <div id="overview" class="scroll-mt-28 rounded-2xl bg-white border border-black/10 shadow-sm overflow-hidden">
+          <h2 class="bg-bridge-50 border-b border-black/10 px-6 py-4 font-display text-lg font-bold text-bridge-900">Overview for International Students</h2>
+          <div class="px-6 py-5">
+            {paragraphs(u.overview).map(p => <p class="mt-3 first:mt-0 text-ink/75 leading-relaxed">{p}</p>)}
+          </div>
+        </div>
+      )}
+
+      {bullets(u.why_choose).length > 0 && (
+        <div id="why" class="scroll-mt-28 rounded-2xl bg-white border border-black/10 shadow-sm overflow-hidden">
+          <h2 class="bg-bridge-50 border-b border-black/10 px-6 py-4 font-display text-lg font-bold text-bridge-900">Why choose {u.name}</h2>
+          <ul class="px-6 py-5 space-y-3">
+            {bullets(u.why_choose).map(b => (
+              <li class="flex gap-3 text-ink/75">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-sunrise-600 shrink-0 mt-0.5" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" /></svg>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
       {courses.length > 0 && (
-        <div id="courses" class="scroll-mt-24">
-          <h2 class="section-heading">Courses at {u.name}</h2>
-          <p class="mt-3 text-sm text-ink/60">{courses.length} course{courses.length === 1 ? '' : 's'} in our directory. Use the course search for the full list with filters.</p>
-          <div class="mt-5 overflow-x-auto rounded-xl border border-black/10">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="text-left bg-bridge-50 border-b border-black/10">
-                  <th class="px-4 py-3 font-semibold text-bridge-900">Course</th>
-                  <th class="px-4 py-3 font-semibold text-bridge-900 whitespace-nowrap">Level</th>
-                  <th class="px-4 py-3 font-semibold text-bridge-900 whitespace-nowrap">Duration</th>
-                  <th class="px-4 py-3"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {courses.map(c => (
-                  <tr class="border-b border-black/5 last:border-0">
-                    <td class="px-4 py-3 font-medium text-bridge-900">{c.name}</td>
-                    <td class="px-4 py-3 text-ink/70 whitespace-nowrap">{c.level}</td>
-                    <td class="px-4 py-3 text-ink/70 whitespace-nowrap">{c.duration}</td>
-                    <td class="px-4 py-3 text-right whitespace-nowrap">
-                      <a href="/apply-now" class="text-sm font-semibold text-sunrise-600 hover:underline">Apply</a>
-                    </td>
+        <div id="programmes" class="scroll-mt-28 rounded-2xl bg-white border border-black/10 shadow-sm overflow-hidden">
+          <h2 class="bg-bridge-50 border-b border-black/10 px-6 py-4 font-display text-lg font-bold text-bridge-900">
+            {u.name} programmes for international students
+          </h2>
+          <div class="px-6 py-5">
+            <p class="text-sm text-ink/60">{courses.length} programme{courses.length === 1 ? '' : 's'} in our directory. Use the course search for the full list with filters.</p>
+            <div class="mt-4 overflow-x-auto rounded-xl border border-black/10">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left bg-bridge-50 border-b border-black/10">
+                    <th class="px-4 py-3 font-semibold text-bridge-900">Course name</th>
+                    <th class="px-4 py-3 font-semibold text-bridge-900 whitespace-nowrap">Study level</th>
+                    <th class="px-4 py-3 font-semibold text-bridge-900 whitespace-nowrap">Duration</th>
+                    <th class="px-4 py-3"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {courses.map(c => (
+                    <tr class="border-b border-black/5 last:border-0">
+                      <td class="px-4 py-3 font-medium text-bridge-900">{c.name}</td>
+                      <td class="px-4 py-3 text-ink/70 whitespace-nowrap">{c.level}</td>
+                      <td class="px-4 py-3 text-ink/70 whitespace-nowrap">{c.duration}</td>
+                      <td class="px-4 py-3 text-right whitespace-nowrap">
+                        <a href="/apply-now" class="text-sm font-semibold text-sunrise-600 hover:underline">Learn more</a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <a href={`/programs?university=${encodeURIComponent(u.name)}`} class="btn-outline mt-4 inline-flex">See these in the course search</a>
           </div>
-          <a href={`/programs?university=${encodeURIComponent(u.name)}`} class="btn-outline mt-5 inline-flex">See these in the course search</a>
         </div>
       )}
 
-      {(u.rankings_note || u.ranking) && (
-        <div id="rankings" class="scroll-mt-24">
-          <h2 class="section-heading">Rankings</h2>
-          {u.ranking && u.ranking !== 'Not Ranked' && (
-            <p class="mt-4 inline-block rounded-lg bg-bridge-50 border border-black/10 px-4 py-2 text-sm text-ink/75">
-              QS World University Rankings: <span class="font-semibold text-bridge-900">{u.ranking}</span>
-            </p>
-          )}
-          {u.rankings_note && <p class="mt-4 text-ink/70 leading-relaxed">{u.rankings_note}</p>}
+      {u.entry_requirements && (
+        <div id="entry" class="scroll-mt-28 rounded-2xl bg-white border border-black/10 shadow-sm overflow-hidden">
+          <h2 class="bg-bridge-50 border-b border-black/10 px-6 py-4 font-display text-lg font-bold text-bridge-900">Entry requirements</h2>
+          <div class="px-6 py-5">
+            {paragraphs(u.entry_requirements).map(p => <p class="mt-3 first:mt-0 text-ink/75 leading-relaxed">{p}</p>)}
+          </div>
+        </div>
+      )}
+
+      {(feeRange || u.scholarships_info) && (
+        <div id="fees" class="scroll-mt-28 rounded-2xl bg-white border border-black/10 shadow-sm overflow-hidden">
+          <h2 class="bg-bridge-50 border-b border-black/10 px-6 py-4 font-display text-lg font-bold text-bridge-900">Fees and scholarships</h2>
+          <div class="px-6 py-5">
+            {feeRange && (
+              <p class="text-ink/75">Tuition for international students is typically in the range of
+                <span class="font-semibold text-bridge-900"> {feeRange}</span> per year, depending on the course.</p>
+            )}
+            {u.scholarships_info && paragraphs(u.scholarships_info).map(p => <p class="mt-3 text-ink/75 leading-relaxed">{p}</p>)}
+          </div>
+        </div>
+      )}
+
+      {(u.rankings_note || (u.ranking && u.ranking !== 'Not Ranked')) && (
+        <div id="rankings" class="scroll-mt-28 rounded-2xl bg-white border border-black/10 shadow-sm overflow-hidden">
+          <h2 class="bg-bridge-50 border-b border-black/10 px-6 py-4 font-display text-lg font-bold text-bridge-900">University rankings</h2>
+          <div class="px-6 py-5">
+            {u.ranking && u.ranking !== 'Not Ranked' && (
+              <p class="inline-block rounded-lg bg-bridge-50 border border-black/10 px-4 py-2 text-sm text-ink/75">
+                QS World University Rankings: <span class="font-semibold text-bridge-900">{u.ranking}</span>
+              </p>
+            )}
+            {u.rankings_note && paragraphs(u.rankings_note).map(p => <p class="mt-3 text-ink/75 leading-relaxed">{p}</p>)}
+          </div>
+        </div>
+      )}
+
+      {u.facilities && (
+        <div id="facilities" class="scroll-mt-28 rounded-2xl bg-white border border-black/10 shadow-sm overflow-hidden">
+          <h2 class="bg-bridge-50 border-b border-black/10 px-6 py-4 font-display text-lg font-bold text-bridge-900">Campus and facilities</h2>
+          <div class="px-6 py-5">
+            {paragraphs(u.facilities).map(p => <p class="mt-3 first:mt-0 text-ink/75 leading-relaxed">{p}</p>)}
+          </div>
         </div>
       )}
 
       {u.services && (
-        <div id="services" class="scroll-mt-24">
-          <h2 class="section-heading">Support for international students</h2>
-          {paragraphs(u.services).map(p => <p class="mt-4 text-ink/70 leading-relaxed">{p}</p>)}
+        <div id="services" class="scroll-mt-28 rounded-2xl bg-white border border-black/10 shadow-sm overflow-hidden">
+          <h2 class="bg-bridge-50 border-b border-black/10 px-6 py-4 font-display text-lg font-bold text-bridge-900">Services for international students</h2>
+          <div class="px-6 py-5">
+            {paragraphs(u.services).map(p => <p class="mt-3 first:mt-0 text-ink/75 leading-relaxed">{p}</p>)}
+          </div>
         </div>
       )}
 
       {u.student_life && (
-        <div id="student-life" class="scroll-mt-24">
-          <h2 class="section-heading">Student life</h2>
-          {paragraphs(u.student_life).map(p => <p class="mt-4 text-ink/70 leading-relaxed">{p}</p>)}
+        <div id="student-life" class="scroll-mt-28 rounded-2xl bg-white border border-black/10 shadow-sm overflow-hidden">
+          <h2 class="bg-bridge-50 border-b border-black/10 px-6 py-4 font-display text-lg font-bold text-bridge-900">International student life</h2>
+          <div class="px-6 py-5">
+            {paragraphs(u.student_life).map(p => <p class="mt-3 first:mt-0 text-ink/75 leading-relaxed">{p}</p>)}
+          </div>
         </div>
       )}
 
       {u.accommodation && (
-        <div id="accommodation" class="scroll-mt-24">
-          <h2 class="section-heading">Accommodation</h2>
-          {paragraphs(u.accommodation).map(p => <p class="mt-4 text-ink/70 leading-relaxed">{p}</p>)}
+        <div id="accommodation" class="scroll-mt-28 rounded-2xl bg-white border border-black/10 shadow-sm overflow-hidden">
+          <h2 class="bg-bridge-50 border-b border-black/10 px-6 py-4 font-display text-lg font-bold text-bridge-900">Accommodation for international students</h2>
+          <div class="px-6 py-5">
+            {paragraphs(u.accommodation).map(p => <p class="mt-3 first:mt-0 text-ink/75 leading-relaxed">{p}</p>)}
+          </div>
         </div>
       )}
 
@@ -219,41 +303,66 @@ const verified = u.last_verified_at
             Our counsellors already work with {u.name} — the written guide is on its way.
             In the meantime, ask us anything about courses, fees or entry requirements and we will answer from what the university tells us directly.
           </p>
-          <a href="/free-consultation" class="btn-primary mt-5 inline-flex">Ask a counsellor</a>
         </div>
       )}
-    </div>
 
-    <aside class="lg:col-span-1">
-      <div class="lg:sticky lg:top-28 space-y-6">
-        <div class="rounded-2xl p-6 text-white shadow-xl" style="background-image:linear-gradient(140deg,#2f5182,#aa1821)">
-          <h2 class="font-display text-lg font-bold">Thinking about {u.name}?</h2>
-          <p class="mt-2 text-sm text-white/85">Our counsellors check your grades and budget against this university before you apply — free, with no obligation.</p>
-          <a href="/free-consultation" class="mt-5 inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-bridge-900">Book a free consultation</a>
+      <div id="apply" class="scroll-mt-28 rounded-2xl p-6 md:p-8 text-white shadow-xl" style="background-image:linear-gradient(140deg,#2f5182,#aa1821)">
+        <h2 class="font-display text-xl font-bold">Thinking about {u.name}?</h2>
+        <p class="mt-2 text-white/85 max-w-2xl">
+          Our counsellors check your grades, budget and plans against this university before you apply, and handle the application and visa paperwork with you — free, with no obligation.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="/free-consultation" class="inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-bridge-900">Book a free consultation</a>
+          <a href="/apply-now" class="inline-flex rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition">Start an application</a>
         </div>
-
-        {u.facultyList.length > 0 && (
-          <div class="rounded-2xl border border-black/10 p-6">
-            <h2 class="font-display font-bold text-bridge-900">Faculties</h2>
-            <div class="mt-3 flex flex-wrap gap-2">
-              {u.facultyList.map((f: string) => (
-                <span class="rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs text-ink/70">{f}</span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {u.website && (
-          <div class="rounded-2xl border border-black/10 p-6">
-            <h2 class="font-display font-bold text-bridge-900">Official website</h2>
-            <p class="mt-2 text-sm text-ink/60">Fees, deadlines and entry requirements are set by the university itself.</p>
-            <a href={u.website} target="_blank" rel="noopener noreferrer"
-               class="mt-3 inline-flex text-sm font-semibold text-sunrise-600 hover:underline break-all">{u.website.replace(/^https?:\/\//, '').replace(/\/$/, '')} ↗</a>
-          </div>
-        )}
       </div>
-    </aside>
+
+      {verified && (
+        <p class="text-xs text-ink/50">
+          Tuition, intakes and entry requirements are set by the university and change.
+          Last checked {verified} —
+          {u.source_url
+            ? <a href={u.source_url} target="_blank" rel="noopener noreferrer" class="underline"> confirm on {u.name}’s own pages</a>
+            : <span> confirm with the university before you budget or apply</span>}.
+        </p>
+      )}
+    </div>
   </div>
 </section>
+
+<script is:inline>
+  /* Mark the section you are reading in the left menu. A long profile is
+     easier to hold on to when the menu says where you are, not just where you
+     could go. */
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('[data-uni-nav]'));
+    if (!links.length) return;
+    var panes = links
+      .map(function (a) { return document.getElementById(a.dataset.uniNav); })
+      .filter(Boolean);
+
+    function setActive(id) {
+      links.forEach(function (a) {
+        var on = a.dataset.uniNav === id;
+        a.classList.toggle('bg-bridge-50', on);
+        a.classList.toggle('border-bridge-800/40', on);
+        a.classList.toggle('font-semibold', on);
+        a.classList.toggle('text-bridge-800', on);
+      });
+    }
+
+    var seen = {};
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { seen[e.target.id] = e.intersectionRatio; });
+      var best = null, bestRatio = 0;
+      Object.keys(seen).forEach(function (id) {
+        if (seen[id] > bestRatio) { bestRatio = seen[id]; best = id; }
+      });
+      if (best) setActive(best);
+    }, { rootMargin: '-120px 0px -55% 0px', threshold: [0, 0.2, 0.5, 1] });
+
+    panes.forEach(function (p) { io.observe(p); });
+  })();
+</script>
 
 </Layout>
