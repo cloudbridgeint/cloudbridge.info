@@ -29,6 +29,28 @@ const {
 } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
+/* Which menu entry the page belongs to, so the header can show where you are.
+   Matched by prefix, because a country guide, an article and an event all live
+   under a menu entry rather than being one: /destinations/study-in-uk belongs
+   under Study Destination. Home is an exact match — every path starts with a
+   slash. */
+const NAV_SECTIONS: Array<{ key: string; paths: string[] }> = [
+  { key: 'about', paths: ['/about', '/our-team'] },
+  { key: 'university-college', paths: ['/university-college'] },
+  { key: 'destinations', paths: ['/destinations'] },
+  { key: 'programs', paths: ['/programs'] },
+  { key: 'scholarship', paths: ['/scholarship'] },
+  { key: 'events', paths: ['/events'] },
+  { key: 'apply-now', paths: ['/apply-now'] },
+  { key: 'blogs', paths: ['/blogs'] },
+  { key: 'contact', paths: ['/contact'] },
+];
+const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const navKey = currentPath === '/'
+  ? 'home'
+  : (NAV_SECTIONS.find(s => s.paths.some(pth => currentPath === pth || currentPath.startsWith(pth + '/')))?.key || '');
+const isNav = (key: string) => navKey === key;
+
 const SITE = 'https://cloudbridge.info';
 const toAbs = (u: string) => (u.startsWith('http') ? u : new URL(u, SITE).href);
 const shareImage = image ? toAbs(image) : `${SITE}/assets/logo.png`;
@@ -237,6 +259,12 @@ import '../styles/site.css';
   .nav-link { cursor:pointer; }
   header nav.font-display { font-family:'Times New Roman', Times, serif; }
   .nav-link.active { color:#ce1d27 !important; }
+  /* The entry for the page you are on. A tint stronger than the hover state,
+     so the two are not mistaken for each other, plus the brand red. */
+  .nav-current { background:#d7e0ef; color:#ce1d27 !important; font-weight:700; }
+  .nav-current:hover { background:#c6d3e8; }
+  .mobile-menu-item.nav-current { background:#f9d2d5; color:#ce1d27; }
+  .nav-drop-panel .nav-current { background:#eef2f9; }
   .nav-drop { position:relative; }
   .nav-drop-panel { display:none; position:absolute; left:0; top:100%; min-width:190px; background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:.6rem; box-shadow:0 10px 30px rgba(0,0,0,.08); padding:.4rem 0; }
   .nav-drop:hover .nav-drop-panel { display:block; }
@@ -443,22 +471,22 @@ import '../styles/site.css';
       <Image src={logo} alt="CloudBridge — Study Abroad Consultants" class="h-16 md:h-16 lg:h-20 2xl:h-24 w-auto object-contain" loading="eager" fetchpriority="high" widths={[128, 256, 384]} sizes="(min-width: 1024px) 96px, (min-width: 768px) 80px, 64px" />
     </a>
     <nav class="hidden min-[1120px]:flex items-center gap-0.5 xl:gap-1 text-[16px] xl:text-[18px] font-medium font-display">
-      <a href="/" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="home">Home</a>
+      <a href="/" class:list={["nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50", { "nav-current": isNav("home") }]} aria-current={isNav("home") ? "page" : undefined}>Home</a>
       <div class="nav-drop">
-        <span class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block" data-page="about">About ▾</span>
+        <span class:list={["nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50 inline-block", { "nav-current": isNav("about") }]}>About ▾</span>
         <div class="nav-drop-panel">
-          <a href="/about" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">About Us</a>
-          <a href="/our-team" class="nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50">Our Team</a>
+          <a href="/about" class:list={["nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50", { "nav-current": currentPath === "/about" }]}>About Us</a>
+          <a href="/our-team" class:list={["nav-link block px-4 py-2 text-bridge-800 hover:bg-bridge-50", { "nav-current": currentPath === "/our-team" }]}>Our Team</a>
         </div>
       </div>
-      <a href="/university-college" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="university-college">University &amp; College</a>
-      <a href="/destinations" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="destinations">Study Destination</a>
-      <a href="/programs" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="programs">Course</a>
-      <a href="/scholarship" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="scholarship">Scholarship</a>
-      <a href="/events" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="events">Events</a>
-      <a href="/apply-now" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50">Apply Now</a>
-      <a href="/blogs" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="blogs">Blogs</a>
-      <a href="/contact" class="nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50" data-page="contact">Contact</a>
+      <a href="/university-college" class:list={["nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50", { "nav-current": isNav("university-college") }]} aria-current={isNav("university-college") ? "page" : undefined}>University &amp; College</a>
+      <a href="/destinations" class:list={["nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50", { "nav-current": isNav("destinations") }]} aria-current={isNav("destinations") ? "page" : undefined}>Study Destination</a>
+      <a href="/programs" class:list={["nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50", { "nav-current": isNav("programs") }]} aria-current={isNav("programs") ? "page" : undefined}>Course</a>
+      <a href="/scholarship" class:list={["nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50", { "nav-current": isNav("scholarship") }]} aria-current={isNav("scholarship") ? "page" : undefined}>Scholarship</a>
+      <a href="/events" class:list={["nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50", { "nav-current": isNav("events") }]} aria-current={isNav("events") ? "page" : undefined}>Events</a>
+      <a href="/apply-now" class:list={["nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50", { "nav-current": isNav("apply-now") }]} aria-current={isNav("apply-now") ? "page" : undefined}>Apply Now</a>
+      <a href="/blogs" class:list={["nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50", { "nav-current": isNav("blogs") }]} aria-current={isNav("blogs") ? "page" : undefined}>Blogs</a>
+      <a href="/contact" class:list={["nav-link whitespace-nowrap px-2 2xl:px-3 py-2 rounded-md text-bridge-800 hover:bg-bridge-50", { "nav-current": isNav("contact") }]} aria-current={isNav("contact") ? "page" : undefined}>Contact</a>
     </nav>
     <div class="hidden min-[1120px]:flex items-center shrink-0">
       <a href="/free-consultation" class="btn-primary !px-3 2xl:!px-5 !py-2 text-[13px] 2xl:text-[16px] whitespace-nowrap inline-flex items-center gap-1.5 !rounded-lg !text-white transition hover:brightness-110" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%);font-weight:700;font-family:'Times New Roman', Times, serif">
@@ -476,7 +504,7 @@ import '../styles/site.css';
   </div>
   <nav id="mobileMenu" class="hidden min-[1120px]:hidden border-t border-black/5">
     <div class="px-4 py-4 space-y-2.5">
-      <a href="/" class="mobile-menu-item nav-link">Home</a>
+      <a href="/" class:list={["mobile-menu-item nav-link", { "nav-current": isNav("home") }]} aria-current={isNav("home") ? "page" : undefined}>Home</a>
       <div>
         <button type="button" class="mobile-accordion-btn" onclick="toggleMobileAccordion(this)">
           <span>About</span>
@@ -487,13 +515,13 @@ import '../styles/site.css';
           <a href="/our-team" class="nav-link">Our Team</a>
         </div>
       </div>
-      <a href="/university-college" class="mobile-menu-item nav-link">University &amp; College</a>
-      <a href="/destinations" class="mobile-menu-item nav-link">Study Destination</a>
-      <a href="/programs" class="mobile-menu-item nav-link">Course</a>
-      <a href="/scholarship" class="mobile-menu-item nav-link">Scholarship</a>
-      <a href="/events" class="mobile-menu-item nav-link">Events</a>
-      <a href="/blogs" class="mobile-menu-item nav-link">Blogs</a>
-      <a href="/contact" class="mobile-menu-item nav-link">Contact</a>
+      <a href="/university-college" class:list={["mobile-menu-item nav-link", { "nav-current": isNav("university-college") }]} aria-current={isNav("university-college") ? "page" : undefined}>University &amp; College</a>
+      <a href="/destinations" class:list={["mobile-menu-item nav-link", { "nav-current": isNav("destinations") }]} aria-current={isNav("destinations") ? "page" : undefined}>Study Destination</a>
+      <a href="/programs" class:list={["mobile-menu-item nav-link", { "nav-current": isNav("programs") }]} aria-current={isNav("programs") ? "page" : undefined}>Course</a>
+      <a href="/scholarship" class:list={["mobile-menu-item nav-link", { "nav-current": isNav("scholarship") }]} aria-current={isNav("scholarship") ? "page" : undefined}>Scholarship</a>
+      <a href="/events" class:list={["mobile-menu-item nav-link", { "nav-current": isNav("events") }]} aria-current={isNav("events") ? "page" : undefined}>Events</a>
+      <a href="/blogs" class:list={["mobile-menu-item nav-link", { "nav-current": isNav("blogs") }]} aria-current={isNav("blogs") ? "page" : undefined}>Blogs</a>
+      <a href="/contact" class:list={["mobile-menu-item nav-link", { "nav-current": isNav("contact") }]} aria-current={isNav("contact") ? "page" : undefined}>Contact</a>
       <a href="/apply-now" class="mobile-menu-item mobile-menu-apply nav-link">
         Apply Now
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 010-1.06L10.94 10 7.21 6.29a.75.75 0 111.06-1.06l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0z" clip-rule="evenodd" /></svg>
