@@ -71,6 +71,13 @@ import adminImageUrl from '../scripts/admin-image.js?url';
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>{title} — CloudBridge Admin</title>
+
+  <!-- The stylesheet asked for Inter but nothing ever loaded it, so the panel
+       fell back to whatever the operating system supplies. That is why the
+       admin never quite matched the public site, which does load it. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style is:global>
     body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }

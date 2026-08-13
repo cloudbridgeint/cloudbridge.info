@@ -1,0 +1,24 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import DestinationForm from '../../../components/admin/DestinationForm.astro';
+import destination_formUrl from '../../../scripts/admin-destination-form.js?url';
+
+export const prerender = false;
+---
+<AdminLayout title="Add destination" active="destinations">
+  <nav class="text-sm text-slate-500 mb-2">
+    <a href="/cbc-admin/destinations" class="hover:text-bridge-700 hover:underline">Study Destinations</a>
+    <span class="mx-1.5 text-slate-300">/</span>
+    <span class="text-slate-700 font-medium">Add destination</span>
+  </nav>
+  <h1 class="text-2xl font-bold text-slate-900">Add a destination</h1>
+  <p class="text-slate-500 mt-1 text-sm max-w-2xl">
+    This creates a new country guide with its own page, and adds it to the destinations page, the home page and the sitemap.
+  </p>
+
+  <div class="mt-6">
+    <DestinationForm row={null} />
+  </div>
+</AdminLayout>
+
+<script src={destination_formUrl} is:inline></script>

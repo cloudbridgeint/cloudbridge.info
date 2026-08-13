@@ -1,0 +1,248 @@
+---
+/*
+ * The editor for one country guide.
+ *
+ * It used to be a modal. A country carries around twenty fields plus three
+ * line-per-entry lists and a set of FAQ pairs — that is a page's worth of work,
+ * and doing it in a box that scrolls inside another scrolling page made it hard
+ * to see where you were. It now has its own address, so it can be linked,
+ * reloaded and left open.
+ *
+ * `row` is null when creating a new destination.
+ */
+import { flagSrc } from '../../lib/flags';
+import { safeGradient } from '../../lib/icons';
+
+export interface Props {
+  row: any | null;
+}
+const { row } = Astro.props;
+
+const parseList = (raw: any) => {
+  try {
+    const v = JSON.parse(String(raw || '[]'));
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+};
+const lines = (raw: any) => parseList(raw).join('\n');
+const faqs = parseList(row?.faqs).filter((f: any) => f && f.q && f.a);
+const [grad1, grad2] = safeGradient(row?.gradient).split(',');
+const photo = row?.card_image
+  ? (String(row.card_image).startsWith('media:') ? `/api/media/${String(row.card_image).slice(6)}` : row.card_image)
+  : '';
+
+const field = 'w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-bridge-500 focus:ring-2 focus:ring-bridge-100 outline-none';
+const label = 'block text-sm font-semibold text-slate-800 mb-1';
+const help = 'text-xs text-slate-500 mt-1';
+const card = 'bg-white rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden';
+const head = 'px-5 md:px-6 py-4 border-b border-slate-100 bg-slate-50/70';
+---
+<input type="hidden" id="dId" value={row?.id ?? ''} />
+<input type="hidden" id="dOriginalSlug" value={row?.slug ?? ''} />
+
+<div class="space-y-6 pb-28">
+
+  <div class={card}>
+    <div class={head}><h2 class="text-lg font-bold text-slate-900">The basics</h2>
+      <p class="text-sm text-slate-500 mt-0.5">Name, address and how the card looks on the destinations page.</p></div>
+    <div class="px-5 md:px-6 py-5 grid sm:grid-cols-2 gap-5">
+      <div>
+        <label class={label} for="dCountry">Country name *</label>
+        <input id="dCountry" class={field} value={row?.country ?? ''} placeholder="the United Kingdom" />
+        <p class={help}>Written as it reads in a sentence — “the United Kingdom”, “Malaysia”.</p>
+      </div>
+      <div>
+        <label class={label} for="dShort">Short name *</label>
+        <input id="dShort" class={field} value={row?.short ?? ''} placeholder="UK" />
+        <p class={help}>Used in headings and cards — keep it short.</p>
+      </div>
+      <div>
+        <label class={label} for="dSlug">Page address *</label>
+        <input id="dSlug" class={field} value={row?.slug ?? ''} placeholder="uk" />
+        <p id="dSlugPreview" class={help}></p>
+      </div>
+      <div>
+        <label class={label} for="dFlag">Flag</label>
+        <div class="flex items-center gap-2">
+          <img id="dFlagPreview" alt="" width="40" height="30"
+               src={flagSrc(row?.flag) || undefined}
+               class={`shrink-0 w-10 h-[1.875rem] rounded object-cover ring-1 ring-black/10 ${flagSrc(row?.flag) ? '' : 'hidden'}`} />
+          <input id="dFlag" class={field} value={row?.flag ?? ''} placeholder="GB" />
+        </div>
+        <p id="dFlagNote" class={help}>Two-letter country code — GB, US, MY, AU. A flag emoji works too.</p>
+      </div>
+      <div class="sm:col-span-2">
+        <label class={label} for="dTagline">Card tagline</label>
+        <input id="dTagline" class={field} value={row?.tagline ?? ''} placeholder="One-year Master's, Graduate Route work visa" />
+        <p class={help}>One line under the country name on the card.</p>
+      </div>
+
+      <div>
+        <label class={label}>Card colour</label>
+        <div class="flex items-center gap-2">
+          <input id="dGrad1" type="color" class="h-10 w-14 rounded border border-slate-300 cursor-pointer" value={grad1} />
+          <input id="dGrad2" type="color" class="h-10 w-14 rounded border border-slate-300 cursor-pointer" value={grad2} />
+          <span id="dGradPreview" class="flex-1 h-10 rounded-lg border border-slate-200"></span>
+        </div>
+        <p class={help}>Shown when there is no photograph, and behind one when there is.</p>
+      </div>
+
+      <div>
+        <label class={label}>Card photograph</label>
+        <div class="flex items-center gap-3 rounded-xl border border-dashed border-slate-300 p-3 bg-slate-50/60">
+          <img id="dCardPreview" alt="" src={photo || undefined}
+               class={`h-16 w-24 object-cover rounded-lg border border-slate-200 bg-white ${photo ? '' : 'hidden'}`} />
+          <div class="min-w-0">
+            <input type="file" id="dCardFile" accept="image/*"
+                   class="block text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-bridge-700 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:bg-bridge-800" />
+            <button type="button" id="dCardClear" class={`mt-2 text-xs text-slate-500 hover:text-red-600 underline ${photo ? '' : 'hidden'}`}>Remove photo</button>
+          </div>
+          <input type="hidden" id="dCardImage" value={row?.card_image ?? ''} />
+        </div>
+        <p class={help}>Landscape, around 1200&times;800. Leave empty for colour only.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class={card}>
+    <div class={head}><h2 class="text-lg font-bold text-slate-900">Opening the guide</h2>
+      <p class="text-sm text-slate-500 mt-0.5">The “In short” box and the paragraph beneath it.</p></div>
+    <div class="px-5 md:px-6 py-5 space-y-5">
+      <div>
+        <label class={label} for="dAnswer">Short answer</label>
+        <textarea id="dAnswer" rows="4" class={field}>{row?.answer ?? ''}</textarea>
+        <p class={help}>40–60 words covering cost, course length and the English requirement. This is the part an AI assistant is most likely to quote, so it has to make sense on its own.</p>
+      </div>
+      <div>
+        <label class={label} for="dIntro">Introduction</label>
+        <textarea id="dIntro" rows="5" class={field}>{row?.intro ?? ''}</textarea>
+      </div>
+      <div>
+        <label class={label} for="dWhy">Why students choose it</label>
+        <textarea id="dWhy" rows="6" class={field}>{lines(row?.why)}</textarea>
+        <p class={help}>One reason per line. Each becomes a bullet point.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class={card}>
+    <div class={head}><h2 class="text-lg font-bold text-slate-900">Costs and requirements</h2>
+      <p class="text-sm text-slate-500 mt-0.5">The four summary boxes and the cost table.</p></div>
+    <div class="px-5 md:px-6 py-5 grid sm:grid-cols-2 gap-5">
+      <div class="sm:col-span-2">
+        <label class={label} for="dTuition">Tuition</label>
+        <textarea id="dTuition" rows="2" class={field}>{row?.tuition ?? ''}</textarea>
+      </div>
+      <div class="sm:col-span-2">
+        <label class={label} for="dLiving">Living costs</label>
+        <textarea id="dLiving" rows="2" class={field}>{row?.living ?? ''}</textarea>
+      </div>
+      <div>
+        <label class={label} for="dCurrency">Currency</label>
+        <input id="dCurrency" class={field} value={row?.currency ?? ''} placeholder="GBP (£)" />
+      </div>
+      <div>
+        <label class={label} for="dIntakes">Intakes</label>
+        <input id="dIntakes" class={field} value={row?.intakes ?? ''} />
+      </div>
+      <div>
+        <label class={label} for="dWorkRights">Work while studying</label>
+        <input id="dWorkRights" class={field} value={row?.work_rights ?? ''} />
+      </div>
+      <div>
+        <label class={label} for="dPostStudy">After graduating</label>
+        <input id="dPostStudy" class={field} value={row?.post_study ?? ''} />
+      </div>
+      <div class="sm:col-span-2">
+        <label class={label} for="dEnglishReq">English requirement</label>
+        <textarea id="dEnglishReq" rows="3" class={field}>{row?.english_req ?? ''}</textarea>
+      </div>
+      <div class="sm:col-span-2">
+        <label class={label} for="dAcademicReq">Academic requirement</label>
+        <textarea id="dAcademicReq" rows="3" class={field}>{row?.academic_req ?? ''}</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class={card}>
+    <div class={head}><h2 class="text-lg font-bold text-slate-900">The visa</h2>
+      <p class="text-sm text-slate-500 mt-0.5">Named route, the steps, and where the official rule lives.</p></div>
+    <div class="px-5 md:px-6 py-5 space-y-5">
+      <div>
+        <label class={label} for="dVisaName">Visa name</label>
+        <input id="dVisaName" class={field} value={row?.visa_name ?? ''} placeholder="Student visa" />
+      </div>
+      <div>
+        <label class={label} for="dVisaSteps">Steps</label>
+        <textarea id="dVisaSteps" rows="7" class={field}>{lines(row?.visa_steps)}</textarea>
+        <p class={help}>One step per line, in order. They are numbered on the page.</p>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-5">
+        <div>
+          <label class={label} for="dOfficialLabel">Official source — name</label>
+          <input id="dOfficialLabel" class={field} value={row?.official_label ?? ''} placeholder="UK Government — Student visa" />
+        </div>
+        <div>
+          <label class={label} for="dOfficialUrl">Official source — link</label>
+          <input id="dOfficialUrl" class={field} value={row?.official_url ?? ''} placeholder="https://www.gov.uk/student-visa" />
+        </div>
+      </div>
+      <p class={help}>Costs and visa amounts change, and only the official page is authoritative. The guide links here and tells students to check before they budget — so it should point at the government or immigration page that actually sets the rule.</p>
+    </div>
+  </div>
+
+  <div class={card}>
+    <div class={head}><h2 class="text-lg font-bold text-slate-900">Funding and universities</h2></div>
+    <div class="px-5 md:px-6 py-5 grid sm:grid-cols-2 gap-5">
+      <div>
+        <label class={label} for="dScholarships">Scholarships</label>
+        <textarea id="dScholarships" rows="5" class={field}>{lines(row?.scholarships)}</textarea>
+        <p class={help}>One per line.</p>
+      </div>
+      <div>
+        <label class={label} for="dUniversities">Universities we work with</label>
+        <textarea id="dUniversities" rows="5" class={field}>{lines(row?.universities)}</textarea>
+        <p class={help}>One per line.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class={card}>
+    <div class={head}>
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Frequently asked questions</h2>
+          <p class="text-sm text-slate-500 mt-0.5">Also published in a form Google understands, so these can show as expandable questions under the page in search results.</p>
+        </div>
+        <button type="button" id="dFaqAdd" class="shrink-0 rounded-lg bg-white border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">+ Add question</button>
+      </div>
+    </div>
+    <div class="px-5 md:px-6 py-5">
+      <div id="dFaqList" class="space-y-3" data-initial={JSON.stringify(faqs)}></div>
+      <p class={help}>A question with no answer is dropped when you save.</p>
+    </div>
+  </div>
+
+  <div class={card}>
+    <div class={head}><h2 class="text-lg font-bold text-slate-900">Publishing</h2></div>
+    <div class="px-5 md:px-6 py-5">
+      <label class="flex items-center gap-2 text-sm text-slate-700">
+        <input type="checkbox" id="dActive" checked={row ? row.active === 1 : true} /> Show this guide on the website
+      </label>
+      <p class={help}>Unticking hides the guide and takes it out of the sitemap, but keeps everything written here.</p>
+    </div>
+  </div>
+</div>
+
+<div class="sticky bottom-0 -mx-5 md:-mx-9 px-5 md:px-9 py-4 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center gap-4">
+  {row && (
+    <button id="dDelete" class="px-4 py-2 text-sm rounded-lg text-red-600 hover:bg-red-50 font-semibold">Delete destination</button>
+  )}
+  <span id="saveHint" class="ml-auto text-xs text-slate-400">All changes saved</span>
+  <a href="/cbc-admin/destinations" class="px-4 py-2.5 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Cancel</a>
+  <button id="dSave" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-7 py-3 shadow-lg transition">
+    {row ? 'Save destination' : 'Create destination'}
+  </button>
+</div>

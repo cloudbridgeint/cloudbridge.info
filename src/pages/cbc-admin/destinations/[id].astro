@@ -1,0 +1,31 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import DestinationForm from '../../../components/admin/DestinationForm.astro';
+import destination_formUrl from '../../../scripts/admin-destination-form.js?url';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const row = await db.prepare('SELECT * FROM destinations WHERE id = ?').bind(Astro.params.id).first();
+if (!row) return Astro.redirect('/cbc-admin/destinations');
+---
+<AdminLayout title={`Edit — Study in ${row.short}`} active="destinations">
+  <nav class="text-sm text-slate-500 mb-2">
+    <a href="/cbc-admin/destinations" class="hover:text-bridge-700 hover:underline">Study Destinations</a>
+    <span class="mx-1.5 text-slate-300">/</span>
+    <span class="text-slate-700 font-medium">Study in {row.short}</span>
+  </nav>
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <h1 class="text-2xl font-bold text-slate-900">Study in {row.short}</h1>
+    <a href={`/destinations/study-in-${row.slug}`} target="_blank" rel="noopener"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+      View the live page ↗
+    </a>
+  </div>
+
+  <div class="mt-6">
+    <DestinationForm row={row} />
+  </div>
+</AdminLayout>
+
+<script src={destination_formUrl} is:inline></script>
