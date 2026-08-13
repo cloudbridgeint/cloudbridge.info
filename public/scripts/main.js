@@ -870,7 +870,7 @@ function initUniversityDirectory() {
           </div>
           <div class="flex items-center justify-between">
             <span class="text-ink font-medium">About the university</span>
-            <a href="/#lead-form" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View Profile</a>
+            <a href="/universities/${encodeURIComponent(u.slug || '')}" class="font-semibold text-sunrise-600 hover:underline nav-link cursor-pointer">View Profile</a>
           </div>
           <div class="flex items-center justify-between">
             <span class="text-ink font-medium">Find Courses</span>

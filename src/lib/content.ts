@@ -41,7 +41,7 @@ export async function getUniversityDirectory(db: D1Like) {
   ).all();
   const splitCsv = (s: string) => (s || '').split(',').map((x: string) => x.trim()).filter(Boolean);
   return (results as any[]).map(u => ({
-    name: u.name, country: u.country, city: u.city,
+    name: u.name, slug: u.slug || '', country: u.country, city: u.city,
     feeMin: u.fee_min, feeMax: u.fee_max,
     intake: splitCsv(u.intake), intakeYear: splitCsv(u.intake_year),
     scholarship: !!u.scholarship, ranking: u.ranking,
@@ -466,4 +466,56 @@ export async function getScholarships(db: D1Like) {
     ...s,
     logo: s.logo ? mediaUrl(s.logo, '') : '',
   }));
+}
+
+// ---- University profiles ----
+
+/** One directory entry by its slug, for /universities/<slug>. */
+export async function getUniversityBySlug(db: D1Like, slug: string) {
+  const row = await db.prepare(
+    'SELECT * FROM university_directory WHERE slug = ? AND active = 1'
+  ).bind(slug).first();
+  if (!row) return null;
+  const splitCsv = (s: string) => (s || '').split(',').map((x: string) => x.trim()).filter(Boolean);
+  const u = row as any;
+  return {
+    ...u,
+    intakeList: splitCsv(u.intake),
+    intakeYearList: splitCsv(u.intake_year),
+    facultyList: splitCsv(u.faculty),
+    studyLevelList: splitCsv(u.study_level),
+    logoUrl: mediaUrl(u.logo, ''),
+    coverUrl: u.cover_image ? mediaUrl(u.cover_image, '') : '',
+  };
+}
+
+/** Slugs of every published entry, for the sitemap. */
+export async function getUniversitySlugs(db: D1Like) {
+  const { results } = await db.prepare(
+    "SELECT slug, name FROM university_directory WHERE active = 1 AND slug != '' ORDER BY name"
+  ).all();
+  return (results || []) as any[];
+}
+
+/** The courses this university offers, for the profile page's course table. */
+export async function getCoursesByUniversity(db: D1Like, universityName: string) {
+  const { results } = await db.prepare(
+    'SELECT * FROM courses WHERE active = 1 AND university = ? ORDER BY level ASC, name ASC'
+  ).bind(universityName).all();
+  return ((results || []) as any[]).map(c => ({
+    name: c.name, level: c.level, subject: c.subject,
+    delivery: c.delivery, duration: c.duration, city: c.city,
+  }));
+}
+
+/**
+ * Paragraphs from a stored text block. Written in the admin as plain text with
+ * blank lines between paragraphs; no HTML is accepted, so nothing typed into a
+ * profile can put markup on the page.
+ */
+export function paragraphs(raw: string | null | undefined): string[] {
+  return String(raw || '')
+    .split(/\n\s*\n/)
+    .map(s => s.trim())
+    .filter(Boolean);
 }

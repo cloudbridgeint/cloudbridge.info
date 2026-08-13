@@ -116,6 +116,63 @@ export const prerender = false;
           </div>
           <input type="hidden" id="fCoverUrl">
         </div>
+
+        <!-- Everything below appears on the public profile page. It is optional:
+             a university with none of it still gets a page, which says the
+             profile is being written rather than showing empty headings. -->
+        <div class="col-span-2 pt-4 mt-2 border-t border-slate-200">
+          <h4 class="font-semibold text-slate-900">Profile page</h4>
+          <p class="text-xs text-slate-500 mt-0.5">Shown at /universities/&lt;address&gt;. Leave a box empty and that section is left off the page.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Page address</label>
+          <input id="fSlug" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="aston-university">
+          <p class="text-xs text-slate-400 mt-1">Lowercase, dashes instead of spaces. Changing it moves a published page.</p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Founded</label>
+          <input id="fFounded" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="1895">
+        </div>
+
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Official website</label>
+          <input id="fWebsite" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="https://www.aston.ac.uk/">
+        </div>
+
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Overview</label>
+          <textarea id="fOverview" rows="7" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+          <p class="text-xs text-slate-400 mt-1">Leave a blank line between paragraphs. Write it in our own words — copying the university's text is a copyright problem and reads like their marketing rather than our advice.</p>
+        </div>
+
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Rankings note</label>
+          <textarea id="fRankingsNote" rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Support for international students</label>
+          <textarea id="fServices" rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Student life</label>
+          <textarea id="fStudentLife" rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Accommodation</label>
+          <textarea id="fAccommodation" rows="3" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Source page</label>
+          <input id="fSourceUrl" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="https://www.aston.ac.uk/international">
+          <p class="text-xs text-slate-400 mt-1">The university page these details came from.</p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Last checked</label>
+          <input id="fLastVerified" type="date" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          <p class="text-xs text-slate-400 mt-1">Shown to students as “Last checked …”, next to a link to the source. Update it whenever you re-check.</p>
+        </div>
       </div>
       <div class="flex justify-end gap-2 mt-6">
         <button id="cancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Cancel</button>
@@ -209,6 +266,16 @@ export const prerender = false;
     document.getElementById('fStudyLevel').value = u.study_level || '';
     document.getElementById('fLogoUrl').value = u.logo || '';
     document.getElementById('fCoverUrl').value = u.cover_image || '';
+    document.getElementById('fSlug').value = u.slug || '';
+    document.getElementById('fWebsite').value = u.website || '';
+    document.getElementById('fFounded').value = u.founded || '';
+    document.getElementById('fOverview').value = u.overview || '';
+    document.getElementById('fRankingsNote').value = u.rankings_note || '';
+    document.getElementById('fServices').value = u.services || '';
+    document.getElementById('fStudentLife').value = u.student_life || '';
+    document.getElementById('fAccommodation').value = u.accommodation || '';
+    document.getElementById('fSourceUrl').value = u.source_url || '';
+    document.getElementById('fLastVerified').value = u.last_verified_at || '';
     const logoPreview = document.getElementById('fLogoPreview');
     if (u.logo) { logoPreview.src = resolveImg(u.logo); logoPreview.classList.remove('hidden'); }
     else { logoPreview.classList.add('hidden'); }
@@ -233,7 +300,9 @@ export const prerender = false;
     const chosenCountry = countryFilter ? countryFilter.current() : '';
     document.getElementById('modalTitle').textContent = 'Add University';
     document.getElementById('editId').value = '';
-    ['fName','fCountry','fCity','fRanking','fIntake','fIntakeYear','fFaculty','fStudyLevel','fLogoUrl','fCoverUrl'].forEach(id => document.getElementById(id).value = '');
+    ['fName','fCountry','fCity','fRanking','fIntake','fIntakeYear','fFaculty','fStudyLevel','fLogoUrl','fCoverUrl',
+      'fSlug','fWebsite','fFounded','fOverview','fRankingsNote','fServices','fStudentLife','fAccommodation','fSourceUrl','fLastVerified']
+      .forEach(id => document.getElementById(id).value = '');
     if (chosenCountry && chosenCountry !== '__none__') document.getElementById('fCountry').value = chosenCountry;
     document.getElementById('fFeeMin').value = 0;
     document.getElementById('fFeeMax').value = 0;
@@ -297,6 +366,16 @@ export const prerender = false;
       study_level: document.getElementById('fStudyLevel').value.trim(),
       logo: document.getElementById('fLogoUrl').value.trim(),
       cover_image: document.getElementById('fCoverUrl').value.trim(),
+      slug: document.getElementById('fSlug').value.trim(),
+      website: document.getElementById('fWebsite').value.trim(),
+      founded: document.getElementById('fFounded').value.trim(),
+      overview: document.getElementById('fOverview').value.trim(),
+      rankings_note: document.getElementById('fRankingsNote').value.trim(),
+      services: document.getElementById('fServices').value.trim(),
+      student_life: document.getElementById('fStudentLife').value.trim(),
+      accommodation: document.getElementById('fAccommodation').value.trim(),
+      source_url: document.getElementById('fSourceUrl').value.trim(),
+      last_verified_at: document.getElementById('fLastVerified').value.trim(),
     };
     if (!payload.name || !payload.country) { showToast('Name and country are required', 'error'); return; }
     try {

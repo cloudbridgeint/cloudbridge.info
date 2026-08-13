@@ -86,6 +86,24 @@ export const GET: APIRoute = async (context) => {
     // a database hiccup shouldn't break the sitemap
   }
 
+  // University profiles — one page per directory entry.
+  try {
+    const db = (context.locals as any).runtime?.env?.DB;
+    if (db) {
+      const { results } = await db.prepare(
+        "SELECT slug FROM university_directory WHERE active = 1 AND slug IS NOT NULL AND slug != ''"
+      ).all();
+      for (const row of results || []) {
+        if (!row?.slug) continue;
+        urls.push(
+          `  <url>\n    <loc>${SITE}/universities/${esc(row.slug)}</loc>\n    <lastmod>${today}</lastmod>\n` +
+          `    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>`);
+      }
+    }
+  } catch {
+    // a database hiccup shouldn't break the sitemap
+  }
+
   // Event pages: one URL per occurrence, since each run now keeps its own
   // permanent address.
   try {

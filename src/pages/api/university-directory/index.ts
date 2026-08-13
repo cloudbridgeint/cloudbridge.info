@@ -16,18 +16,34 @@ export const POST: APIRoute = async (context) => {
   const {
     name, country, city, fee_min = 0, fee_max = 0, intake, intake_year,
     scholarship, ranking, faculty, study_level, logo, cover_image, sort_order = 0,
+    slug, website, founded, overview, rankings_note, services, student_life,
+    accommodation, source_url, last_verified_at,
   } = body || {};
   if (!name || !country) {
     return new Response(JSON.stringify({ error: 'name and country are required' }), { status: 400 });
   }
+
+  /* Every entry gets an address as soon as it exists, derived from the name
+     when none is given — a profile link that goes nowhere is worse than a
+     profile that is still empty. */
+  const makeSlug = (v) => String(v || '')
+    .toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  let finalSlug = makeSlug(slug || name);
+  const clash = await db.prepare('SELECT id FROM university_directory WHERE slug = ?').bind(finalSlug).first();
+  if (clash) finalSlug = `${finalSlug}-${Date.now().toString(36).slice(-4)}`;
   const result = await db.prepare(
     `INSERT INTO university_directory
-      (name, country, city, fee_min, fee_max, intake, intake_year, scholarship, ranking, faculty, study_level, logo, cover_image, sort_order, active)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`
+      (name, country, city, fee_min, fee_max, intake, intake_year, scholarship, ranking, faculty, study_level, logo, cover_image, sort_order, active,
+       slug, website, founded, overview, rankings_note, services, student_life, accommodation, source_url, last_verified_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     name, country, city || '', fee_min, fee_max, intake || '', intake_year || '',
     scholarship ? 1 : 0, ranking || '', faculty || '', study_level || '',
-    logo || '', cover_image || '', sort_order
+    logo || '', cover_image || '', sort_order,
+    finalSlug, website || '', founded || '', overview || '', rankings_note || '',
+    services || '', student_life || '', accommodation || '', source_url || '',
+    last_verified_at || ''
   ).run();
   return new Response(JSON.stringify({ success: true, id: result.meta.last_row_id }), {
     status: 201,

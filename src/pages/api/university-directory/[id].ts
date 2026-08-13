@@ -9,7 +9,14 @@ export const PUT: APIRoute = async (context) => {
   const {
     name, country, city, fee_min, fee_max, intake, intake_year,
     scholarship, ranking, faculty, study_level, logo, cover_image, sort_order, active,
+    slug, website, founded, overview, rankings_note, services, student_life,
+    accommodation, source_url, last_verified_at,
   } = body || {};
+
+/* A profile's address must stay unique and URL-safe: it is a published page. */
+const cleanSlug = slug === undefined ? null : String(slug)
+  .toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
   await db.prepare(
     `UPDATE university_directory SET
@@ -27,7 +34,17 @@ export const PUT: APIRoute = async (context) => {
       logo = COALESCE(?, logo),
       cover_image = COALESCE(?, cover_image),
       sort_order = COALESCE(?, sort_order),
-      active = COALESCE(?, active)
+      active = COALESCE(?, active),
+      slug = COALESCE(?, slug),
+      website = COALESCE(?, website),
+      founded = COALESCE(?, founded),
+      overview = COALESCE(?, overview),
+      rankings_note = COALESCE(?, rankings_note),
+      services = COALESCE(?, services),
+      student_life = COALESCE(?, student_life),
+      accommodation = COALESCE(?, accommodation),
+      source_url = COALESCE(?, source_url),
+      last_verified_at = COALESCE(?, last_verified_at)
      WHERE id = ?`
   ).bind(
     name ?? null, country ?? null, city ?? null,
@@ -36,7 +53,11 @@ export const PUT: APIRoute = async (context) => {
     scholarship === undefined ? null : (scholarship ? 1 : 0),
     ranking ?? null, faculty ?? null, study_level ?? null,
     logo ?? null, cover_image ?? null, sort_order ?? null,
-    active === undefined ? null : (active ? 1 : 0), id
+    active === undefined ? null : (active ? 1 : 0),
+    cleanSlug, website ?? null, founded ?? null, overview ?? null,
+    rankings_note ?? null, services ?? null, student_life ?? null,
+    accommodation ?? null, source_url ?? null, last_verified_at ?? null,
+    id
   ).run();
 
   return new Response(JSON.stringify({ success: true }), { headers: { 'Content-Type': 'application/json' } });
