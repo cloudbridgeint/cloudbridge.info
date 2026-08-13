@@ -101,7 +101,7 @@ console.log(`\nVerifying ${BASE}\n`);
   const photos = await page.evaluate(() => Array.from(
     document.querySelectorAll('section .grid > a img[src*="/assets/destinations/"], section .grid > a img[src^="/api/media/"]'))
     .map(i => ({ src: i.getAttribute('src'), w: i.naturalWidth })));
-  check(photos.length >= 3, 'destination photos render on the hub', `found ${photos.length}`, `${photos.length} photos`);
+  check(photos.length === 10, 'every destination card has its photo', `found ${photos.length}`, `${photos.length} photos`);
   const badPhotos = photos.filter(p => p.w === 0).map(p => p.src);
   check(badPhotos.length === 0, 'every destination photo loaded', badPhotos.join(', '));
 
