@@ -67,3 +67,13 @@ export function safeGradient(value: string | null | undefined, fallback = '#2e4a
   const v = String(value || '').trim();
   return /^#[0-9a-fA-F]{3,8},#[0-9a-fA-F]{3,8}$/.test(v) ? v : fallback;
 }
+
+/**
+ * A value going inside `url('…')` in a style attribute. Quotes, parentheses,
+ * backslashes and whitespace are removed rather than escaped: nothing legitimate
+ * in an image path needs them, and any one of them would let a stored value
+ * break out of the attribute.
+ */
+export function safeCssUrl(value: string | null | undefined): string {
+  return String(value || '').replace(/["'()\\\s;]/g, '');
+}

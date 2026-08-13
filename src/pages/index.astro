@@ -2,7 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import EventModals from '../components/EventModals.astro';
 import { Image } from 'astro:assets';
-import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, mediaUrl, eventPeriod, eventExcerpt } from '../lib/content';
+import { safeCssUrl } from '../lib/icons';
+import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, getDestinations, mediaUrl, eventPeriod, eventExcerpt } from '../lib/content';
 import heroSlide1 from '../assets/hero/slide1.jpg';
 import heroSlide2 from '../assets/hero/slide2.jpg';
 import heroSlide3 from '../assets/hero/slide3.jpg';
@@ -19,6 +20,14 @@ const db = (Astro.locals as any).runtime.env.DB;
 const cm = await getAllContent(db);
 const universities = await getUniversities(db);
 const faqs = await getFaqs(db);
+/* The three featured cards below take their photograph from the destinations
+   table, the same place /destinations reads. The picture was hardcoded here
+   before, which is why a country could show a photo on the home page and only
+   a colour on the hub. Uploading one in the admin now changes both. */
+const destPhoto = Object.fromEntries(
+  (await getDestinations(db)).map(d => [d.slug, d.cardImage])
+);
+const cardPhoto = (slug: string, fallback: string) => safeCssUrl(destPhoto[slug] || fallback);
 
 /* FAQPage schema — only the questions actually rendered below, which is what
    Google requires for an FAQ rich result. */
@@ -212,15 +221,15 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
       <p class="mt-3 text-ink/60">Every country we work with, hand-picked for strong outcomes for Bangladeshi students.</p>
     </div>
     <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <a href="/destinations/study-in-uk" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(0deg,rgba(15,28,48,.35),rgba(15,28,48,.1)),url('/assets/destinations/uk.webp')">
+      <a href="/destinations/study-in-uk" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style={`background-image:linear-gradient(0deg,rgba(15,28,48,.35),rgba(15,28,48,.1)),url('${cardPhoto('uk', '/assets/destinations/uk.webp')}')`}>
         <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
         <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">United Kingdom</h3><p class="mt-1 text-sm text-white/75">Globally respected degrees and diverse study opportunities.</p></div>
       </a>
-      <a href="/destinations/study-in-malaysia" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(0deg,rgba(15,28,48,.35),rgba(15,28,48,.1)),url('/assets/destinations/malaysia.webp')">
+      <a href="/destinations/study-in-malaysia" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style={`background-image:linear-gradient(0deg,rgba(15,28,48,.35),rgba(15,28,48,.1)),url('${cardPhoto('malaysia', '/assets/destinations/malaysia.webp')}')`}>
         <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
         <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">Malaysia</h3><p class="mt-1 text-sm text-white/75">English-medium education with affordable living costs.</p></div>
       </a>
-      <a href="/destinations/study-in-usa" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style="background-image:linear-gradient(0deg,rgba(15,28,48,.35),rgba(15,28,48,.1)),url('/assets/destinations/usa.webp')">
+      <a href="/destinations/study-in-usa" class="nav-link group relative h-72 rounded-2xl overflow-hidden flex flex-col justify-end card-photo" style={`background-image:linear-gradient(0deg,rgba(15,28,48,.35),rgba(15,28,48,.1)),url('${cardPhoto('usa', '/assets/destinations/usa.webp')}')`}>
         <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
         <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">USA</h3><p class="mt-1 text-sm text-white/75">Small classes, academic freedom, strong mentorship.</p></div>
       </a>

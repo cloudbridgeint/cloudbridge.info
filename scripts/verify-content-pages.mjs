@@ -95,6 +95,16 @@ console.log(`\nVerifying ${BASE}\n`);
   /* Flags are real images now: an emoji renders as the bare country-code
      letters on Windows, which is what this replaced. Check they loaded rather
      than just that the tag is there. */
+  /* The photo now comes from the database, the same row the home page reads —
+     it used to be hardcoded in two places, so a country could show a picture on
+     one page and only a colour on the other. */
+  const photos = await page.evaluate(() => Array.from(
+    document.querySelectorAll('section .grid > a img[src*="/assets/destinations/"], section .grid > a img[src^="/api/media/"]'))
+    .map(i => ({ src: i.getAttribute('src'), w: i.naturalWidth })));
+  check(photos.length >= 3, 'destination photos render on the hub', `found ${photos.length}`, `${photos.length} photos`);
+  const badPhotos = photos.filter(p => p.w === 0).map(p => p.src);
+  check(badPhotos.length === 0, 'every destination photo loaded', badPhotos.join(', '));
+
   const flags = await page.evaluate(() => Array.from(
     document.querySelectorAll('img[src^="/assets/flags/"]'))
     .map(i => ({ src: i.getAttribute('src'), w: i.naturalWidth })));
@@ -210,6 +220,13 @@ console.log(`\nVerifying ${BASE}\n`);
   check(chips === 3, 'homepage links only the three featured guides', `found ${chips} distinct`, `${chips} guides`);
   const seeAll = await page.locator('a[href="/destinations"]').count();
   check(seeAll >= 1, '"See all destinations" still links to the hub', 'link missing');
+
+  const heroPhotos = await page.evaluate(() => Array.from(
+    document.querySelectorAll('a[href^="/destinations/study-in-"].card-photo'))
+    .map(a => getComputedStyle(a).backgroundImage));
+  const withPhoto = heroPhotos.filter(b => /url\(/.test(b));
+  check(withPhoto.length === 3, 'the three featured cards still show their photo',
+    `only ${withPhoto.length} of ${heroPhotos.length} have one`);
   check(errors.length === 0, 'no console errors', errors.join(' | '));
   await page.close();
 
