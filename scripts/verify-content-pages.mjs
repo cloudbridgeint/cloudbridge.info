@@ -92,6 +92,16 @@ console.log(`\nVerifying ${BASE}\n`);
   const bg = await cards.first().evaluate(el => getComputedStyle(el).backgroundImage);
   check(bg.includes('gradient'), 'card colour applied', `background-image was "${bg}"`);
 
+  /* Flags are real images now: an emoji renders as the bare country-code
+     letters on Windows, which is what this replaced. Check they loaded rather
+     than just that the tag is there. */
+  const flags = await page.evaluate(() => Array.from(
+    document.querySelectorAll('img[src^="/assets/flags/"]'))
+    .map(i => ({ src: i.getAttribute('src'), w: i.naturalWidth })));
+  check(flags.length === 10, 'every card has a flag image', `found ${flags.length}`, `${flags.length} flags`);
+  const unloaded = flags.filter(f => f.w === 0).map(f => f.src);
+  check(unloaded.length === 0, 'every flag image actually loaded', unloaded.join(', '));
+
   const broken = await brokenImages(page);
   check(broken.length === 0, 'no broken images', broken.join(', '));
   check(errors.length === 0, 'no console errors', errors.join(' | '));
@@ -124,6 +134,13 @@ console.log(`\nVerifying ${BASE}\n`);
 
   const others = await page.locator('aside a[href^="/destinations/study-in-"]').count();
   check(others === 9, 'sidebar lists the other nine guides', `found ${others}`);
+
+  const heroFlag = await page.evaluate(() => {
+    const i = document.querySelector('h1 img[src^="/assets/flags/"]');
+    return i ? { src: i.getAttribute('src'), w: i.naturalWidth } : null;
+  });
+  check(heroFlag && heroFlag.w > 0, 'the heading flag loaded',
+    heroFlag ? `${heroFlag.src} did not load` : 'no flag image in the H1', heroFlag?.src);
 
   check(errors.length === 0, 'no console errors', errors.join(' | '));
   await page.close();
@@ -184,10 +201,15 @@ console.log(`\nVerifying ${BASE}\n`);
 {
   console.log('\n/ (homepage destination chips)');
   const { page, errors } = await open('/');
+  /* The row of chips under the three cards was removed — "See all
+     destinations" carries people to the hub instead. Only the three featured
+     cards and the header menu should link a guide from here now. */
   const chips = await page.evaluate(() => new Set(
     Array.from(document.querySelectorAll('a[href^="/destinations/study-in-"]'))
       .map(a => a.getAttribute('href'))).size);
-  check(chips === 10, 'homepage links every guide', `found ${chips} distinct`, `${chips} guides`);
+  check(chips === 3, 'homepage links only the three featured guides', `found ${chips} distinct`, `${chips} guides`);
+  const seeAll = await page.locator('a[href="/destinations"]').count();
+  check(seeAll >= 1, '"See all destinations" still links to the hub', 'link missing');
   check(errors.length === 0, 'no console errors', errors.join(' | '));
   await page.close();
 

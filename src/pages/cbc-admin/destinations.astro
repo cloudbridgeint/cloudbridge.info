@@ -88,8 +88,13 @@ const sections: Section[] = [
             <p id="dSlugPreview" class="text-xs text-slate-400 mt-1"></p>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-600 mb-1">Flag emoji</label>
-            <input id="dFlag" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="🇬🇧">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Flag</label>
+            <div class="flex items-center gap-2">
+              <img id="dFlagPreview" alt="" width="40" height="30"
+                   class="hidden shrink-0 w-10 h-[1.875rem] rounded object-cover ring-1 ring-black/10">
+              <input id="dFlag" class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="GB">
+            </div>
+            <p id="dFlagNote" class="text-xs text-slate-400 mt-1">Two-letter country code — GB, US, MY, AU. A flag emoji works too.</p>
           </div>
           <div class="sm:col-span-2">
             <label class="block text-xs font-medium text-slate-600 mb-1">Card tagline</label>

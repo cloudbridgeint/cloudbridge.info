@@ -11,6 +11,7 @@
  */
 import Layout from '../../layouts/Layout.astro';
 import { getDestinations, getDestinationBySlug } from '../../lib/content';
+import { flagSrc } from '../../lib/flags';
 
 export const prerender = false;
 
@@ -55,7 +56,10 @@ const others = (await getDestinations(db)).filter(x => x.slug !== d.slug);
   <div class="max-w-container mx-auto px-4 md:px-8">
     <p class="crumb"><a href="/">Home</a> / <a href="/destinations">Destinations</a> / {d.short}</p>
     <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">
-      <span class="mr-2">{d.flag}</span>Study in {d.country} from Bangladesh
+      {flagSrc(d.flag)
+        ? <img src={flagSrc(d.flag)} alt="" width="56" height="42"
+               class="inline-block align-middle w-14 h-[2.625rem] mr-3 rounded object-cover shadow-md ring-1 ring-white/25" />
+        : <span class="mr-2">{d.flag}</span>}Study in {d.country} from Bangladesh
     </h1>
     <p class="mt-4 max-w-2xl text-white/80">{d.tagline}</p>
     <a href="/free-consultation" class="btn-primary mt-8 inline-flex">Talk to a counsellor — free</a>
@@ -193,7 +197,10 @@ const others = (await getDestinations(db)).filter(x => x.slug !== d.slug);
             {others.map(o => (
               <li>
                 <a href={`/destinations/study-in-${o.slug}`} class="text-sm text-ink/70 hover:text-bridge-800 hover:underline">
-                  <span class="mr-1.5">{o.flag}</span>Study in {o.short}
+                  {flagSrc(o.flag)
+                    ? <img src={flagSrc(o.flag)} alt="" width="20" height="15" loading="lazy"
+                           class="inline-block align-middle w-5 h-[0.9375rem] mr-2 rounded-sm object-cover ring-1 ring-black/10" />
+                    : <span class="mr-1.5">{o.flag}</span>}Study in {o.short}
                 </a>
               </li>
             ))}

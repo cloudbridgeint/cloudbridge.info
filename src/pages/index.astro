@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import EventModals from '../components/EventModals.astro';
 import { Image } from 'astro:assets';
-import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, getDestinations, mediaUrl, eventPeriod, eventExcerpt } from '../lib/content';
+import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, mediaUrl, eventPeriod, eventExcerpt } from '../lib/content';
 import heroSlide1 from '../assets/hero/slide1.jpg';
 import heroSlide2 from '../assets/hero/slide2.jpg';
 import heroSlide3 from '../assets/hero/slide3.jpg';
@@ -19,10 +19,6 @@ const db = (Astro.locals as any).runtime.env.DB;
 const cm = await getAllContent(db);
 const universities = await getUniversities(db);
 const faqs = await getFaqs(db);
-/* The three cards above are curated; this pulls the rest of the guides from the
-   destinations table so a country added in the admin is reachable from the
-   home page too. */
-const otherDestinations = (await getDestinations(db)).filter(x => !['uk', 'usa', 'malaysia'].includes(x.slug));
 
 /* FAQPage schema — only the questions actually rendered below, which is what
    Google requires for an FAQ rich result. */
@@ -228,16 +224,6 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
         <div class="absolute inset-0 bg-gradient-to-t from-bridge-950/85 via-bridge-950/10 to-transparent"></div>
         <div class="relative p-5 text-white"><h3 class="font-display text-xl font-bold">USA</h3><p class="mt-1 text-sm text-white/75">Small classes, academic freedom, strong mentorship.</p></div>
       </a>
-    </div>
-    <!-- The remaining destinations, so every guide is reachable from the home
-         page rather than only from the hub. -->
-    <div class="mt-6 flex flex-wrap justify-center gap-2">
-      {otherDestinations.map(x => (
-        <a href={`/destinations/study-in-${x.slug}`}
-           class="rounded-full border border-black/10 bg-white px-4 py-2 text-sm text-ink/70 hover:border-bridge-800 hover:text-bridge-800 transition">
-          <span class="mr-1.5">{x.flag}</span>Study in {x.short}
-        </a>
-      ))}
     </div>
     <div class="mt-8 text-center">
       <a href="/destinations" class="btn-outline see-more-btn !rounded-lg">See all destinations</a>

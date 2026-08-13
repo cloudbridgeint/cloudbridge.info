@@ -32,6 +32,25 @@
       .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   }
 
+
+  /* The flag is stored as it was typed — a code or an emoji — and resolved to
+     an image here and on the public page by the same rule. Windows has no flag
+     glyphs, so an emoji alone would show as two letters to a good share of
+     visitors; the picture is what everyone actually sees. */
+  function flagCode(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    const letters = Array.from(raw)
+      .map(ch => ch.codePointAt(0))
+      .filter(p => p >= 0x1f1e6 && p <= 0x1f1ff)
+      .map(p => String.fromCharCode(p - 0x1f1e6 + 65))
+      .join('');
+    if (letters.length >= 2) return letters.slice(0, 2).toLowerCase();
+    const plain = raw.toLowerCase().replace(/[^a-z-]/g, '');
+    return plain.slice(0, 2);
+  }
+  const flagSrc = (v) => { const c = flagCode(v); return c ? `/assets/flags/${c}.svg` : ''; };
+
   function gradientOf(row) {
     const v = String(row.gradient || '');
     return /^#[0-9a-fA-F]{3,8},#[0-9a-fA-F]{3,8}$/.test(v) ? v.split(',') : ['#2e4a7a', '#4d70a8'];
@@ -50,7 +69,9 @@
       return `
       <div class="rounded-2xl ring-1 ring-black/5 shadow-sm bg-white overflow-hidden">
         <div class="h-20 flex items-end p-4 text-white" style="background-image:linear-gradient(160deg,${esc(c1)},${esc(c2)})">
-          <span class="text-2xl">${esc(d.flag || '')}</span>
+          ${flagSrc(d.flag)
+            ? `<img src="${esc(flagSrc(d.flag))}" alt="" class="w-10 h-[1.875rem] rounded object-cover ring-1 ring-white/30 shadow" onerror="this.style.display='none'">`
+            : `<span class="text-2xl">${esc(d.flag || '')}</span>`}
         </div>
         <div class="p-4">
           <div class="flex items-start justify-between gap-2">
@@ -116,6 +137,19 @@
     $('dSlugPreview').textContent = s ? `Page will be /destinations/study-in-${s}` : 'Lowercase letters, numbers and dashes only.';
   }
 
+  function syncFlagPreview() {
+    const img = $('dFlagPreview');
+    const src = flagSrc($('dFlag').value);
+    if (src) {
+      img.src = src;
+      img.classList.remove('hidden');
+      img.onerror = () => { img.classList.add('hidden'); $('dFlagNote').textContent = 'No flag found for that code — check the two-letter country code.'; };
+      img.onload = () => { $('dFlagNote').textContent = 'Two-letter country code — GB, US, MY, AU. A flag emoji works too.'; };
+    } else {
+      img.classList.add('hidden');
+    }
+  }
+
   function openModal(row) {
     editing = row || null;
     originalSlug = row ? row.slug : '';
@@ -154,6 +188,7 @@
     $('dGrad2').value = c2;
     syncGradientPreview();
     syncSlugPreview();
+    syncFlagPreview();
 
     const list = $('dFaqList');
     list.innerHTML = '';
@@ -211,6 +246,7 @@
     $('dGrad1').addEventListener('input', syncGradientPreview);
     $('dGrad2').addEventListener('input', syncGradientPreview);
     $('dSlug').addEventListener('input', syncSlugPreview);
+    $('dFlag').addEventListener('input', syncFlagPreview);
     $('dFaqAdd').addEventListener('click', () => $('dFaqList').appendChild(faqRow('', '')));
 
     /* A new destination gets its slug suggested from the short name; an
