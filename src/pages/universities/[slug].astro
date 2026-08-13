@@ -73,14 +73,40 @@ const verified = u.last_verified_at
   ? new Date(u.last_verified_at + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
   : '';
 
+/* The headline figures, as icon-and-number rather than a table.
+   Each one is left out entirely when it is not known: three boxes reading
+   "Not Rated" make a profile look unfinished, where showing only what has
+   been checked looks deliberate. */
+const stats = [
+  { icon: 'building', value: u.founded, label: 'Founding year' },
+  { icon: 'medal', value: u.ranking && u.ranking !== 'Not Ranked' ? u.ranking : '', label: 'QS World Ranking' },
+  { icon: 'laurel', value: u.ranking_guardian, label: 'Guardian Ranking' },
+  { icon: 'chart', value: u.ranking_the, label: 'THE World Ranking' },
+  { icon: 'people', value: u.student_count, label: 'Students' },
+  { icon: 'cap-money', value: u.scholarship ? 'Available' : '', label: 'Scholarships' },
+].filter(s => String(s.value || '').trim());
+
 const facts = [
-  { k: 'Founded', v: u.founded || '—' },
   { k: 'Location', v: [u.city, u.country].filter(Boolean).join(', ') || '—' },
-  { k: 'Students', v: u.student_count || '—' },
   { k: 'International', v: u.international_count || '—' },
   { k: 'Tuition range (per year)', v: feeRange || 'Ask a counsellor' },
-  { k: 'Scholarships', v: u.scholarship ? 'Available' : 'Ask a counsellor' },
 ];
+
+/* What the map is asked to find. The name plus the city resolves correctly for
+   almost every institution; it is editable for the ones where it does not. */
+const mapQuery = (u.map_query || [u.name, u.city, u.country].filter(Boolean).join(', ')).trim();
+const mapEmbed = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
+const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
+
+/* Fixed set, so nothing stored in the database ends up as markup on the page. */
+const STAT_ICONS: Record<string, string> = {
+  building: 'M3 21h18M4 21V10l8-5 8 5v11M9 21v-6h6v6M7 13h.01M17 13h.01',
+  medal: 'M12 15a5 5 0 100-10 5 5 0 000 10zm0 0v6l-3-2-3 2m6-6v6l3-2 3 2M12 8.5l.7 1.4 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6L9.7 10l1.6-.2.7-1.3z',
+  laurel: 'M12 4v10m0 0c-2.5 0-4.5-2-4.5-4.5M12 14c2.5 0 4.5-2 4.5-4.5M6 12c0 3.3 2.7 6 6 6s6-2.7 6-6M9 20h6',
+  chart: 'M4 20h16M7 20v-6m5 6V8m5 12v-9M12 3l1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.3-2.4 1.3.5-2.6L8.2 5.8l2.6-.4L12 3z',
+  people: 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H2v-2a4 4 0 013-3.87m4-3.13a4 4 0 100-8 4 4 0 000 8zm7 3.13a4 4 0 00-3-3.87',
+  'cap-money': 'M12 4L3 8.5 12 13l9-4.5L12 4zM6.5 10.6V15c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3v-4.4M12 15.5v2',
+};
 ---
 <Layout title={title} description={description} schema={schema}
         image={u.coverUrl || undefined}
@@ -120,25 +146,66 @@ const facts = [
   </div>
 </section>
 
-<!-- Facts at a glance -->
+<!-- Enquire, share and the map, then the headline figures -->
 <section class="py-8 bg-bridge-50/60 border-b border-black/5">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 items-stretch">
-      {facts.map(x => (
-        <div class="h-full flex flex-col rounded-xl bg-white border border-black/10 overflow-hidden">
-          <p class="bg-bridge-50 border-b border-black/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-ink/55">{x.k}</p>
-          <p class="flex-1 px-3 py-2.5 text-sm text-ink/75 leading-snug">{x.v}</p>
+
+    <div class="flex flex-wrap items-start justify-between gap-6">
+      <div class="min-w-0 grid sm:grid-cols-3 gap-3 flex-1">
+        {facts.map(x => (
+          <div class="h-full flex flex-col rounded-xl bg-white border border-black/10 overflow-hidden">
+            <p class="bg-bridge-50 border-b border-black/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-ink/55">{x.k}</p>
+            <p class="flex-1 px-3 py-2.5 text-sm text-ink/75 leading-snug">{x.v}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="shrink-0 w-full sm:w-72">
+        <div class="flex items-center gap-2">
+          <a href="/free-consultation" class="flex-1 inline-flex items-center justify-center rounded-lg bg-sunrise-600 hover:bg-sunrise-700 px-4 py-2.5 text-sm font-semibold text-white transition">Enquire Now</a>
+          <button type="button" id="shareBtn"
+                  class="inline-flex items-center gap-1.5 rounded-lg border border-black/15 bg-white px-4 py-2.5 text-sm font-semibold text-bridge-900 hover:bg-bridge-50 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="w-4 h-4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.7 10.7l6.6-3.4M8.7 13.3l6.6 3.4M18 8a2 2 0 100-4 2 2 0 000 4zM6 14a2 2 0 100-4 2 2 0 000 4zm12 6a2 2 0 100-4 2 2 0 000 4z" /></svg>
+            Share
+          </button>
         </div>
-      ))}
+        <!-- Loaded lazily: the map is a third-party frame and is not what the
+             page is for, so it must not hold up the content. -->
+        <div class="mt-3 rounded-xl overflow-hidden border border-black/10 bg-white">
+          <iframe src={mapEmbed} title={`Map showing ${u.name}`} loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  class="w-full h-40 block border-0"></iframe>
+        </div>
+        <a href={mapLink} target="_blank" rel="noopener noreferrer"
+           class="mt-2 inline-flex text-xs font-semibold text-bridge-700 hover:underline">Open in Google Maps ↗</a>
+      </div>
     </div>
 
+    {stats.length > 0 && (
+      <div class="mt-6 pt-6 border-t border-black/10">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          {stats.map(st => (
+            <div class="text-center">
+              <span class="mx-auto w-14 h-14 rounded-full bg-white border border-black/10 flex items-center justify-center text-bridge-700">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="w-6 h-6" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d={STAT_ICONS[st.icon]} />
+                </svg>
+              </span>
+              <p class="mt-3 font-display font-bold text-bridge-900">{st.value}</p>
+              <p class="text-xs text-ink/50">{st.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
     {(u.intakeList.length > 0 || u.studyLevelList.length > 0 || u.facultyList.length > 0) && (
-      <div class="mt-3 flex flex-wrap gap-2">
+      <div class="mt-6 flex flex-wrap gap-2">
         {u.intakeList.map((i: string) => (
           <span class="rounded-full bg-white border border-black/10 px-3 py-1.5 text-xs text-ink/70">Intake: {i}</span>
         ))}
-        {u.studyLevelList.map((s: string) => (
-          <span class="rounded-full bg-white border border-black/10 px-3 py-1.5 text-xs text-ink/70">{s}</span>
+        {u.studyLevelList.map((sl: string) => (
+          <span class="rounded-full bg-white border border-black/10 px-3 py-1.5 text-xs text-ink/70">{sl}</span>
         ))}
         {u.facultyList.map((f: string) => (
           <span class="rounded-full bg-white border border-black/10 px-3 py-1.5 text-xs text-ink/70">{f}</span>
@@ -315,6 +382,25 @@ const facts = [
 </section>
 
 <script is:inline>
+  /* Share: the device's own share sheet where there is one — that is what a
+     student on a phone expects — and a copied link everywhere else. No
+     third-party share buttons, which would load tracking script on a page
+     that otherwise loads none. */
+  (function () {
+    var btn = document.getElementById('shareBtn');
+    if (!btn) return;
+    btn.addEventListener('click', async function () {
+      var data = { title: document.title, url: location.href };
+      try {
+        if (navigator.share) { await navigator.share(data); return; }
+        await navigator.clipboard.writeText(location.href);
+        var original = btn.innerHTML;
+        btn.textContent = 'Link copied';
+        setTimeout(function () { btn.innerHTML = original; }, 1800);
+      } catch (e) { /* dismissed by the user — nothing to report */ }
+    });
+  })();
+
   /* Mark the section you are reading in the left menu. A long profile is
      easier to hold on to when the menu says where you are, not just where you
      could go. */

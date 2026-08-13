@@ -11,6 +11,8 @@ export const PUT: APIRoute = async (context) => {
     scholarship, ranking, faculty, study_level, logo, cover_image, sort_order, active,
     slug, website, founded, overview, rankings_note, services, student_life,
     accommodation, source_url, last_verified_at,
+    ranking_guardian, ranking_the, student_count, international_count, map_query,
+    why_choose, entry_requirements, scholarships_info, facilities,
   } = body || {};
 
 /* A profile's address must stay unique and URL-safe: it is a published page. */
@@ -44,7 +46,16 @@ const cleanSlug = slug === undefined ? null : String(slug)
       student_life = COALESCE(?, student_life),
       accommodation = COALESCE(?, accommodation),
       source_url = COALESCE(?, source_url),
-      last_verified_at = COALESCE(?, last_verified_at)
+      last_verified_at = COALESCE(?, last_verified_at),
+      ranking_guardian = COALESCE(?, ranking_guardian),
+      ranking_the = COALESCE(?, ranking_the),
+      student_count = COALESCE(?, student_count),
+      international_count = COALESCE(?, international_count),
+      map_query = COALESCE(?, map_query),
+      why_choose = COALESCE(?, why_choose),
+      entry_requirements = COALESCE(?, entry_requirements),
+      scholarships_info = COALESCE(?, scholarships_info),
+      facilities = COALESCE(?, facilities)
      WHERE id = ?`
   ).bind(
     name ?? null, country ?? null, city ?? null,
@@ -57,6 +68,7 @@ const cleanSlug = slug === undefined ? null : String(slug)
     cleanSlug, website ?? null, founded ?? null, overview ?? null,
     rankings_note ?? null, services ?? null, student_life ?? null,
     accommodation ?? null, source_url ?? null, last_verified_at ?? null,
+    ranking_guardian ?? null, ranking_the ?? null, student_count ?? null, international_count ?? null, map_query ?? null, why_choose ?? null, entry_requirements ?? null, scholarships_info ?? null, facilities ?? null,
     id
   ).run();
 

@@ -140,6 +140,53 @@ export const prerender = false;
           <input id="fWebsite" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="https://www.aston.ac.uk/">
         </div>
 
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Guardian Ranking</label>
+          <input id="fRankingGuardian" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="#100">
+          <p class="text-xs text-slate-400 mt-1">Leave empty and the box is left off the page — better than printing “Not Rated”.</p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">THE World Ranking</label>
+          <input id="fRankingThe" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="601-800">
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Students</label>
+          <input id="fStudentCount" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="17,500+">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">International students</label>
+          <input id="fInternationalCount" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="120+ countries">
+        </div>
+
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Map search</label>
+          <input id="fMapQuery" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Aston University, Birmingham, UK">
+          <p class="text-xs text-slate-400 mt-1">What the map is asked to find. Leave empty to use the name and city, which is right for almost every university.</p>
+        </div>
+
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Why choose this university</label>
+          <textarea id="fWhyChoose" rows="6" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+          <p class="text-xs text-slate-400 mt-1">One point per line. Each becomes a ticked line on the page.</p>
+        </div>
+
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Entry requirements</label>
+          <textarea id="fEntryRequirements" rows="5" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+          <p class="text-xs text-slate-400 mt-1">Give the usual range and say it is indicative. Requirements differ by course and change every cycle — a fixed threshold here is how a student applies for something they cannot get.</p>
+        </div>
+
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Scholarships and funding</label>
+          <textarea id="fScholarshipsInfo" rows="4" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </div>
+
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Campus and facilities</label>
+          <textarea id="fFacilities" rows="4" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </div>
+
         <div class="col-span-2">
           <label class="block text-xs font-medium text-slate-600 mb-1">Overview</label>
           <textarea id="fOverview" rows="7" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
@@ -276,6 +323,15 @@ export const prerender = false;
     document.getElementById('fAccommodation').value = u.accommodation || '';
     document.getElementById('fSourceUrl').value = u.source_url || '';
     document.getElementById('fLastVerified').value = u.last_verified_at || '';
+    document.getElementById('fRankingGuardian').value = u.ranking_guardian || '';
+    document.getElementById('fRankingThe').value = u.ranking_the || '';
+    document.getElementById('fStudentCount').value = u.student_count || '';
+    document.getElementById('fInternationalCount').value = u.international_count || '';
+    document.getElementById('fMapQuery').value = u.map_query || '';
+    document.getElementById('fWhyChoose').value = u.why_choose || '';
+    document.getElementById('fEntryRequirements').value = u.entry_requirements || '';
+    document.getElementById('fScholarshipsInfo').value = u.scholarships_info || '';
+    document.getElementById('fFacilities').value = u.facilities || '';
     const logoPreview = document.getElementById('fLogoPreview');
     if (u.logo) { logoPreview.src = resolveImg(u.logo); logoPreview.classList.remove('hidden'); }
     else { logoPreview.classList.add('hidden'); }
@@ -301,7 +357,8 @@ export const prerender = false;
     document.getElementById('modalTitle').textContent = 'Add University';
     document.getElementById('editId').value = '';
     ['fName','fCountry','fCity','fRanking','fIntake','fIntakeYear','fFaculty','fStudyLevel','fLogoUrl','fCoverUrl',
-      'fSlug','fWebsite','fFounded','fOverview','fRankingsNote','fServices','fStudentLife','fAccommodation','fSourceUrl','fLastVerified']
+      'fSlug','fWebsite','fFounded','fOverview','fRankingsNote','fServices','fStudentLife','fAccommodation','fSourceUrl','fLastVerified',
+      'fRankingGuardian','fRankingThe','fStudentCount','fInternationalCount','fMapQuery','fWhyChoose','fEntryRequirements','fScholarshipsInfo','fFacilities']
       .forEach(id => document.getElementById(id).value = '');
     if (chosenCountry && chosenCountry !== '__none__') document.getElementById('fCountry').value = chosenCountry;
     document.getElementById('fFeeMin').value = 0;
@@ -376,6 +433,15 @@ export const prerender = false;
       accommodation: document.getElementById('fAccommodation').value.trim(),
       source_url: document.getElementById('fSourceUrl').value.trim(),
       last_verified_at: document.getElementById('fLastVerified').value.trim(),
+      ranking_guardian: document.getElementById('fRankingGuardian').value.trim(),
+      ranking_the: document.getElementById('fRankingThe').value.trim(),
+      student_count: document.getElementById('fStudentCount').value.trim(),
+      international_count: document.getElementById('fInternationalCount').value.trim(),
+      map_query: document.getElementById('fMapQuery').value.trim(),
+      why_choose: document.getElementById('fWhyChoose').value.trim(),
+      entry_requirements: document.getElementById('fEntryRequirements').value.trim(),
+      scholarships_info: document.getElementById('fScholarshipsInfo').value.trim(),
+      facilities: document.getElementById('fFacilities').value.trim(),
     };
     if (!payload.name || !payload.country) { showToast('Name and country are required', 'error'); return; }
     try {
