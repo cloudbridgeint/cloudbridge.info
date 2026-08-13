@@ -783,7 +783,6 @@ function initUniversityDirectory() {
       <label class="uni-filter-check-label"><input type="checkbox" class="uni-filter-check" data-group="city" value="${c}" ${prevCheckedCities.includes(c) ? 'checked' : ''}> ${c}</label>
     `).join('');
 
-    cityBox.querySelectorAll('.uni-filter-check').forEach(el => el.addEventListener('change', renderChips));
     renderChips();
   }
 
@@ -934,17 +933,25 @@ function initUniversityDirectory() {
     applyFilters();
   }
 
-  countryBox.querySelectorAll('.uni-filter-check').forEach(el => el.addEventListener('change', () => { updateDependentFilters(); renderChips(); }));
-  document.querySelectorAll('.uni-filter-check[data-group="faculty"], .uni-filter-check[data-group="studylevel"], .uni-filter-check[data-group="intakeyear"], .uni-filter-check[data-group="intake"], .uni-filter-check[data-group="university"]').forEach(el => {
-    el.addEventListener('change', renderChips);
-  });
-  rankingSel.addEventListener('change', renderChips);
-  feeMinSel.addEventListener('change', renderChips);
-  feeMaxSel.addEventListener('change', renderChips);
+  /* Results update as soon as a choice is made, so there is no Apply button to
+     miss — a filtered list that still shows everything reads as broken. One
+     delegated listener on the panel rather than one per checkbox, because the
+     Location list is rebuilt whenever the country changes and freshly created
+     boxes would otherwise have nothing attached. */
+  const uniPanel = document.getElementById('uniFilterPanel');
+  if (uniPanel) {
+    uniPanel.addEventListener('change', (e) => {
+      const el = e.target;
+      if (!el.matches('.uni-filter-check, #uniFilterRanking, #uniFilterFeeMin, #uniFilterFeeMax')) return;
+      /* Country decides which cities can be offered, so that list is rebuilt
+         before anything is counted or filtered. */
+      if (el.matches('.uni-filter-check[data-group="country"]')) updateDependentFilters();
+      renderChips();
+      applyFilters();
+    });
+  }
   searchInput.addEventListener('input', filterUniversityCheckboxList);
 
-  const applyBtn = document.getElementById('uniApplyFilters');
-  if (applyBtn) applyBtn.addEventListener('click', applyFilters);
   const clearBtn = document.getElementById('uniClearFilters');
   if (clearBtn) clearBtn.addEventListener('click', clearAll);
   const emptyClearBtn = document.getElementById('uniEmptyClear');
@@ -959,16 +966,6 @@ function initUniversityDirectory() {
       if (toggleIcon) toggleIcon.style.transform = panel.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
     });
   }
-
-  document.querySelectorAll('.uni-accordion').forEach(acc => {
-    const btn = acc.querySelector('.uni-accordion-btn');
-    const accPanel = acc.querySelector('.uni-accordion-panel');
-    btn.addEventListener('click', () => {
-      const isOpen = acc.classList.contains('open');
-      acc.classList.toggle('open', !isOpen);
-      accPanel.classList.toggle('hidden', isOpen);
-    });
-  });
 
   updateDependentFilters();
   applyFilters();
@@ -1055,8 +1052,19 @@ function initCourseDirectory() {
     applyFilters();
   }
 
-  const applyBtn = document.getElementById('courseApplyFilters');
-  if (applyBtn) applyBtn.addEventListener('click', applyFilters);
+  /* Same as the university directory: choosing a filter shows the result. */
+  [subjectSel, levelSel, deliverySel, durationSel].forEach(el => {
+    if (el) el.addEventListener('change', applyFilters);
+  });
+  /* Typing waits for a pause rather than re-rendering on every keystroke. */
+  let searchTimer;
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(applyFilters, 200);
+    });
+  }
+
   const resetBtn = document.getElementById('courseResetFilters');
   if (resetBtn) resetBtn.addEventListener('click', clearAll);
   const emptyClearBtn = document.getElementById('courseEmptyClear');
