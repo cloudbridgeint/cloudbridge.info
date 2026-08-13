@@ -13,6 +13,9 @@ const PUBLIC_ADMIN_PATHS = ['/cbc-admin/login', '/api/login'];
    analytics) plus the endpoints those screens use. */
 const SETTINGS_PAGES = [
   '/cbc-admin/homepage',
+  '/cbc-admin/about',
+  '/cbc-admin/destinations',
+  '/cbc-admin/scholarships',
   '/cbc-admin/universities',
   '/cbc-admin/university-directory',
   '/cbc-admin/courses',
@@ -24,6 +27,9 @@ const SETTINGS_PAGES = [
 ];
 const SETTINGS_APIS = [
   '/api/content',
+  '/api/page-items',
+  '/api/destinations',
+  '/api/scholarships',
   '/api/universities',
   '/api/university-directory',
   '/api/courses',

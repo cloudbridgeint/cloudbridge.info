@@ -1,0 +1,229 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ContentSections from '../../components/admin/ContentSections.astro';
+import type { Section } from '../../components/admin/ContentSections.astro';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('destinations.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+const sections: Section[] = [
+  {
+    title: 'Search result (title & description)',
+    note: 'What Google shows for /destinations.',
+    fields: [
+      { key: 'destinations.meta_title', label: 'Page title', default: 'Study Abroad Destinations for Bangladeshi Students | CloudBridge' },
+      { key: 'destinations.meta_description', label: 'Meta description', type: 'textarea', rows: 2, default: 'Compare study destinations on tuition, living costs, visa route and post-study work — written for students applying from Bangladesh.' },
+    ],
+  },
+  {
+    title: 'Destinations page — heading and intro',
+    fields: [
+      { key: 'destinations.heading', label: 'Main heading (H1)', default: 'Choose Your Destination' },
+      { key: 'destinations.intro', label: 'Intro paragraph', type: 'textarea', rows: 4, default: '' , help: 'Leave empty to use the default wording, which counts your countries automatically.' },
+      { key: 'destinations.help_heading', label: '"Not sure which country fits?" heading', default: 'Not sure which country fits?' },
+      { key: 'destinations.help_text', label: 'Closing paragraphs', type: 'textarea', rows: 6, help: 'A blank line starts a new paragraph.', default: '' },
+      { key: 'destinations.cta_label', label: 'Button text', default: 'Book a free consultation' },
+      { key: 'destinations.cta_url', label: 'Button link', default: '/free-consultation' },
+    ],
+  },
+];
+---
+<AdminLayout title="Study Destinations" active="destinations">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Study Destinations</h1>
+      <p class="text-slate-500 mt-1 text-sm">
+        Each country here becomes its own page at <code class="text-xs bg-slate-100 px-1 py-0.5 rounded">/destinations/study-in-&lt;url name&gt;</code>,
+        and appears on the destinations page, the homepage and the sitemap automatically.
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/destinations" target="_blank" rel="noopener" class="text-sm font-semibold text-bridge-700 hover:underline">View page ↗</a>
+      <button id="addBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition">+ Add destination</button>
+    </div>
+  </div>
+
+  <div id="destList" class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <p class="text-sm text-slate-400">Loading…</p>
+  </div>
+
+  <h2 class="mt-12 text-lg font-bold text-slate-900">Destinations page wording</h2>
+  <p class="text-slate-500 mt-1 text-sm">The headings and text around the country cards.</p>
+  <div class="mt-5">
+    <ContentSections sections={sections} values={cm} />
+  </div>
+  <div class="sticky bottom-4 mt-6 flex justify-end">
+    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-6 py-3 shadow-lg transition">Save page wording</button>
+  </div>
+
+  <!-- Full-screen editor for one country -->
+  <div id="destModal" class="hidden fixed inset-0 bg-black/40 z-40 overflow-y-auto p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-auto my-8">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
+        <h3 id="destModalTitle" class="font-bold text-lg text-slate-900">Add destination</h3>
+        <button id="destClose" class="text-slate-400 hover:text-slate-700 text-xl leading-none" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="p-6 space-y-6">
+        <input type="hidden" id="dId">
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Country name *</label>
+            <input id="dCountry" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="the United Kingdom">
+            <p class="text-xs text-slate-400 mt-1">Written as it reads in a sentence — “the United Kingdom”, “Malaysia”.</p>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Short name *</label>
+            <input id="dShort" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="UK">
+            <p class="text-xs text-slate-400 mt-1">Used in headings and cards — keep it short.</p>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">URL name (slug) *</label>
+            <input id="dSlug" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="uk">
+            <p id="dSlugPreview" class="text-xs text-slate-400 mt-1"></p>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Flag emoji</label>
+            <input id="dFlag" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="🇬🇧">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Card tagline</label>
+            <input id="dTagline" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="One-year Master's, Graduate Route work visa">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Card colour</label>
+            <div class="flex items-center gap-2">
+              <input id="dGrad1" type="color" class="h-9 w-12 rounded border border-slate-300" value="#2e4a7a">
+              <input id="dGrad2" type="color" class="h-9 w-12 rounded border border-slate-300" value="#4d70a8">
+              <span id="dGradPreview" class="flex-1 h-9 rounded-lg"></span>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Card photo (optional)</label>
+            <input type="file" id="dCardFile" accept="image/*" class="w-full text-sm">
+            <input type="hidden" id="dCardImage">
+            <p class="text-xs text-slate-400 mt-1">Sits behind the colour. Leave empty for colour only.</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Short answer</label>
+          <textarea id="dAnswer" rows="4" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+          <p class="text-xs text-slate-400 mt-1">40–60 words covering cost, course length and the English requirement. It is shown in the “In short” box and is the part an AI assistant is most likely to quote, so it must make sense on its own.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Introduction</label>
+          <textarea id="dIntro" rows="4" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Why students choose it</label>
+          <textarea id="dWhy" rows="5" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono text-xs"></textarea>
+          <p class="text-xs text-slate-400 mt-1">One reason per line.</p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Tuition</label>
+            <textarea id="dTuition" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Living costs</label>
+            <textarea id="dLiving" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Currency</label>
+            <input id="dCurrency" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Intakes</label>
+            <input id="dIntakes" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Work while studying</label>
+            <input id="dWorkRights" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">After graduating</label>
+            <input id="dPostStudy" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">English requirement</label>
+            <textarea id="dEnglishReq" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Academic requirement</label>
+            <textarea id="dAcademicReq" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"></textarea>
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Visa name</label>
+            <input id="dVisaName" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="Student visa">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Visa steps</label>
+            <textarea id="dVisaSteps" rows="6" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono text-xs"></textarea>
+            <p class="text-xs text-slate-400 mt-1">One step per line, in order. They are numbered on the page.</p>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Official source — label</label>
+            <input id="dOfficialLabel" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Official source — link</label>
+            <input id="dOfficialUrl" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="https://www.gov.uk/student-visa">
+            <p class="text-xs text-slate-400 mt-1">The government page that actually sets the rule. Costs and visa amounts change — the page links here so a student can check.</p>
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Scholarships</label>
+            <textarea id="dScholarships" rows="4" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono text-xs"></textarea>
+            <p class="text-xs text-slate-400 mt-1">One per line.</p>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Universities we work with</label>
+            <textarea id="dUniversities" rows="4" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono text-xs"></textarea>
+            <p class="text-xs text-slate-400 mt-1">One per line.</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-xs font-medium text-slate-600">Frequently asked questions</label>
+            <button type="button" id="dFaqAdd" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">+ Add question</button>
+          </div>
+          <div id="dFaqList" class="space-y-3"></div>
+          <p class="text-xs text-slate-400 mt-2">These are published as structured data, so they can appear as expandable questions under the page in Google. A question without an answer is dropped.</p>
+        </div>
+
+        <div class="flex items-center gap-6 pt-2 border-t border-slate-200">
+          <label class="flex items-center gap-2 text-sm text-slate-600 mt-4">
+            <input type="checkbox" id="dActive" checked> Published
+          </label>
+          <p class="text-xs text-slate-400 mt-4">Unpublishing hides the guide and removes it from the sitemap, but keeps the content.</p>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center gap-2 px-6 py-4 border-t border-slate-200 sticky bottom-0 bg-white rounded-b-2xl">
+        <button id="dDelete" class="hidden px-4 py-2 text-sm rounded-lg text-red-600 hover:bg-red-50 font-semibold">Delete destination</button>
+        <div class="flex gap-2 ml-auto">
+          <button id="dCancel" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button id="dSave" class="px-5 py-2 text-sm rounded-lg bg-bridge-700 hover:bg-bridge-800 text-white font-semibold">Save destination</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script src="/scripts/admin-content-fields.js" is:inline></script>
+<script src="/scripts/admin-destinations.js" is:inline></script>

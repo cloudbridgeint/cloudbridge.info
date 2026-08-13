@@ -1,28 +1,25 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { DESTINATIONS } from '../data/destinations';
+import { getAllContent, getDestinations, c } from '../lib/content';
+import { safeGradient } from '../lib/icons';
 
 export const prerender = false;
 
-const title = 'Study Abroad Destinations for Bangladeshi Students | CloudBridge';
-const description =
-  'Compare ten study destinations — the UK, USA, Canada, Malaysia, Finland, France, Malta, the Netherlands, New Zealand and Spain — on tuition, living costs, visa route and post-study work.';
+/* Both the country list and this page's own wording now come from the
+   database, so a new destination appears here, on its own guide and in the
+   sitemap the moment it is saved in the admin. */
+const db = (Astro.locals as any).runtime.env.DB;
+const [cm, destinations] = await Promise.all([getAllContent(db), getDestinations(db)]);
 
-/* A card colour per country, so the hub does not need ten photographs to look
-   deliberate. Written out in full because Tailwind only keeps classes it can
-   see as complete strings. */
-const SHADE: Record<string, string> = {
-  uk: '#2e4a7a,#4d70a8',
-  usa: '#963c3c,#c25a5a',
-  canada: '#a02c2c,#d15b5b',
-  malaysia: '#1e786e,#22a396',
-  finland: '#2a5b8f,#5b8fc4',
-  france: '#31407e,#5c6bb0',
-  malta: '#8c2b3c,#bd5a6b',
-  netherlands: '#b4591f,#dd8b4a',
-  'new-zealand': '#1f4d5c,#3d7d92',
-  spain: '#9a5a12,#c98a3c',
-};
+const count = destinations.length;
+const title = c(cm, 'destinations.meta_title', 'Study Abroad Destinations for Bangladeshi Students | CloudBridge');
+const description = c(
+  cm,
+  'destinations.meta_description',
+  'Compare study destinations on tuition, living costs, visa route and post-study work — written for students applying from Bangladesh.'
+);
+const introFallback = `${count} countries, each with a different balance of cost, course length and what you can do after you graduate. Every guide below covers tuition, living costs, entry requirements and the visa route — written for students applying from Bangladesh.`;
+const helpFallback = "The right destination depends on your budget, your grades and what you want afterwards. A one-year Master's in the UK costs more per year but less in total than a two-year degree elsewhere. Malaysia keeps the total lowest. Canada and New Zealand offer the longest post-study work rights. Finland and France charge the least in tuition once scholarships or public fees are taken into account.\n\nOur counsellors compare these against your own profile rather than in the abstract — that conversation is free and carries no obligation.";
 ---
 <Layout title={title} description={description}
         breadcrumbs={[{ name: 'Destinations', url: '/destinations' }]}>
@@ -30,44 +27,42 @@ const SHADE: Record<string, string> = {
 <section class="text-white py-16 md:py-20" style="background-image:linear-gradient(160deg,#0f1c30,#2e4a7a)">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <p class="crumb"><a href="/">Home</a> / Destinations</p>
-    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Choose Your Destination</h1>
-    <p class="mt-4 max-w-2xl text-white/80">
-      Ten countries, each with a different balance of cost, course length and what you can do after
-      you graduate. Every guide below covers tuition, living costs, entry requirements and the visa
-      route — written for students applying from Bangladesh.
-    </p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">{c(cm, 'destinations.heading', 'Choose Your Destination')}</h1>
+    <p class="mt-4 max-w-2xl text-white/80">{c(cm, 'destinations.intro', introFallback)}</p>
   </div>
 </section>
 
 <section class="py-14">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {DESTINATIONS.map(d => (
-        <a href={`/destinations/study-in-${d.slug}`}
-           class="group relative rounded-2xl overflow-hidden flex flex-col justify-end p-6 h-60 text-white shadow-lg transition hover:-translate-y-1"
-           style={`background-image:linear-gradient(160deg,${SHADE[d.slug] || '#2e4a7a,#4d70a8'})`}>
-          <span class="text-3xl">{d.flag}</span>
-          <h2 class="mt-3 font-display text-xl font-bold">Study in {d.short}</h2>
-          <p class="mt-1 text-sm text-white/80">{d.tagline}</p>
-          <span class="mt-3 text-sm font-semibold text-white/90 group-hover:underline">Read the guide ›</span>
-        </a>
-      ))}
-    </div>
+    {count === 0 ? (
+      <p class="text-ink/60">Destination guides are being updated. Please check back shortly.</p>
+    ) : (
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {destinations.map(d => (
+          <a href={`/destinations/study-in-${d.slug}`}
+             class="group relative rounded-2xl overflow-hidden flex flex-col justify-end p-6 h-60 text-white shadow-lg transition hover:-translate-y-1"
+             style={`background-image:linear-gradient(160deg,${safeGradient(d.gradient)})`}>
+            {d.cardImage && (
+              <img src={d.cardImage} alt="" aria-hidden="true" loading="lazy"
+                   class="absolute inset-0 w-full h-full object-cover opacity-40" />
+            )}
+            <div class="relative">
+              <span class="text-3xl">{d.flag}</span>
+              <h2 class="mt-3 font-display text-xl font-bold">Study in {d.short}</h2>
+              <p class="mt-1 text-sm text-white/80">{d.tagline}</p>
+              <span class="mt-3 block text-sm font-semibold text-white/90 group-hover:underline">Read the guide ›</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
 
     <div class="mt-12 max-w-3xl">
-      <h2 class="section-heading">Not sure which country fits?</h2>
-      <p class="mt-3 text-ink/70 leading-relaxed">
-        The right destination depends on your budget, your grades and what you want afterwards. A
-        one-year Master's in the UK costs more per year but less in total than a two-year degree
-        elsewhere. Malaysia keeps the total lowest. Canada and New Zealand offer the longest
-        post-study work rights. Finland and France charge the least in tuition once scholarships or
-        public fees are taken into account.
-      </p>
-      <p class="mt-3 text-ink/70 leading-relaxed">
-        Our counsellors compare these against your own profile rather than in the abstract — that
-        conversation is free and carries no obligation.
-      </p>
-      <a href="/free-consultation" class="btn-primary mt-6 inline-flex">Book a free consultation</a>
+      <h2 class="section-heading">{c(cm, 'destinations.help_heading', 'Not sure which country fits?')}</h2>
+      <p class="mt-3 text-ink/70 leading-relaxed whitespace-pre-line">{c(cm, 'destinations.help_text', helpFallback)}</p>
+      <a href={c(cm, 'destinations.cta_url', '/free-consultation')} class="btn-primary mt-6 inline-flex">
+        {c(cm, 'destinations.cta_label', 'Book a free consultation')}
+      </a>
     </div>
   </div>
 </section>

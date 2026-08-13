@@ -10,12 +10,17 @@
  * requirement in one lift, without needing the rest of the page for context.
  */
 import Layout from '../../layouts/Layout.astro';
-import { DESTINATIONS, getDestination } from '../../data/destinations';
+import { getDestinations, getDestinationBySlug } from '../../lib/content';
 
 export const prerender = false;
 
+/* Content moved out of src/data/destinations.ts and into the destinations
+   table so the office can edit a guide without a deploy. The shape returned by
+   getDestinationBySlug matches what this template already used, so the markup
+   below is unchanged. */
+const db = (Astro.locals as any).runtime.env.DB;
 const { slug } = Astro.params;
-const d = slug ? getDestination(slug) : undefined;
+const d = slug ? await getDestinationBySlug(db, slug) : null;
 if (!d) return new Response(null, { status: 404 });
 
 const url = `https://cloudbridge.info/destinations/study-in-${d.slug}`;
@@ -35,7 +40,7 @@ const faqSchema = [{
   })),
 }];
 
-const others = DESTINATIONS.filter(x => x.slug !== d.slug);
+const others = (await getDestinations(db)).filter(x => x.slug !== d.slug);
 ---
 <Layout
   title={title}

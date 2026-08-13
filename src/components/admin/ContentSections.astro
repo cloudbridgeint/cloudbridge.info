@@ -1,0 +1,71 @@
+---
+/*
+ * Editable text/image fields for one page, grouped into sections.
+ *
+ * The Homepage screen grew this pattern first; About, Destinations and
+ * Scholarships need exactly the same thing, so it lives here once. Values are
+ * read from the content table and written back through PUT /api/content.
+ */
+export interface Field {
+  key: string;
+  label: string;
+  type?: 'text' | 'textarea' | 'image' | 'toggle';
+  default?: string;
+  fallback?: string;
+  help?: string;
+  rows?: number;
+}
+export interface Section {
+  title: string;
+  note?: string;
+  fields: Field[];
+}
+export interface Props {
+  sections: Section[];
+  values: Record<string, string>;
+}
+const { sections, values: cm } = Astro.props;
+
+function resolveImg(v: string | undefined, fallback = '') {
+  if (!v) return fallback;
+  if (v.startsWith('media:')) return `/api/media/${v.slice(6)}`;
+  return v;
+}
+---
+<div class="space-y-6">
+  {sections.map(section => (
+    <div class="bg-white rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <h2 class="font-semibold text-slate-900 mb-1">{section.title}</h2>
+      {section.note && <p class="text-xs text-slate-400 mb-4">{section.note}</p>}
+      <div class="space-y-4 mt-4">
+        {section.fields.map(f => (
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">{f.label}</label>
+            {f.help && <p class="text-xs text-slate-400 mb-1.5">{f.help}</p>}
+            {f.type === 'toggle' ? (
+              <select class="field-input w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" data-key={f.key}>
+                <option value="1" selected={(cm[f.key] ?? f.default ?? '1') !== '0'}>Show</option>
+                <option value="0" selected={(cm[f.key] ?? f.default ?? '1') === '0'}>Hide</option>
+              </select>
+            ) : f.type === 'image' ? (
+              <div class="flex items-center gap-4 flex-wrap">
+                <img class="img-preview h-16 w-24 object-cover rounded-lg border bg-slate-50"
+                     data-key={f.key}
+                     src={resolveImg(cm[f.key], f.fallback || '/assets/logo.png')} alt="" />
+                <input type="file" accept="image/*" class="img-file text-sm" data-key={f.key} />
+                <input type="hidden" class="field-input" data-key={f.key} value={cm[f.key] ?? ''} />
+                <button type="button" class="img-clear text-xs text-slate-500 hover:text-red-600 underline" data-key={f.key}>Remove</button>
+              </div>
+            ) : f.type === 'textarea' ? (
+              <textarea class="field-input w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                        rows={f.rows ?? 3} data-key={f.key}>{cm[f.key] ?? f.default ?? ''}</textarea>
+            ) : (
+              <input class="field-input w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                     data-key={f.key} value={cm[f.key] ?? f.default ?? ''} />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>

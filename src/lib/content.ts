@@ -320,3 +320,150 @@ export async function getLeadSourceBreakdown(db: D1Like, limit = 4) {
   const total = rows.reduce((s, r) => s + r.n, 0);
   return { rows, total };
 }
+
+// ---- Repeatable page rows (About, Scholarship) ----
+
+export interface PageItem {
+  id: number;
+  group_key: string;
+  title: string;
+  subtitle: string;
+  body: string;
+  icon: string;
+  image: string;
+  link_url: string;
+  link_label: string;
+  accent: string;
+  sort_order: number;
+  active: number;
+}
+
+/**
+ * Rows for one list on a page — the About timeline, the scholarship funding
+ * types, and so on. Inactive rows are left out so an editor can hide an item
+ * without losing what it said.
+ */
+export async function getPageItems(db: D1Like, groupKey: string): Promise<PageItem[]> {
+  const { results } = await db.prepare(
+    'SELECT * FROM page_items WHERE group_key = ? AND active = 1 ORDER BY sort_order ASC, id ASC'
+  ).bind(groupKey).all();
+  return (results || []) as any[];
+}
+
+/** Several lists in one round trip, keyed by group. */
+export async function getPageItemGroups(
+  db: D1Like,
+  groupKeys: string[]
+): Promise<Record<string, PageItem[]>> {
+  const out: Record<string, PageItem[]> = {};
+  for (const k of groupKeys) out[k] = [];
+  if (!groupKeys.length) return out;
+  const placeholders = groupKeys.map(() => '?').join(',');
+  const { results } = await db.prepare(
+    `SELECT * FROM page_items WHERE group_key IN (${placeholders}) AND active = 1
+     ORDER BY sort_order ASC, id ASC`
+  ).bind(...groupKeys).all();
+  for (const row of (results || []) as any[]) {
+    (out[row.group_key] ||= []).push(row);
+  }
+  return out;
+}
+
+// ---- Destinations ----
+
+export interface DestinationRow {
+  id: number;
+  slug: string;
+  country: string;
+  short: string;
+  flag: string;
+  tagline: string;
+  answer: string;
+  intro: string;
+  why: string[];
+  tuition: string;
+  living: string;
+  currency: string;
+  intakes: string;
+  workRights: string;
+  postStudy: string;
+  englishReq: string;
+  academicReq: string;
+  visaName: string;
+  visaSteps: string[];
+  scholarships: string[];
+  universities: string[];
+  officialSource: { label: string; url: string };
+  faqs: { q: string; a: string }[];
+  cardImage: string;
+  gradient: string;
+  sortOrder: number;
+}
+
+/** Array columns are JSON text. A malformed value must not take a page down. */
+function parseList(raw: any): any[] {
+  if (Array.isArray(raw)) return raw;
+  try {
+    const v = JSON.parse(String(raw || '[]'));
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+
+function toDestination(r: any): DestinationRow {
+  return {
+    id: r.id,
+    slug: r.slug,
+    country: r.country,
+    short: r.short,
+    flag: r.flag || '',
+    tagline: r.tagline || '',
+    answer: r.answer || '',
+    intro: r.intro || '',
+    why: parseList(r.why),
+    tuition: r.tuition || '',
+    living: r.living || '',
+    currency: r.currency || '',
+    intakes: r.intakes || '',
+    workRights: r.work_rights || '',
+    postStudy: r.post_study || '',
+    englishReq: r.english_req || '',
+    academicReq: r.academic_req || '',
+    visaName: r.visa_name || '',
+    visaSteps: parseList(r.visa_steps),
+    scholarships: parseList(r.scholarships),
+    universities: parseList(r.universities),
+    officialSource: { label: r.official_label || '', url: r.official_url || '' },
+    faqs: parseList(r.faqs).filter((f: any) => f && f.q && f.a),
+    cardImage: r.card_image ? mediaUrl(r.card_image, '') : '',
+    gradient: r.gradient || '',
+    sortOrder: r.sort_order ?? 0,
+  };
+}
+
+export async function getDestinations(db: D1Like): Promise<DestinationRow[]> {
+  const { results } = await db.prepare(
+    'SELECT * FROM destinations WHERE active = 1 ORDER BY sort_order ASC, id ASC'
+  ).all();
+  return ((results || []) as any[]).map(toDestination);
+}
+
+export async function getDestinationBySlug(db: D1Like, slug: string): Promise<DestinationRow | null> {
+  const row = await db.prepare(
+    'SELECT * FROM destinations WHERE slug = ? AND active = 1'
+  ).bind(slug).first();
+  return row ? toDestination(row) : null;
+}
+
+// ---- Scholarships ----
+
+export async function getScholarships(db: D1Like) {
+  const { results } = await db.prepare(
+    'SELECT * FROM scholarships WHERE active = 1 ORDER BY featured DESC, sort_order ASC, id ASC'
+  ).all();
+  return ((results || []) as any[]).map(s => ({
+    ...s,
+    logo: s.logo ? mediaUrl(s.logo, '') : '',
+  }));
+}

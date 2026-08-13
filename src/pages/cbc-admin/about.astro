@@ -1,0 +1,161 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ContentSections from '../../components/admin/ContentSections.astro';
+import ListEditor from '../../components/admin/ListEditor.astro';
+import type { Section } from '../../components/admin/ContentSections.astro';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('about.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+const sections: Section[] = [
+  {
+    title: 'Search result (title & description)',
+    note: 'What Google shows for /about. Keep the title under about 60 characters and the description under about 155, or they get cut off.',
+    fields: [
+      { key: 'about.meta_title', label: 'Page title', default: 'About Us | CloudBridge Study Abroad Consultancy' },
+      { key: 'about.meta_description', label: 'Meta description', type: 'textarea', rows: 2, default: 'Learn how CloudBridge supports students from university shortlisting to visa approval, with expert counsellors guiding every step abroad.' },
+    ],
+  },
+  {
+    title: 'Top banner',
+    fields: [
+      { key: 'about.hero.badge', label: 'Small badge above the heading', default: 'About CloudBridge' },
+      { key: 'about.hero.heading', label: 'Main heading (H1)', default: 'Your partner from application to arrival' },
+      { key: 'about.hero.text', label: 'Intro line', type: 'textarea', rows: 2, default: 'Cloud Bridge — International Student Consultancy (CBC) has been guiding Bangladeshi students to universities abroad since 2019.' },
+    ],
+  },
+  {
+    title: 'About Cloud Bridge (CBC)',
+    note: 'Leave the image empty to keep the plain blue panel that is there now.',
+    fields: [
+      { key: 'about.intro.image', label: 'Section image', type: 'image', fallback: '/assets/logo.png' },
+      { key: 'about.intro.image_alt', label: 'Image description (for screen readers and image search)', default: 'The CloudBridge team at work' },
+      { key: 'about.intro.heading', label: 'Heading', default: 'About Cloud Bridge (CBC)' },
+      { key: 'about.intro.p1', label: 'Paragraph 1', type: 'textarea', rows: 4, default: "Cloud Bridge — International Student Consultancy (CBC) is a study-abroad consultancy committed to helping ambitious Bangladeshi students reach the right university, in the right country, without the guesswork. We believe access to quality international education shouldn't depend on who you already know." },
+      { key: 'about.intro.p2', label: 'Paragraph 2', type: 'textarea', rows: 4, default: "We follow ethical counselling practices in line with recognised international education standards — honest advice, no hidden costs, and no pressure to choose a university just because it pays the highest commission. Integrity, transparency, and respect for every student's goals sit behind every recommendation we make." },
+      { key: 'about.intro.p3', label: 'Paragraph 3', type: 'textarea', rows: 3, default: 'Since 2019, CBC has grown from a single Dhaka office into a team spanning Dhaka and Sylhet, supporting students across 10 countries — from first shortlisting a course to settling into life abroad.' },
+    ],
+  },
+  {
+    title: 'Our Mission',
+    fields: [
+      { key: 'about.mission.image', label: 'Section image', type: 'image', fallback: '/assets/logo.png' },
+      { key: 'about.mission.image_alt', label: 'Image description', default: 'A counsellor advising a student' },
+      { key: 'about.mission.heading', label: 'Heading', default: 'Our Mission' },
+      { key: 'about.mission.p1', label: 'Paragraph 1', type: 'textarea', rows: 3, default: 'Our mission is to guide students toward academic excellence and a career path that actually fits them — through free, personalised counselling from day one.' },
+      { key: 'about.mission.p2', label: 'Paragraph 2', type: 'textarea', rows: 4, default: "We help students understand entry requirements, realistic tuition and living costs, and scholarship options for their destination — then match them honestly to courses they're genuinely qualified for, not just the ones easiest for us to sell." },
+      { key: 'about.mission.p3', label: 'Paragraph 3', type: 'textarea', rows: 3, default: 'Every student works with a dedicated counsellor who stays with them through the entire process — application, visa, and beyond.' },
+    ],
+  },
+  {
+    title: 'Our Vision',
+    fields: [
+      { key: 'about.vision.image', label: 'Section image', type: 'image', fallback: '/assets/logo.png' },
+      { key: 'about.vision.image_alt', label: 'Image description', default: 'Students on campus abroad' },
+      { key: 'about.vision.heading', label: 'Heading', default: 'Our Vision' },
+      { key: 'about.vision.p1', label: 'Paragraph 1', type: 'textarea', rows: 3, default: 'Our vision is to be the education consultancy Bangladeshi students trust first — recognised not for the loudest marketing, but for consistently getting students into universities that are genuinely right for them.' },
+      { key: 'about.vision.p2', label: 'Paragraph 2', type: 'textarea', rows: 4, default: "We're working toward a future where every aspiring student, in Dhaka, Sylhet, or beyond, can access the same quality of guidance without traveling far or paying a taka in consultancy fees — with a growing office network and a digital-first application process that removes friction at every step." },
+    ],
+  },
+  {
+    title: 'Coloured call-to-action band',
+    fields: [
+      { key: 'about.band.label', label: 'Small label', default: '10,000+ Students Served Since 2019' },
+      { key: 'about.band.heading', label: 'Heading', default: 'Start Your Journey Today, Achieve More Tomorrow' },
+      { key: 'about.band.cta1_label', label: 'Button 1 text', default: 'Read Success Stories' },
+      { key: 'about.band.cta1_url', label: 'Button 1 link', default: '/blogs' },
+      { key: 'about.band.cta2_label', label: 'Button 2 text', default: 'Contact Us' },
+      { key: 'about.band.cta2_url', label: 'Button 2 link', default: '/contact' },
+    ],
+  },
+  {
+    title: 'Key Skills — section heading',
+    note: 'The individual skills are edited in the list further down this page.',
+    fields: [
+      { key: 'about.skills.heading', label: 'Heading', default: 'Key Skills and Core Competences Gained' },
+      { key: 'about.skills.text', label: 'Subtext', type: 'textarea', rows: 2, default: 'What students walk away with, beyond just an offer letter.' },
+    ],
+  },
+  {
+    title: 'Reasons to Choose Us — section heading',
+    fields: [
+      { key: 'about.reasons.heading', label: 'Heading', default: 'Six Reasons to Choose Us' },
+      { key: 'about.reasons.text', label: 'Subtext', type: 'textarea', rows: 2, default: "We're committed to supporting you at every step of your journey, from first shortlist to settling in abroad." },
+    ],
+  },
+  {
+    title: 'Company History — section heading',
+    note: 'The subtext is empty by default. The old page carried a note saying the timeline was illustrative — confirm your real milestones in the list below, then leave this blank.',
+    fields: [
+      { key: 'about.history.heading', label: 'Heading', default: 'Our Company History' },
+      { key: 'about.history.text', label: 'Subtext (leave empty to hide)', type: 'textarea', rows: 2, default: '' },
+    ],
+  },
+  {
+    title: 'Team section heading',
+    note: 'The team members themselves are still set in the page template, because the same people also appear on /our-team. Ask for the team list to be moved into the panel and both pages will be driven from one place.',
+    fields: [
+      { key: 'about.team.heading', label: 'Heading', default: 'Our Team Members' },
+      { key: 'about.team.text', label: 'Subtext', type: 'textarea', rows: 2, default: 'The counsellors and staff behind every successful application.' },
+    ],
+  },
+  {
+    title: 'Closing call to action',
+    fields: [
+      { key: 'about.cta.heading', label: 'Heading', default: 'Ready to start your journey?' },
+      { key: 'about.cta.label', label: 'Button text', default: 'Talk to a Counsellor' },
+      { key: 'about.cta.url', label: 'Button link', default: '/contact' },
+    ],
+  },
+];
+---
+<AdminLayout title="About Page" active="about">
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">About Page</h1>
+      <p class="text-slate-500 mt-1 text-sm">Every heading, paragraph, image and list on the public About page. Changes go live as soon as you save.</p>
+    </div>
+    <a href="/about" target="_blank" rel="noopener" class="text-sm font-semibold text-bridge-700 hover:underline">View page ↗</a>
+  </div>
+
+  <div class="mt-8">
+    <ContentSections sections={sections} values={cm} />
+  </div>
+
+  <div class="sticky bottom-4 mt-6 flex justify-end">
+    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-6 py-3 shadow-lg transition">Save text &amp; images</button>
+  </div>
+
+  <h2 class="mt-12 text-lg font-bold text-slate-900">Lists on this page</h2>
+  <p class="text-slate-500 mt-1 text-sm">Each list saves on its own — use the button inside the box.</p>
+
+  <div class="mt-5 space-y-6">
+    <ListEditor
+      group="about.skills"
+      title="Key Skills and Core Competences"
+      note="Shown as a grid of icons. Pick an icon from the list — this keeps the page consistent and stops broken graphics."
+      fields={['title', 'icon']}
+      labels={{ title: 'Skill' }} />
+
+    <ListEditor
+      group="about.reasons"
+      title="Reasons to Choose Us"
+      note="A ticked list. Set Colour to Navy on the last line if you want it emphasised, as the current final line is."
+      fields={['title', 'accent']}
+      labels={{ title: 'Reason', accent: 'Emphasis (Navy = bold)' }} />
+
+    <ListEditor
+      group="about.history"
+      title="Company History timeline"
+      note="Entries alternate left and right down the timeline automatically, in the order shown here."
+      fields={['subtitle', 'title', 'body']}
+      labels={{ subtitle: 'Year', title: 'Milestone', body: 'What happened' }} />
+  </div>
+</AdminLayout>
+
+<script src="/scripts/admin-content-fields.js" is:inline></script>
+<script src="/scripts/admin-list-editor.js" is:inline></script>

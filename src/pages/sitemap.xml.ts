@@ -11,16 +11,9 @@ const STATIC_PAGES: Array<{ path: string; priority: string; changefreq: string }
   { path: '/about', priority: '0.8', changefreq: 'monthly' },
   { path: '/our-team', priority: '0.6', changefreq: 'monthly' },
   { path: '/destinations', priority: '0.9', changefreq: 'monthly' },
-  { path: '/destinations/study-in-uk', priority: '0.9', changefreq: 'monthly' },
-  { path: '/destinations/study-in-usa', priority: '0.9', changefreq: 'monthly' },
-  { path: '/destinations/study-in-malaysia', priority: '0.9', changefreq: 'monthly' },
-  { path: '/destinations/study-in-canada', priority: '0.9', changefreq: 'monthly' },
-  { path: '/destinations/study-in-finland', priority: '0.9', changefreq: 'monthly' },
-  { path: '/destinations/study-in-france', priority: '0.9', changefreq: 'monthly' },
-  { path: '/destinations/study-in-malta', priority: '0.9', changefreq: 'monthly' },
-  { path: '/destinations/study-in-netherlands', priority: '0.9', changefreq: 'monthly' },
-  { path: '/destinations/study-in-new-zealand', priority: '0.9', changefreq: 'monthly' },
-  { path: '/destinations/study-in-spain', priority: '0.9', changefreq: 'monthly' },
+  // The individual country guides are not listed here: they live in the
+  // destinations table and are appended below, so adding or removing one in
+  // the admin keeps the sitemap right without a code change.
   { path: '/university-college', priority: '0.8', changefreq: 'weekly' },
   { path: '/programs', priority: '0.8', changefreq: 'weekly' },
   { path: '/scholarship', priority: '0.8', changefreq: 'weekly' },
@@ -73,6 +66,24 @@ export const GET: APIRoute = async (context) => {
   } catch {
     // A database hiccup shouldn't produce a broken sitemap — serve the static
     // pages rather than a 500.
+  }
+
+  // Destination guides, straight from the table that renders them.
+  try {
+    const db = (context.locals as any).runtime?.env?.DB;
+    if (db) {
+      const { results } = await db.prepare(
+        'SELECT slug, updated_at FROM destinations WHERE active = 1 ORDER BY sort_order ASC'
+      ).all();
+      for (const row of results || []) {
+        if (!row?.slug) continue;
+        urls.push(
+          `  <url>\n    <loc>${SITE}/destinations/study-in-${esc(row.slug)}</loc>\n    <lastmod>${isoDate(row.updated_at)}</lastmod>\n` +
+          `    <changefreq>monthly</changefreq>\n    <priority>0.9</priority>\n  </url>`);
+      }
+    }
+  } catch {
+    // a database hiccup shouldn't break the sitemap
   }
 
   // Event pages: one URL per occurrence, since each run now keeps its own
