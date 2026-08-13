@@ -1,5 +1,7 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import country_filterUrl from '../../scripts/admin-country-filter.js?url';
+
 export const prerender = false;
 ---
 <AdminLayout title="Courses" active="courses">
@@ -11,7 +13,11 @@ export const prerender = false;
     <button id="addBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition shrink-0">+ Add Course</button>
   </div>
 
-  <div class="mt-6 card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden">
+  <div class="mt-6 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-6 lg:items-start">
+
+    <nav id="courseCountryNav" aria-label="Filter by country" class="lg:sticky lg:top-0 mb-4 lg:mb-0"></nav>
+
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm overflow-hidden min-w-0">
     <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-wrap gap-3">
       <p class="font-semibold text-bridge-950 text-sm">All Courses <span id="courseCount" class="text-slate-400 font-normal"></span></p>
       <div class="relative">
@@ -38,6 +44,8 @@ export const prerender = false;
       </table>
       <p id="courseEmpty" class="hidden text-slate-400 text-sm p-8 text-center">No courses yet. Click "+ Add Course" to get started.</p>
     </div>
+  </div>
+
   </div>
 
   <!-- Add/Edit modal -->
@@ -105,8 +113,11 @@ export const prerender = false;
   </div>
 </AdminLayout>
 
+<script src={country_filterUrl} is:inline></script>
+
 <script is:inline>
   let allCourses = [];
+  let countryFilter = null;
 
   function resolveImg(url) {
     if (!url) return '/assets/logo.png';
@@ -119,15 +130,28 @@ export const prerender = false;
 
   async function load() {
     allCourses = await apiFetch('/api/courses');
+    if (!countryFilter) {
+      countryFilter = initCountryFilter({
+        navId: 'courseCountryNav',
+        getItems: () => allCourses,
+        onSelect: render,
+      });
+    }
+    countryFilter.render();
     render();
   }
 
   function render() {
     const q = (document.getElementById('courseSearch').value || '').toLowerCase();
     const rows = allCourses.filter(c =>
-      !q || `${c.name} ${c.university} ${c.subject} ${c.country}`.toLowerCase().includes(q)
+      (!countryFilter || countryFilter.matches(c)) &&
+      (!q || `${c.name} ${c.university} ${c.subject} ${c.country}`.toLowerCase().includes(q))
     );
-    document.getElementById('courseCount').textContent = `(${allCourses.length})`;
+    /* The count follows what is on screen: showing 80 above a list of six
+       reads as a fault rather than as a filter. */
+    const chosen = countryFilter ? countryFilter.current() : '';
+    document.getElementById('courseCount').textContent =
+      (chosen || q) ? `(${rows.length} of ${allCourses.length})` : `(${allCourses.length})`;
     const body = document.getElementById('courseTableBody');
     body.innerHTML = rows.map(c => `
       <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition">
@@ -147,7 +171,11 @@ export const prerender = false;
         </td>
       </tr>
     `).join('');
-    document.getElementById('courseEmpty').classList.toggle('hidden', allCourses.length > 0);
+    const empty = document.getElementById('courseEmpty');
+    empty.textContent = allCourses.length === 0
+      ? 'No courses yet. Click "+ Add Course" to get started.'
+      : 'No courses here yet. Choose another country, or add one.';
+    empty.classList.toggle('hidden', rows.length > 0);
   }
 
   document.getElementById('courseSearch').addEventListener('input', render);
@@ -182,9 +210,13 @@ export const prerender = false;
   };
 
   document.getElementById('addBtn').addEventListener('click', () => {
+    /* Adding while a country is chosen starts with that country, so the new
+       row lands in the list you are looking at rather than vanishing from it. */
+    const chosenCountry = countryFilter ? countryFilter.current() : '';
     document.getElementById('modalTitle').textContent = 'Add Course';
     document.getElementById('editId').value = '';
     ['fName','fUniversity','fCountry','fCity','fSubject','fDuration','fLogoUrl'].forEach(id => document.getElementById(id).value = '');
+    if (chosenCountry && chosenCountry !== '__none__') document.getElementById('fCountry').value = chosenCountry;
     document.getElementById('fLevel').value = 'Undergraduate';
     document.getElementById('fDelivery').value = 'On-Campus';
     document.getElementById('fLogoFile').value = '';
