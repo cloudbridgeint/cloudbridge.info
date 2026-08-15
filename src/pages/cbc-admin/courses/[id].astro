@@ -1,0 +1,170 @@
+---
+/*
+ * The content editor for one course, at /cbc-admin/courses/<id>.
+ *
+ * The list screen keeps its modal for the eight metadata fields that fit in
+ * one — name, university, level and so on. Everything a student actually reads
+ * lives here instead, because sixteen fields including six multi-line blocks
+ * in a modal is a form nobody finishes.
+ *
+ * Publishing is deliberately its own decision at the bottom, not a side effect
+ * of saving. A half-written course saved for later must not appear on the site:
+ * course names repeat across universities, and thin near-duplicate pages cost
+ * the whole domain rather than only themselves.
+ */
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import course_editorUrl from '../../../scripts/admin-course-editor.js?url';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const row = await db.prepare('SELECT * FROM courses WHERE id = ?').bind(Astro.params.id).first();
+if (!row) return Astro.redirect('/cbc-admin/courses');
+
+const uni = await db
+  .prepare('SELECT slug FROM university_directory WHERE name = ? AND active = 1')
+  .bind(row.university).first();
+const liveUrl = uni?.slug && row.slug ? `/courses/${uni.slug}/${row.slug}` : '';
+
+/* Each block is one entry per line, matching how the university profiles
+   already store their lists. The hints say so on the field rather than in a
+   manual nobody opens. */
+const TEXT_BLOCKS = [
+  { id: 'overview', label: 'Course overview', rows: 8,
+    hint: 'Two or three paragraphs. Blank line between them. This also becomes the meta description.' },
+  { id: 'entry_requirements', label: 'Entry requirements — academic', rows: 6,
+    hint: 'One per line. e.g. "A-levels: BCC – CCD"' },
+  { id: 'english_requirements', label: 'Entry requirements — English', rows: 4,
+    hint: 'One per line. Say if the band is the university\u2019s general one rather than this course\u2019s.' },
+  { id: 'tuition_note', label: 'Fees — notes', rows: 4,
+    hint: 'What the figure covers, placement year, whether it rises yearly.' },
+  { id: 'scholarships_info', label: 'Scholarships', rows: 4, hint: 'One per line.' },
+  { id: 'modules', label: "What you'll study", rows: 8,
+    hint: 'One module per line. e.g. "Year 1 — Biomolecules (30 credits)"' },
+  { id: 'careers', label: 'Career outcomes', rows: 5, hint: 'One job role per line.' },
+  { id: 'how_to_apply', label: 'How to apply', rows: 6,
+    hint: 'One step per line, in order. Rendered as a numbered list.' },
+  { id: 'faq', label: 'FAQ', rows: 6,
+    hint: 'One per line as: question | answer — the pipe separates them. Emitted as FAQ schema.' },
+];
+---
+<AdminLayout title={`Edit — ${row.name}`} active="courses">
+  <nav class="text-sm text-slate-500 mb-2">
+    <a href="/cbc-admin/courses" class="hover:text-bridge-700 hover:underline">Courses</a>
+    <span class="mx-1.5 text-slate-300">/</span>
+    <span class="text-slate-700 font-medium">{row.name}</span>
+  </nav>
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">{row.name}</h1>
+      <p class="text-slate-500 mt-1 text-sm">{row.university}{row.city ? ` — ${row.city}` : ''}</p>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <span id="publishBadge" data-published={row.published}
+            class:list={['rounded-full px-3 py-1.5 text-xs font-semibold',
+              row.published ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600']}>
+        {row.published ? 'Published' : 'Draft'}
+      </span>
+      {liveUrl && row.published && (
+        <a href={liveUrl} target="_blank" rel="noopener"
+           class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+          View the live page ↗
+        </a>
+      )}
+    </div>
+  </div>
+
+  <form id="courseForm" data-id={row.id} class="mt-6 space-y-6">
+
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <p class="font-semibold text-bridge-950 text-sm">The page's address and heading</p>
+      <div class="mt-4 grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">URL slug</label>
+          <input id="fSlug" value={row.slug || ''}
+                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono">
+          <p class="text-xs text-slate-400 mt-1">
+            {liveUrl
+              ? `Live at ${liveUrl}`
+              : 'No university profile matches this course, so it has no URL yet.'}
+            {' '}Changing this after publishing breaks existing links.
+          </p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Award / credential</label>
+          <input id="fCredential" value={row.credential || ''} placeholder="e.g. BSc (Hons)"
+                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          <p class="text-xs text-slate-400 mt-1">Goes into the Course structured data.</p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Tuition (per year, international)</label>
+          <input id="fTuitionFee" value={row.tuition_fee || ''} placeholder="e.g. £22,575"
+                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Intakes</label>
+          <input id="fIntakes" value={(row.intakes || '').split('\n').join(', ')}
+                 placeholder="September 2026, January 2027"
+                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+          <p class="text-xs text-slate-400 mt-1">Comma separated.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6 space-y-5">
+      <p class="font-semibold text-bridge-950 text-sm">What the student reads</p>
+      {TEXT_BLOCKS.map(b => (
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">{b.label}</label>
+          <textarea id={`f_${b.id}`} rows={b.rows}
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm leading-relaxed"
+          >{row[b.id] || ''}</textarea>
+          <p class="text-xs text-slate-400 mt-1">{b.hint}</p>
+        </div>
+      ))}
+    </div>
+
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <p class="font-semibold text-bridge-950 text-sm">Where this came from</p>
+      <p class="text-xs text-slate-500 mt-1">
+        Fees and entry requirements move every intake and only the university's own page is
+        authoritative. Both fields are shown at the bottom of the live page.
+      </p>
+      <div class="mt-4 grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Source URL</label>
+          <input id="fSourceUrl" value={row.source_url || ''} placeholder="https://www.university.ac.uk/..."
+                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Last verified</label>
+          <input id="fVerified" type="date" value={row.last_verified_at || ''}
+                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+      </div>
+    </div>
+
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <p class="font-semibold text-bridge-950 text-sm">Publishing</p>
+      <p class="text-xs text-slate-500 mt-1">
+        An unpublished course has no page at all — its button on the Courses page falls back to
+        the university profile. Publish once the overview, entry requirements and fees are written.
+      </p>
+      <div id="readiness" class="mt-4"></div>
+      <label class="mt-4 flex items-center gap-2.5 text-sm text-slate-700">
+        <input type="checkbox" id="fPublished" checked={!!row.published} class="w-4 h-4">
+        Published — show this course's page on the site
+      </label>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button type="button" id="saveBtn"
+              class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition">
+        Save
+      </button>
+      <a href="/cbc-admin/courses" class="text-sm font-semibold text-slate-500 hover:text-slate-700">Cancel</a>
+    </div>
+  </form>
+</AdminLayout>
+
+<script src={course_editorUrl} is:inline></script>

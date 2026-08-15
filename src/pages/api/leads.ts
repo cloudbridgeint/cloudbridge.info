@@ -21,6 +21,7 @@ export const POST: APIRoute = async (context) => {
     dob, gender, nationality, address, institute_name, course_studied, graduation_year,
     preferred_study_level, intake_month, intake_year, residence_city,
     doc_academic_cert, doc_transcript, doc_english_cert, doc_cv, doc_personal_statement,
+    interested_course, interested_university,
   } = body || {};
 
   // Cap field lengths: nothing legitimate needs more, and it stops a single
@@ -36,8 +37,9 @@ export const POST: APIRoute = async (context) => {
        residence_country, destination_country, degree_level, subject_interested, english_test, test_score,
        dob, gender, nationality, address, institute_name, course_studied, graduation_year,
        preferred_study_level, intake_month, intake_year, residence_city,
-       doc_academic_cert, doc_transcript, doc_english_cert, doc_cv, doc_personal_statement)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       doc_academic_cert, doc_transcript, doc_english_cert, doc_cv, doc_personal_statement,
+       interested_course, interested_university)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     cap(name, 200), cap(email, 200), cap(phone, 50), cap(message, 5000), cap(source_page, 100),
     cap(utm_source, 200), cap(utm_medium, 200), cap(utm_campaign, 200), cap(referrer, 500),
@@ -49,7 +51,8 @@ export const POST: APIRoute = async (context) => {
     cap(preferred_study_level, 100), cap(intake_month, 40), cap(intake_year, 20),
     cap(residence_city, 100),
     cap(doc_academic_cert, 300), cap(doc_transcript, 300), cap(doc_english_cert, 300),
-    cap(doc_cv, 300), cap(doc_personal_statement, 300)
+    cap(doc_cv, 300), cap(doc_personal_statement, 300),
+    cap(interested_course, 200), cap(interested_university, 200)
   ).run();
 
   return new Response(JSON.stringify({ success: true }), {

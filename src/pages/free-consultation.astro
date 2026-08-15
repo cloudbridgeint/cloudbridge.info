@@ -19,6 +19,15 @@ const description = "Get personalised guidance on courses, universities, and sch
     <p class="mt-3 text-ink/60">Get personalised guidance on courses, universities, and available scholarships. Our team ensures a smooth application process, making your admission journey hassle-free.</p>
     <p class="mt-4 font-display font-bold text-sunrise-600">Book your FREE consultation today!</p>
 
+    <!-- Filled in from ?course= when the student arrives from a course page.
+         Shown rather than hidden: an enquiry that silently attaches something
+         the student cannot see is the kind of thing that erodes trust, and
+         seeing the course named is also a reassurance they clicked the right
+         button. Server-side rendering it would mean a cache key per course. -->
+    <p id="courseContext" class="hidden mt-5 rounded-xl bg-bridge-50 border border-black/10 px-4 py-3 text-sm text-ink/75">
+      Enquiring about <span id="courseContextName" class="font-semibold text-bridge-900"></span><span id="courseContextUni"></span>.
+    </p>
+
     <form class="demo-form mt-8 grid sm:grid-cols-2 gap-5 bg-white rounded-2xl p-6 md:p-10 shadow-sm ring-1 ring-black/5 text-left" data-source="free-consultation">
       <input name="firstName" required placeholder="First name" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm">
       <input name="lastName" required placeholder="Last name" class="form-input rounded-xl border border-black/10 px-4 py-3.5 text-sm">

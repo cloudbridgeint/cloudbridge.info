@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { uniqueCourseSlug } from '../../../lib/content';
 
 export const prerender = false;
 
@@ -17,12 +18,16 @@ export const POST: APIRoute = async (context) => {
   if (!name) {
     return new Response(JSON.stringify({ error: 'name is required' }), { status: 400 });
   }
+  // A course gets its slug at creation, not the first time someone opens the
+  // content editor: without one it has no URL, and nothing can link to it.
+  const slug = await uniqueCourseSlug(db, university || '', name);
+
   const result = await db.prepare(
-    `INSERT INTO courses (name, university, country, city, level, subject, delivery, duration, logo, sort_order, active)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`
+    `INSERT INTO courses (name, university, country, city, level, subject, delivery, duration, logo, sort_order, active, slug)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`
   ).bind(
     name, university || '', country || '', city || '', level || '', subject || '',
-    delivery || '', duration || '', logo || '', sort_order
+    delivery || '', duration || '', logo || '', sort_order, slug
   ).run();
   return new Response(JSON.stringify({ success: true, id: result.meta.last_row_id }), {
     status: 201,

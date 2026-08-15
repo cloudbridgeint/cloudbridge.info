@@ -37,6 +37,7 @@ export const prerender = false;
             <th class="px-5 py-3 font-medium whitespace-nowrap">Subject</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap">Delivery</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap">Duration</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Page</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap"></th>
           </tr>
         </thead>
@@ -128,6 +129,14 @@ export const prerender = false;
     const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML;
   }
 
+  /* Three states, not two. "Draft" and "Not started" both mean no public page,
+     but they need different work: one is half-written, the other untouched. */
+  function statusPill(c) {
+    if (c.published) return '<span class="rounded-full bg-green-100 text-green-800 px-2.5 py-1 text-[11px] font-semibold">Published</span>';
+    if ((c.overview || '').trim()) return '<span class="rounded-full bg-amber-100 text-amber-800 px-2.5 py-1 text-[11px] font-semibold">Draft</span>';
+    return '<span class="rounded-full bg-slate-100 text-slate-500 px-2.5 py-1 text-[11px] font-semibold">Not started</span>';
+  }
+
   async function load() {
     allCourses = await apiFetch('/api/courses');
     if (!countryFilter) {
@@ -150,8 +159,10 @@ export const prerender = false;
     /* The count follows what is on screen: showing 80 above a list of six
        reads as a fault rather than as a filter. */
     const chosen = countryFilter ? countryFilter.current() : '';
+    const live = allCourses.filter(c => c.published).length;
     document.getElementById('courseCount').textContent =
-      (chosen || q) ? `(${rows.length} of ${allCourses.length})` : `(${allCourses.length})`;
+      ((chosen || q) ? `(${rows.length} of ${allCourses.length})` : `(${allCourses.length})`) +
+      ` — ${live} with a published page`;
     const body = document.getElementById('courseTableBody');
     body.innerHTML = rows.map(c => `
       <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition">
@@ -165,8 +176,10 @@ export const prerender = false;
         <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(c.subject)}</td>
         <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(c.delivery)}</td>
         <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(c.duration)}</td>
+        <td class="px-5 py-3 whitespace-nowrap">${statusPill(c)}</td>
         <td class="px-5 py-3 whitespace-nowrap">
-          <button class="text-xs font-semibold text-iris-700 hover:underline" onclick="editCourse(${c.id})">Edit</button>
+          <a class="text-xs font-semibold text-iris-700 hover:underline" href="/cbc-admin/courses/${c.id}">Content</a>
+          <button class="text-xs font-semibold text-iris-700 hover:underline ml-3" onclick="editCourse(${c.id})">Edit</button>
           <button class="text-xs font-semibold text-red-600 hover:underline ml-3" onclick="deleteCourse(${c.id})">Delete</button>
         </td>
       </tr>

@@ -1254,6 +1254,20 @@ function initPageScripts() {
   }, { threshold: 0.5 });
   counters.forEach(c => io.observe(c));
 
+  // Name the course the enquiry came from, when there is one.
+  (function showCourseContext() {
+    const box = document.getElementById('courseContext');
+    if (!box) return;
+    const params = new URLSearchParams(location.search);
+    const course = params.get('course');
+    if (!course) return;
+    const uni = params.get('university');
+    document.getElementById('courseContextName').textContent = course;
+    const uniEl = document.getElementById('courseContextUni');
+    if (uni) uniEl.textContent = ` at ${uni}`;
+    box.classList.remove('hidden');
+  })();
+
   // Forms: show a thank-you state immediately, and best-effort send the lead to the backend
   document.querySelectorAll('.demo-form').forEach(form => {
     form.addEventListener('submit', (e) => {
@@ -1289,6 +1303,13 @@ function initPageScripts() {
         const engTestBoxes = Array.from(form.querySelectorAll('[name="engTest"]:checked, [name="engTest2"]:checked'));
         const englishTest = engTestBoxes.map(b => b.value).join(', ');
 
+        /* A student arriving from a course page brought the course with them
+           in the URL. Reading it here is what lets a counsellor open the lead
+           already knowing what it is about, rather than asking. */
+        const params = new URLSearchParams(location.search);
+        const interestedCourse = params.get('course') || '';
+        const interestedUniversity = params.get('university') || '';
+
         const payload = {
           name,
           email: get('email'),
@@ -1301,6 +1322,8 @@ function initPageScripts() {
           subject_interested: subjectInterested,
           english_test: englishTest,
           test_score: get('testScore'),
+          interested_course: interestedCourse,
+          interested_university: interestedUniversity,
         };
         fetch('/api/leads', {
           method: 'POST',

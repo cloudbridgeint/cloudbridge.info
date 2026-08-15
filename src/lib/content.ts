@@ -49,6 +49,31 @@ export async function getCourses(db: D1Like) {
 /* Course detail pages. The join to university_directory is what supplies the
    university half of the URL, the logo, the campus city and the link back to
    the profile — a course row only stores the university's name. */
+
+/** URL-safe form of a title. Shared by the API and the seed scripts so a slug
+    made in the admin matches one made anywhere else. */
+export function slugify(s: string): string {
+  return String(s).toLowerCase().normalize('NFKD')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+}
+
+/** The same slug at the same university is a URL collision, so suffix until it
+    is free. A different university may reuse it — that is the whole reason the
+    university is in the path. */
+export async function uniqueCourseSlug(
+  db: D1Like, university: string, wanted: string, excludeId?: number,
+): Promise<string> {
+  const base = slugify(wanted) || 'course';
+  for (let n = 1; n < 50; n++) {
+    const candidate = n === 1 ? base : `${base}-${n}`;
+    const clash = await db
+      .prepare('SELECT id FROM courses WHERE university = ? AND slug = ? AND id <> ? LIMIT 1')
+      .bind(university, candidate, excludeId ?? -1).first();
+    if (!clash) return candidate;
+  }
+  return `${base}-${Date.now()}`;
+}
+
 const COURSE_SELECT = `
   SELECT c.*, d.slug AS uni_slug, d.name AS uni_name, d.city AS uni_city,
          d.country AS uni_country, d.logo AS uni_logo, d.cover_image AS uni_cover,
