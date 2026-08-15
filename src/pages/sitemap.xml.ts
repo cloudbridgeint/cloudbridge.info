@@ -104,6 +104,29 @@ export const GET: APIRoute = async (context) => {
     // a database hiccup shouldn't break the sitemap
   }
 
+  // Course pages. Only the published ones: an unpublished course has no page,
+  // and listing a 404 in a sitemap wastes the crawl and costs trust.
+  try {
+    const db = (context.locals as any).runtime?.env?.DB;
+    if (db) {
+      const { results } = await db.prepare(
+        `SELECT c.slug, c.last_verified_at, c.created_at, d.slug AS uni_slug
+         FROM courses c
+         JOIN university_directory d ON d.name = c.university AND d.active = 1
+         WHERE c.active = 1 AND c.published = 1 AND c.slug != '' AND d.slug != ''`
+      ).all();
+      for (const row of results || []) {
+        if (!row?.slug || !row?.uni_slug) continue;
+        urls.push(
+          `  <url>\n    <loc>${SITE}/courses/${esc(row.uni_slug)}/${esc(row.slug)}</loc>\n` +
+          `    <lastmod>${isoDate(row.last_verified_at || row.created_at)}</lastmod>\n` +
+          `    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>`);
+      }
+    }
+  } catch {
+    // a database hiccup shouldn't break the sitemap
+  }
+
   // Event pages: one URL per occurrence, since each run now keeps its own
   // permanent address.
   try {

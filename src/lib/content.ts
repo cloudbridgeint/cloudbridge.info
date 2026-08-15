@@ -25,14 +25,78 @@ export function cImage(map: Record<string, string>, key: string, fallback: strin
 }
 
 export async function getCourses(db: D1Like) {
+  // Left join, not inner: a course whose university is missing from the
+  // directory must still appear in the /programs list. It just loses the link
+  // to a profile, which the card falls back on.
   const { results } = await db.prepare(
-    'SELECT * FROM courses WHERE active = 1 ORDER BY sort_order ASC, id ASC'
+    `SELECT c.*, d.slug AS uni_slug
+     FROM courses c
+     LEFT JOIN university_directory d ON d.name = c.university AND d.active = 1
+     WHERE c.active = 1 ORDER BY c.sort_order ASC, c.id ASC`
   ).all();
   return (results as any[]).map(c => ({
     name: c.name, university: c.university, country: c.country, city: c.city,
     level: c.level, subject: c.subject, delivery: c.delivery, duration: c.duration,
     logo: mediaUrl(c.logo, '/assets/logo.png'),
+    // Where the card's button should point. A course with a written, published
+    // detail page gets its own URL; everything else falls back to the
+    // university profile, which is a real page rather than a lead form.
+    slug: c.slug || '', uni_slug: c.uni_slug || '',
+    published: Number(c.published) === 1 ? 1 : 0,
   }));
+}
+
+/* Course detail pages. The join to university_directory is what supplies the
+   university half of the URL, the logo, the campus city and the link back to
+   the profile — a course row only stores the university's name. */
+const COURSE_SELECT = `
+  SELECT c.*, d.slug AS uni_slug, d.name AS uni_name, d.city AS uni_city,
+         d.country AS uni_country, d.logo AS uni_logo, d.cover_image AS uni_cover,
+         d.website AS uni_website, d.overview AS uni_overview,
+         d.scholarship AS uni_scholarship, d.intake AS uni_intake
+  FROM courses c
+  JOIN university_directory d ON d.name = c.university AND d.active = 1`;
+
+function shapeCourse(c: any) {
+  return {
+    ...c,
+    logo: mediaUrl(c.logo, ''),
+    uni_logo: mediaUrl(c.uni_logo, '/assets/logo.png'),
+    uni_cover: c.uni_cover ? mediaUrl(c.uni_cover, '') : '',
+    url: `/courses/${c.uni_slug}/${c.slug}`,
+  };
+}
+
+/** One published course, addressed the way its URL addresses it. */
+export async function getCourseBySlugs(db: D1Like, uniSlug: string, courseSlug: string) {
+  const { results } = await db
+    .prepare(`${COURSE_SELECT} WHERE c.active = 1 AND c.published = 1
+              AND d.slug = ? AND c.slug = ? LIMIT 1`)
+    .bind(uniSlug, courseSlug).all();
+  const row = (results as any[])[0];
+  return row ? shapeCourse(row) : null;
+}
+
+/** Courses to link on from a detail page: same subject first, then same
+    university. Only published ones — linking to a 404 helps nobody. */
+export async function getRelatedCourses(db: D1Like, course: any, limit = 6) {
+  const { results } = await db
+    .prepare(`${COURSE_SELECT} WHERE c.active = 1 AND c.published = 1 AND c.id <> ?
+              AND (c.subject = ? OR c.university = ?)
+              ORDER BY CASE WHEN c.subject = ? THEN 0 ELSE 1 END, c.sort_order ASC, c.id ASC
+              LIMIT ?`)
+    .bind(course.id, course.subject, course.university, course.subject, limit).all();
+  return (results as any[]).map(shapeCourse);
+}
+
+/** Published course URLs, for the sitemap. */
+export async function getPublishedCourseUrls(db: D1Like) {
+  const { results } = await db
+    .prepare(`SELECT c.slug, c.last_verified_at, c.created_at, d.slug AS uni_slug
+              FROM courses c JOIN university_directory d ON d.name = c.university AND d.active = 1
+              WHERE c.active = 1 AND c.published = 1 AND c.slug <> '' AND d.slug <> ''`)
+    .all();
+  return results as any[];
 }
 
 export async function getUniversityDirectory(db: D1Like) {

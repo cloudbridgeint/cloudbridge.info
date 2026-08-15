@@ -1,0 +1,368 @@
+---
+/*
+ * One course at /courses/<university-slug>/<course-slug>.
+ *
+ * The university slug is in the URL on purpose. Course names repeat across
+ * institutions — "BA Business Management" is at both Aston and Arden — so a
+ * flat /courses/<name> would collide, and the pages would read as duplicates
+ * to a crawler even where they collided cleanly.
+ *
+ * Sections run in the order a student asks the questions: what is it, can I
+ * get in, what does it cost, what will I study, where does it lead, how do I
+ * apply. Entry requirements sit high because that is the search that brings
+ * people here, not the prose.
+ *
+ * Every section is conditional. A course with only an overview written renders
+ * an overview and nothing else, rather than a row of empty headings — and the
+ * page is only reachable at all once `published` is set, so a half-written
+ * course is never online.
+ */
+import Layout from '../../../layouts/Layout.astro';
+import { getCourseBySlugs, getRelatedCourses, paragraphs } from '../../../lib/content';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { uni, course: courseSlug } = Astro.params;
+const c = uni && courseSlug ? await getCourseBySlugs(db, uni, courseSlug) : null;
+if (!c) return new Response(null, { status: 404 });
+
+const related = await getRelatedCourses(db, c);
+const url = `https://cloudbridge.info/courses/${c.uni_slug}/${c.slug}`;
+
+/* Lists are stored one entry per line, as they are on a university profile. */
+const bullets = (raw: unknown) =>
+  String(raw || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+
+/* FAQs are one per line, "question | answer". */
+const faqs = bullets(c.faq)
+  .map(line => {
+    const i = line.indexOf('|');
+    return i < 0 ? null : { q: line.slice(0, i).trim(), a: line.slice(i + 1).trim() };
+  })
+  .filter((f): f is { q: string; a: string } => !!f && !!f.q && !!f.a);
+
+const title = `${c.name} at ${c.uni_name} — Fees, Entry Requirements & Intakes | CloudBridge`;
+const description = c.overview
+  ? paragraphs(c.overview)[0].slice(0, 155)
+  : `${c.name} at ${c.uni_name}, ${c.uni_city}. ${c.level} course${c.duration ? `, ${c.duration}` : ''}` +
+    ` — entry requirements, tuition and intakes for students applying from Bangladesh.`;
+
+const facts = [
+  { k: 'Level', v: c.level },
+  { k: 'Duration', v: c.duration },
+  { k: 'Delivery', v: c.delivery },
+  { k: 'Location', v: [c.uni_city, c.uni_country].filter(Boolean).join(', ') },
+  { k: 'Intakes', v: bullets(c.intakes).join(', ') || c.uni_intake },
+  { k: 'Tuition (per year)', v: c.tuition_fee },
+].filter(f => String(f.v || '').trim());
+
+const sections = [
+  { id: 'overview', label: 'Course Overview', show: !!c.overview },
+  { id: 'entry', label: 'Entry Requirements', show: bullets(c.entry_requirements).length > 0 || bullets(c.english_requirements).length > 0 },
+  { id: 'fees', label: 'Fees & Scholarships', show: !!c.tuition_fee || !!c.tuition_note || bullets(c.scholarships_info).length > 0 },
+  { id: 'study', label: "What You'll Study", show: bullets(c.modules).length > 0 },
+  { id: 'careers', label: 'Career Outcomes', show: bullets(c.careers).length > 0 },
+  { id: 'apply', label: 'How to Apply', show: bullets(c.how_to_apply).length > 0 },
+  { id: 'university', label: `About ${c.uni_name}`, show: !!c.uni_overview },
+  { id: 'related', label: 'Related Courses', show: related.length > 0 },
+  { id: 'faq', label: 'FAQ', show: faqs.length > 0 },
+].filter(s => s.show);
+
+/* Google's Course rich result needs a CourseInstance carrying the mode and
+   either a workload or a schedule. Tuition is stored as free text ("£16,500"
+   or "Ask a counsellor"), so no Offer is emitted — a price in structured data
+   has to be a number that is actually true, and half of these are not. */
+const courseMode = /online/i.test(c.delivery) ? 'online'
+  : /blend|hybrid/i.test(c.delivery) ? 'blended' : 'onsite';
+
+const schema: Record<string, any>[] = [{
+  '@type': 'Course',
+  '@id': url + '#course',
+  name: c.name,
+  description,
+  url,
+  provider: {
+    '@type': 'CollegeOrUniversity',
+    name: c.uni_name,
+    ...(c.uni_website ? { sameAs: c.uni_website } : {}),
+  },
+  ...(c.credential ? { educationalCredentialAwarded: c.credential } : {}),
+  ...(c.subject ? { about: c.subject } : {}),
+  hasCourseInstance: [{
+    '@type': 'CourseInstance',
+    courseMode,
+    ...(c.duration ? { courseWorkload: c.duration } : {}),
+    ...(courseMode === 'onsite' ? {
+      location: {
+        '@type': 'Place',
+        name: c.uni_name,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: c.uni_city,
+          addressCountry: c.uni_country,
+        },
+      },
+    } : {}),
+  }],
+}];
+
+if (faqs.length) {
+  schema.push({
+    '@type': 'FAQPage',
+    '@id': url + '#faq',
+    mainEntity: faqs.map(f => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  });
+}
+
+/* The enquiry carries what it is about, so a counsellor opens the lead already
+   knowing the course and does not have to ask. */
+const enquiry = `/free-consultation?course=${encodeURIComponent(c.name)}&university=${encodeURIComponent(c.uni_name)}`;
+
+const verified = c.last_verified_at
+  ? new Date(c.last_verified_at + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  : '';
+---
+
+<Layout
+  title={title}
+  description={description}
+  schema={schema}
+  image={c.uni_cover || undefined}
+  breadcrumbs={[
+    { name: 'Universities', url: '/university-college' },
+    { name: c.uni_name, url: `/universities/${c.uni_slug}` },
+    { name: c.name, url: `/courses/${c.uni_slug}/${c.slug}` },
+  ]}
+>
+
+<section class="relative bg-bridge-900 text-white overflow-hidden">
+  {c.uni_cover && (
+    <img src={c.uni_cover} alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover opacity-45" />
+  )}
+  <div class="relative max-w-container mx-auto px-4 md:px-8 py-12 md:py-16">
+    <p class="crumb">
+      <a href="/">Home</a> / <a href="/university-college">Universities</a> /
+      <a href={`/universities/${c.uni_slug}`}>{c.uni_name}</a> / {c.name}
+    </p>
+    <div class="mt-5 flex items-start gap-5 flex-wrap">
+      {c.uni_logo && (
+        <span class="shrink-0 w-20 h-20 rounded-2xl bg-white flex items-center justify-center p-2.5 shadow-lg">
+          <img src={c.uni_logo} alt={`${c.uni_name} logo`} class="max-w-full max-h-full object-contain" />
+        </span>
+      )}
+      <div class="min-w-0">
+        <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">{c.name}</h1>
+        <p class="mt-2 text-white/80">
+          <a href={`/universities/${c.uni_slug}`} class="hover:underline">{c.uni_name}</a>
+          {c.uni_city ? ` — ${c.uni_city}` : ''}{c.uni_country ? `, ${c.uni_country}` : ''}
+        </p>
+      </div>
+    </div>
+    <div class="mt-7 flex flex-wrap gap-3">
+      <a href={enquiry} class="btn-primary inline-flex">Apply for this course</a>
+      <a href="/free-consultation" class="btn-secondary inline-flex">Talk to a counsellor — free</a>
+      <a href={`/universities/${c.uni_slug}`}
+         class="inline-flex items-center rounded-full border border-white/30 px-5 py-2.5 text-sm font-semibold text-white/90 hover:bg-white/10 transition">
+        View university profile
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- The figures a student compares courses on, before any prose. -->
+{facts.length > 0 && (
+  <section class="py-8 bg-bridge-50/60 border-b border-black/5">
+    <div class="max-w-container mx-auto px-4 md:px-8">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        {facts.map(f => (
+          <div class="h-full flex flex-col rounded-xl bg-white border border-black/10 overflow-hidden">
+            <p class="bg-bridge-50 border-b border-black/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-ink/55">{f.k}</p>
+            <p class="flex-1 px-3 py-2.5 text-sm text-ink/75 leading-snug">{f.v}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<section class="py-10 md:py-14">
+  <div class="max-w-container mx-auto px-4 md:px-8 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-10 lg:items-start">
+
+    <nav aria-label="On this page" class="hidden lg:block sticky top-24">
+      <p class="text-[11px] font-semibold uppercase tracking-wide text-ink/45">On this page</p>
+      <ul class="mt-3 space-y-1">
+        {sections.map(s => (
+          <li>
+            <a href={`#${s.id}`} class="block rounded-lg px-3 py-2 text-sm text-ink/70 hover:bg-bridge-50 hover:text-bridge-900 transition">{s.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="space-y-12 min-w-0">
+
+      {c.overview && (
+        <div id="overview" class="scroll-mt-28">
+          <h2 class="section-heading">Course overview</h2>
+          {paragraphs(c.overview).map(p => <p class="mt-4 text-ink/70 leading-relaxed">{p}</p>)}
+        </div>
+      )}
+
+      {(bullets(c.entry_requirements).length > 0 || bullets(c.english_requirements).length > 0) && (
+        <div id="entry" class="scroll-mt-28">
+          <h2 class="section-heading">Entry requirements</h2>
+          {bullets(c.entry_requirements).length > 0 && (
+            <>
+              <h3 class="mt-5 font-display font-bold text-bridge-900">Academic</h3>
+              <ul class="mt-3 space-y-2">
+                {bullets(c.entry_requirements).map(b => (
+                  <li class="flex gap-3 text-ink/70"><span class="text-sunrise-600 mt-0.5" aria-hidden="true">•</span><span>{b}</span></li>
+                ))}
+              </ul>
+            </>
+          )}
+          {bullets(c.english_requirements).length > 0 && (
+            <>
+              <h3 class="mt-6 font-display font-bold text-bridge-900">English language</h3>
+              <ul class="mt-3 space-y-2">
+                {bullets(c.english_requirements).map(b => (
+                  <li class="flex gap-3 text-ink/70"><span class="text-sunrise-600 mt-0.5" aria-hidden="true">•</span><span>{b}</span></li>
+                ))}
+              </ul>
+            </>
+          )}
+          <p class="mt-5 text-sm text-ink/55">
+            Requirements are reviewed each intake and the university's own page is the authority.
+            A counsellor can check your grades against this course before you pay for anything.
+          </p>
+        </div>
+      )}
+
+      {(c.tuition_fee || c.tuition_note || bullets(c.scholarships_info).length > 0) && (
+        <div id="fees" class="scroll-mt-28">
+          <h2 class="section-heading">Fees & scholarships</h2>
+          {c.tuition_fee && (
+            <p class="mt-4 text-ink/70">
+              Tuition: <span class="font-semibold text-bridge-900">{c.tuition_fee}</span>
+              <span class="text-ink/55"> per year for international students</span>
+            </p>
+          )}
+          {c.tuition_note && paragraphs(c.tuition_note).map(p => <p class="mt-3 text-ink/70 leading-relaxed">{p}</p>)}
+          {bullets(c.scholarships_info).length > 0 && (
+            <>
+              <h3 class="mt-6 font-display font-bold text-bridge-900">Scholarships for this course</h3>
+              <ul class="mt-3 space-y-2">
+                {bullets(c.scholarships_info).map(b => (
+                  <li class="flex gap-3 text-ink/70"><span class="text-sunrise-600 mt-0.5" aria-hidden="true">•</span><span>{b}</span></li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
+
+      {bullets(c.modules).length > 0 && (
+        <div id="study" class="scroll-mt-28">
+          <h2 class="section-heading">What you'll study</h2>
+          <ul class="mt-5 grid sm:grid-cols-2 gap-3">
+            {bullets(c.modules).map(m => (
+              <li class="rounded-xl bg-white border border-black/10 px-4 py-3 text-sm text-ink/75">{m}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {bullets(c.careers).length > 0 && (
+        <div id="careers" class="scroll-mt-28">
+          <h2 class="section-heading">Career outcomes</h2>
+          <ul class="mt-5 flex flex-wrap gap-2">
+            {bullets(c.careers).map(j => (
+              <span class="rounded-full bg-white border border-black/10 px-3 py-1.5 text-sm text-ink/70">{j}</span>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {bullets(c.how_to_apply).length > 0 && (
+        <div id="apply" class="scroll-mt-28">
+          <h2 class="section-heading">How to apply</h2>
+          <ol class="mt-5 space-y-4">
+            {bullets(c.how_to_apply).map((step, i) => (
+              <li class="flex gap-4">
+                <span class="shrink-0 w-8 h-8 rounded-full bg-sunrise-600 text-white font-display font-bold text-sm flex items-center justify-center">{i + 1}</span>
+                <span class="text-ink/70 pt-1">{step}</span>
+              </li>
+            ))}
+          </ol>
+          <a href={enquiry} class="btn-primary inline-flex mt-6">Start your application</a>
+        </div>
+      )}
+
+      {c.uni_overview && (
+        <div id="university" class="scroll-mt-28">
+          <h2 class="section-heading">About {c.uni_name}</h2>
+          <p class="mt-4 text-ink/70 leading-relaxed">{paragraphs(c.uni_overview)[0]}</p>
+          <a href={`/universities/${c.uni_slug}`} class="mt-4 inline-flex text-sm font-semibold text-bridge-700 hover:underline">
+            Read the full {c.uni_name} profile →
+          </a>
+        </div>
+      )}
+
+      {related.length > 0 && (
+        <div id="related" class="scroll-mt-28">
+          <h2 class="section-heading">Related courses</h2>
+          <div class="mt-5 grid sm:grid-cols-2 gap-3">
+            {related.map(r => (
+              <a href={r.url} class="block rounded-xl bg-white border border-black/10 hover:border-sunrise-600 px-4 py-3 transition">
+                <p class="font-display font-bold text-bridge-900 text-sm leading-tight">{r.name}</p>
+                <p class="text-xs font-semibold text-sunrise-600 mt-0.5">{r.uni_name}</p>
+                <p class="text-xs text-ink/55 mt-1">{[r.level, r.duration].filter(Boolean).join(' · ')}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {faqs.length > 0 && (
+        <div id="faq" class="scroll-mt-28">
+          <h2 class="section-heading">Frequently asked questions</h2>
+          <div class="mt-5 space-y-3">
+            {faqs.map(f => (
+              <details class="rounded-xl bg-white border border-black/10 px-4 py-3">
+                <summary class="font-display font-bold text-bridge-900 text-sm cursor-pointer">{f.q}</summary>
+                <p class="mt-2 text-sm text-ink/70 leading-relaxed">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div class="rounded-2xl bg-bridge-50 border border-black/10 p-6">
+        <p class="font-display font-bold text-bridge-900 text-lg">Thinking about {c.name}?</p>
+        <p class="mt-2 text-ink/70">
+          A counsellor can check your grades against this course, tell you what the total first-year
+          cost comes to, and what the next intake deadline is. It is free, and there is no obligation.
+        </p>
+        <a href={enquiry} class="btn-primary inline-flex mt-4">Talk to a counsellor about this course</a>
+      </div>
+
+      {(verified || c.source_url) && (
+        <p class="text-xs text-ink/45">
+          {verified && <>Course details last checked on {verified}. </>}
+          Fees and entry requirements change each intake — 
+          {c.source_url
+            ? <> always confirm on <a href={c.source_url} target="_blank" rel="noopener noreferrer" class="underline hover:text-bridge-700">the university's own course page</a>.</>
+            : <> always confirm on the university's own course page.</>}
+        </p>
+      )}
+
+    </div>
+  </div>
+</section>
+
+</Layout>

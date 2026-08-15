@@ -1021,6 +1021,18 @@ function initCourseDirectory() {
   const capIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0z" /></svg>';
   const pinIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M9.69 18.933l.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 00.281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 103 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 002.273 1.765 11.842 11.842 0 00.976.544l.062.029.018.008.006.003zM10 11.25a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5z" clip-rule="evenodd" /></svg>';
 
+  /* Where "Program Details" goes. A course with a written, published detail
+     page has its own URL. Everything else falls back to the university
+     profile — a real page with fees, entry requirements and the rest, and the
+     course name rides along so the enquiry knows what it is about. Sending
+     every course to the homepage lead form, as this used to, answered the
+     question the button asks with a form. */
+  function courseHref(c) {
+    if (c.published && c.slug && c.uni_slug) return `/courses/${c.uni_slug}/${c.slug}`;
+    if (c.uni_slug) return `/universities/${c.uni_slug}?course=${encodeURIComponent(c.name)}`;
+    return `/free-consultation?course=${encodeURIComponent(c.name)}&university=${encodeURIComponent(c.university)}`;
+  }
+
   function cardHTML(c) {
     const logo = c.logo
       ? `<img src="${c.logo}" alt="${c.university}" class="max-h-full max-w-full object-contain">`
@@ -1037,7 +1049,7 @@ function initCourseDirectory() {
           </div>
         </div>
         <div class="shrink-0 w-full sm:w-auto">
-          <a href="/#lead-form" class="course-detail-btn w-full sm:w-auto nav-link">Program Details</a>
+          <a href="${courseHref(c)}" class="course-detail-btn w-full sm:w-auto nav-link">Program Details</a>
         </div>
       </div>`;
   }
