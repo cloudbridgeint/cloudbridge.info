@@ -1,16 +1,18 @@
 ---
 /*
- * The content editor for one course, at /cbc-admin/courses/<id>.
+ * The course page editor, at /cbc-admin/courses/<id>.
  *
- * The list screen keeps its modal for the eight metadata fields that fit in
- * one — name, university, level and so on. Everything a student actually reads
- * lives here instead, because sixteen fields including six multi-line blocks
- * in a modal is a form nobody finishes.
+ * Written for counsellors rather than for whoever built it. That drives three
+ * choices:
  *
- * Publishing is deliberately its own decision at the bottom, not a side effect
- * of saving. A half-written course saved for later must not appear on the site:
- * course names repeat across universities, and thin near-duplicate pages cost
- * the whole domain rather than only themselves.
+ * - There is no publish button. A page appears on the site when the three
+ *   boxes marked "needed" have been filled in, and disappears if they are
+ *   emptied. One less concept, and no way to put an empty page online.
+ * - The URL slug is behind "Advanced settings", closed. It is generated, it is
+ *   almost never the right thing to change, and changing it after a page is
+ *   live breaks links.
+ * - Every box says what goes in it and shows a real example, because the
+ *   alternative is someone being walked through it once and then guessing.
  */
 import AdminLayout from '../../../layouts/AdminLayout.astro';
 import course_editorUrl from '../../../scripts/admin-course-editor.js?url';
@@ -26,26 +28,37 @@ const uni = await db
   .bind(row.university).first();
 const liveUrl = uni?.slug && row.slug ? `/courses/${uni.slug}/${row.slug}` : '';
 
-/* Each block is one entry per line, matching how the university profiles
-   already store their lists. The hints say so on the field rather than in a
-   manual nobody opens. */
-const TEXT_BLOCKS = [
-  { id: 'overview', label: 'Course overview', rows: 8,
-    hint: 'Two or three paragraphs. Blank line between them. This also becomes the meta description.' },
-  { id: 'entry_requirements', label: 'Entry requirements — academic', rows: 6,
-    hint: 'One per line. e.g. "A-levels: BCC – CCD"' },
-  { id: 'english_requirements', label: 'Entry requirements — English', rows: 4,
-    hint: 'One per line. Say if the band is the university\u2019s general one rather than this course\u2019s.' },
-  { id: 'tuition_note', label: 'Fees — notes', rows: 4,
-    hint: 'What the figure covers, placement year, whether it rises yearly.' },
-  { id: 'scholarships_info', label: 'Scholarships', rows: 4, hint: 'One per line.' },
-  { id: 'modules', label: "What you'll study", rows: 8,
-    hint: 'One module per line. e.g. "Year 1 — Biomolecules (30 credits)"' },
-  { id: 'careers', label: 'Career outcomes', rows: 5, hint: 'One job role per line.' },
+const NEEDED = [
+  { id: 'overview', label: 'About this course', rows: 8,
+    help: 'Two or three short paragraphs: what the course covers, who it suits, anything that makes it stand out. Leave a blank line between paragraphs.',
+    eg: 'Aston\u2019s BSc Biomedical Science is built around what a hospital pathology laboratory actually does\u2026' },
+  { id: 'entry_requirements', label: 'Entry requirements', rows: 6,
+    help: 'What grades a student needs. Write one per line — press Enter between them.',
+    eg: 'A-levels: BCC \u2013 CCD\nBTEC: DDM\nUCAS code C900' },
+];
+
+const EXTRA = [
+  { id: 'english_requirements', label: 'English requirements', rows: 4,
+    help: 'IELTS, TOEFL or PTE scores. One per line. If the score is the university\u2019s general one rather than this course\u2019s, say so.',
+    eg: 'IELTS 6.5 overall with a minimum of 6.0 in each band' },
+  { id: 'tuition_note', label: 'Notes about the fee', rows: 4,
+    help: 'Anything a student should know about the money — placement year cost, whether it rises each year.',
+    eg: 'The placement year is charged separately at \u00a32,500.' },
+  { id: 'scholarships_info', label: 'Scholarships', rows: 4,
+    help: 'Scholarships available for this course. One per line.',
+    eg: 'International Excellence Scholarship \u2014 up to \u00a34,000' },
+  { id: 'modules', label: 'What the student will study', rows: 8,
+    help: 'The subjects taught, one per line.',
+    eg: 'Year 1 \u2014 Biomolecules (30 credits)\nYear 1 \u2014 Cells to Systems (30 credits)' },
+  { id: 'careers', label: 'Jobs after this course', rows: 5,
+    help: 'One job per line.',
+    eg: 'Biomedical Scientist (NHS)\nPharmaceutical industry' },
   { id: 'how_to_apply', label: 'How to apply', rows: 6,
-    hint: 'One step per line, in order. Rendered as a numbered list.' },
-  { id: 'faq', label: 'FAQ', rows: 6,
-    hint: 'One per line as: question | answer — the pipe separates them. Emitted as FAQ schema.' },
+    help: 'The steps, in order, one per line. They appear numbered on the page.',
+    eg: 'Talk to a CloudBridge counsellor and get your transcripts checked' },
+  { id: 'faq', label: 'Common questions', rows: 6,
+    help: 'One per line. Put the question, then the | key, then the answer. These also show up in Google.',
+    eg: 'Is the placement year guaranteed? | No. Placements are limited and competitive.' },
 ];
 ---
 <AdminLayout title={`Edit — ${row.name}`} active="courses">
@@ -59,110 +72,124 @@ const TEXT_BLOCKS = [
       <h1 class="text-2xl font-bold text-slate-900">{row.name}</h1>
       <p class="text-slate-500 mt-1 text-sm">{row.university}{row.city ? ` — ${row.city}` : ''}</p>
     </div>
-    <div class="flex items-center gap-2 shrink-0">
-      <span id="publishBadge" data-published={row.published}
-            class:list={['rounded-full px-3 py-1.5 text-xs font-semibold',
-              row.published ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600']}>
-        {row.published ? 'Published' : 'Draft'}
-      </span>
-      {liveUrl && row.published && (
-        <a href={liveUrl} target="_blank" rel="noopener"
-           class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-          View the live page ↗
-        </a>
-      )}
-    </div>
+    {liveUrl && (
+      <a id="viewLive" href={liveUrl} target="_blank" rel="noopener"
+         class:list={['shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50',
+           row.published ? '' : 'hidden']}>
+        See this page ↗
+      </a>
+    )}
   </div>
 
-  <form id="courseForm" data-id={row.id} class="mt-6 space-y-6">
+  <!-- The status of the page, in a sentence, at the top where it is read. -->
+  <div id="statusBox" class="mt-5 rounded-2xl px-5 py-4 ring-1"></div>
 
-    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
-      <p class="font-semibold text-bridge-950 text-sm">The page's address and heading</p>
-      <div class="mt-4 grid sm:grid-cols-2 gap-4">
+  <form id="courseForm" data-id={row.id} data-liveurl={liveUrl} class="mt-6 space-y-6">
+
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6 space-y-6">
+      <div>
+        <p class="font-semibold text-bridge-950">Needed for the page to go on the site</p>
+        <p class="text-sm text-slate-500 mt-1">Fill in these three and the page appears. Leave any empty and it stays off.</p>
+      </div>
+
+      {NEEDED.map((b, i) => (
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">URL slug</label>
-          <input id="fSlug" value={row.slug || ''}
-                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono">
-          <p class="text-xs text-slate-400 mt-1">
-            {liveUrl
-              ? `Live at ${liveUrl}`
-              : 'No university profile matches this course, so it has no URL yet.'}
-            {' '}Changing this after publishing breaks existing links.
-          </p>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">
+            <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-bridge-700 text-white text-xs mr-2">{i + 1}</span>
+            {b.label}
+          </label>
+          <p class="text-xs text-slate-500 mb-2 ml-7">{b.help}</p>
+          <textarea id={`f_${b.id}`} rows={b.rows} data-needed="1"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm leading-relaxed">{row[b.id] || ''}</textarea>
+          <p class="text-xs text-slate-400 mt-1 ml-0.5">Example: <span class="italic">{b.eg.split('\n')[0]}</span></p>
         </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Award / credential</label>
-          <input id="fCredential" value={row.credential || ''} placeholder="e.g. BSc (Hons)"
-                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-          <p class="text-xs text-slate-400 mt-1">Goes into the Course structured data.</p>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Tuition (per year, international)</label>
-          <input id="fTuitionFee" value={row.tuition_fee || ''} placeholder="e.g. £22,575"
-                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Intakes</label>
-          <input id="fIntakes" value={(row.intakes || '').split('\n').join(', ')}
-                 placeholder="September 2026, January 2027"
-                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-          <p class="text-xs text-slate-400 mt-1">Comma separated.</p>
-        </div>
+      ))}
+
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">
+          <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-bridge-700 text-white text-xs mr-2">3</span>
+          Tuition fee for one year
+        </label>
+        <p class="text-xs text-slate-500 mb-2 ml-7">What an international student pays per year. Copy it exactly from the university's own page.</p>
+        <input id="fTuitionFee" value={row.tuition_fee || ''} placeholder="£22,575" data-needed="1"
+               class="w-full max-w-xs rounded-lg border border-slate-300 px-3 py-2 text-sm">
       </div>
     </div>
 
-    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6 space-y-5">
-      <p class="font-semibold text-bridge-950 text-sm">What the student reads</p>
-      {TEXT_BLOCKS.map(b => (
+    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6 space-y-6">
+      <div>
+        <p class="font-semibold text-bridge-950">The rest of the page</p>
+        <p class="text-sm text-slate-500 mt-1">Optional. Anything left empty is simply left off the page — it will not show a blank heading.</p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4">
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">{b.label}</label>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Award</label>
+          <p class="text-xs text-slate-500 mb-2">The qualification given at the end.</p>
+          <input id="fCredential" value={row.credential || ''} placeholder="BSc (Hons)"
+                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Intakes</label>
+          <p class="text-xs text-slate-500 mb-2">When the course starts. Separate with commas.</p>
+          <input id="fIntakes" value={(row.intakes || '').split('\n').join(', ')} placeholder="September 2026, January 2027"
+                 class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        </div>
+      </div>
+
+      {EXTRA.map(b => (
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">{b.label}</label>
+          <p class="text-xs text-slate-500 mb-2">{b.help}</p>
           <textarea id={`f_${b.id}`} rows={b.rows}
-                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm leading-relaxed"
-          >{row[b.id] || ''}</textarea>
-          <p class="text-xs text-slate-400 mt-1">{b.hint}</p>
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm leading-relaxed">{row[b.id] || ''}</textarea>
+          <p class="text-xs text-slate-400 mt-1">Example: <span class="italic">{b.eg.split('\n')[0]}</span></p>
         </div>
       ))}
     </div>
 
     <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
-      <p class="font-semibold text-bridge-950 text-sm">Where this came from</p>
-      <p class="text-xs text-slate-500 mt-1">
-        Fees and entry requirements move every intake and only the university's own page is
-        authoritative. Both fields are shown at the bottom of the live page.
+      <p class="font-semibold text-bridge-950">Where you got this from</p>
+      <p class="text-sm text-slate-500 mt-1">
+        Fees and entry requirements change every year, and only the university's own website is reliable —
+        other sites get the fee wrong all the time. Both of these show at the bottom of the page so students
+        can check for themselves.
       </p>
       <div class="mt-4 grid sm:grid-cols-2 gap-4">
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Source URL</label>
-          <input id="fSourceUrl" value={row.source_url || ''} placeholder="https://www.university.ac.uk/..."
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Link to the university's course page</label>
+          <input id="fSourceUrl" value={row.source_url || ''} placeholder="https://www.aston.ac.uk/study/courses/..."
                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">Last verified</label>
+          <label class="block text-sm font-semibold text-slate-700 mb-1">Date you checked it</label>
           <input id="fVerified" type="date" value={row.last_verified_at || ''}
                  class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
         </div>
       </div>
     </div>
 
-    <div class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
-      <p class="font-semibold text-bridge-950 text-sm">Publishing</p>
-      <p class="text-xs text-slate-500 mt-1">
-        An unpublished course has no page at all — its button on the Courses page falls back to
-        the university profile. Publish once the overview, entry requirements and fees are written.
-      </p>
-      <div id="readiness" class="mt-4"></div>
-      <label class="mt-4 flex items-center gap-2.5 text-sm text-slate-700">
-        <input type="checkbox" id="fPublished" checked={!!row.published} class="w-4 h-4">
-        Published — show this course's page on the site
-      </label>
-    </div>
+    <details class="card-soft rounded-2xl ring-1 ring-black/5 shadow-sm p-6">
+      <summary class="font-semibold text-bridge-950 cursor-pointer text-sm">Advanced settings</summary>
+      <div class="mt-4">
+        <label class="block text-sm font-semibold text-slate-700 mb-1">Web address</label>
+        <p class="text-xs text-slate-500 mb-2">
+          Set automatically from the course name. Only change this if you know why —
+          if the page is already on the site, changing it breaks every link to it.
+        </p>
+        <input id="fSlug" value={row.slug || ''}
+               class="w-full max-w-md rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono">
+        {liveUrl && <p class="text-xs text-slate-400 mt-1">cloudbridge.info{liveUrl}</p>}
+      </div>
+    </details>
 
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-3 sticky bottom-0 bg-white/95 backdrop-blur py-4 border-t border-slate-100">
       <button type="button" id="saveBtn"
-              class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-5 py-2.5 transition">
+              class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-6 py-2.5 transition">
         Save
       </button>
-      <a href="/cbc-admin/courses" class="text-sm font-semibold text-slate-500 hover:text-slate-700">Cancel</a>
+      <a href="/cbc-admin/courses" class="text-sm font-semibold text-slate-500 hover:text-slate-700">Back to courses</a>
+      <span id="savedNote" class="text-sm text-green-700 font-semibold hidden">Saved</span>
     </div>
   </form>
 </AdminLayout>

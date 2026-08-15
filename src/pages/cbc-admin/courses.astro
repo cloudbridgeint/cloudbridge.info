@@ -8,7 +8,7 @@ export const prerender = false;
   <div class="flex items-center justify-between gap-4 flex-wrap">
     <div>
       <h1 class="text-2xl font-bold text-slate-900">Courses</h1>
-      <p class="text-slate-500 mt-1 text-sm">Add, edit, or remove the courses shown on the public Courses page.<br>Click a course name to write the detail page students read.</p>
+      <p class="text-slate-500 mt-1 text-sm">Add, edit, or remove the courses shown on the public Courses page.<br><span class="text-slate-600 font-medium">Click a course name</span> to write the details students read. A course goes on the website once its details are written.</p>
     </div>
     <button id="addBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition shrink-0">+ Add Course</button>
   </div>
@@ -37,7 +37,7 @@ export const prerender = false;
             <th class="px-5 py-3 font-medium whitespace-nowrap">Subject</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap">Delivery</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap">Duration</th>
-            <th class="px-5 py-3 font-medium whitespace-nowrap">Page</th>
+            <th class="px-5 py-3 font-medium whitespace-nowrap">Details page</th>
             <th class="px-5 py-3 font-medium whitespace-nowrap"></th>
           </tr>
         </thead>
@@ -129,12 +129,13 @@ export const prerender = false;
     const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML;
   }
 
-  /* Three states, not two. "Draft" and "Not started" both mean no public page,
-     but they need different work: one is half-written, the other untouched. */
+  /* Whether the course has a page, said plainly. There is no publish switch —
+     a page exists once its details are written — so this reports a fact rather
+     than a setting somebody has to manage. */
   function statusPill(c) {
-    if (c.published) return '<span class="rounded-full bg-green-100 text-green-800 px-2.5 py-1 text-[11px] font-semibold">Published</span>';
-    if ((c.overview || '').trim()) return '<span class="rounded-full bg-amber-100 text-amber-800 px-2.5 py-1 text-[11px] font-semibold">Draft</span>';
-    return '<span class="rounded-full bg-slate-100 text-slate-500 px-2.5 py-1 text-[11px] font-semibold">Not started</span>';
+    if (c.published) return '<span class="rounded-full bg-green-100 text-green-800 px-2.5 py-1 text-[11px] font-semibold">On the site</span>';
+    if ((c.overview || '').trim()) return '<span class="rounded-full bg-amber-100 text-amber-800 px-2.5 py-1 text-[11px] font-semibold">Half done</span>';
+    return '<span class="rounded-full bg-slate-100 text-slate-500 px-2.5 py-1 text-[11px] font-semibold">No details yet</span>';
   }
 
   async function load() {
@@ -162,7 +163,7 @@ export const prerender = false;
     const live = allCourses.filter(c => c.published).length;
     document.getElementById('courseCount').textContent =
       ((chosen || q) ? `(${rows.length} of ${allCourses.length})` : `(${allCourses.length})`) +
-      ` — ${live} with a published page`;
+      ` — ${live} on the site`;
     const body = document.getElementById('courseTableBody');
     body.innerHTML = rows.map(c => `
       <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition">
@@ -180,7 +181,7 @@ export const prerender = false;
         <td class="px-5 py-3 text-slate-600 whitespace-nowrap">${escapeHtml(c.duration)}</td>
         <td class="px-5 py-3 whitespace-nowrap"><a href="/cbc-admin/courses/${c.id}">${statusPill(c)}</a></td>
         <td class="px-5 py-3 whitespace-nowrap">
-          <a class="text-xs font-semibold text-iris-700 hover:underline" href="/cbc-admin/courses/${c.id}">Content</a>
+          <a class="text-xs font-semibold text-iris-700 hover:underline" href="/cbc-admin/courses/${c.id}">Details</a>
           <button class="text-xs font-semibold text-iris-700 hover:underline ml-3" onclick="editCourse(${c.id})">Edit</button>
           <button class="text-xs font-semibold text-red-600 hover:underline ml-3" onclick="deleteCourse(${c.id})">Delete</button>
         </td>

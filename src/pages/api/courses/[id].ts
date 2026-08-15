@@ -22,8 +22,7 @@ export const PUT: APIRoute = async (context) => {
   const { id } = context.params;
   const body = (await context.request.json()) || {};
 
-  const current = await db.prepare('SELECT name, university, slug FROM courses WHERE id = ?')
-    .bind(id).first();
+  const current = await db.prepare('SELECT * FROM courses WHERE id = ?').bind(id).first();
   if (!current) {
     return new Response(JSON.stringify({ error: 'not found' }), { status: 404 });
   }
@@ -39,6 +38,22 @@ export const PUT: APIRoute = async (context) => {
       ? wanted
       : await uniqueCourseSlug(db, String(patch.university || current.university), wanted, Number(id));
   }
+
+  /* Whether a course has a page is not a switch someone has to remember to
+     flip. It follows from whether the page has anything on it: a counsellor
+     writes the three things a student came for, saves, and the page exists.
+     Delete the text and it stops existing.
+
+     This is the whole publishing model. There is no draft state to explain,
+     and — the reason it is computed here rather than trusted from the form —
+     no way to put an empty page on the site by accident. Eighty near-identical
+     stubs would cost the whole domain, not only the stub URLs. */
+  const after = { ...current, ...patch };
+  const filled = (v: unknown) => String(v ?? '').trim().length > 0;
+  patch.published =
+    String(after.overview ?? '').trim().length > 150 &&
+    filled(after.entry_requirements) &&
+    filled(after.tuition_fee) ? 1 : 0;
 
   const sets = FIELDS.map(f => `${f} = COALESCE(?, ${f})`).join(', ');
   const values = FIELDS.map(f => {
