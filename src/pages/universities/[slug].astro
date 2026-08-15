@@ -148,10 +148,11 @@ const STAT_ICONS: Record<string, string> = {
 
 <!-- Enquire, share and the map, then the headline figures -->
 <section class="py-8 bg-bridge-50/60 border-b border-black/5">
-  <div class="max-w-container mx-auto px-4 md:px-8">
+  <div class="max-w-container mx-auto px-4 md:px-8
+              lg:grid lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-x-6 lg:gap-y-0 lg:items-start">
 
-    <div class="flex flex-wrap items-start justify-between gap-6">
-      <div class="min-w-0 grid sm:grid-cols-3 gap-3 flex-1">
+    <div class="flex flex-wrap items-start justify-between gap-6 lg:contents">
+      <div class="min-w-0 grid sm:grid-cols-3 gap-3 flex-1 lg:col-start-1 lg:row-start-1">
         {facts.map(x => (
           <div class="h-full flex flex-col rounded-xl bg-white border border-black/10 overflow-hidden">
             <p class="bg-bridge-50 border-b border-black/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-ink/55">{x.k}</p>
@@ -160,7 +161,7 @@ const STAT_ICONS: Record<string, string> = {
         ))}
       </div>
 
-      <div class="shrink-0 w-full sm:w-72">
+      <div class="shrink-0 w-full sm:w-72 lg:w-auto lg:col-start-2 lg:row-start-1 lg:row-span-3">
         <div class="flex items-center gap-2">
           <a href="/free-consultation" class="flex-1 inline-flex items-center justify-center rounded-lg bg-sunrise-600 hover:bg-sunrise-700 px-4 py-2.5 text-sm font-semibold text-white transition">Enquire Now</a>
           <button type="button" id="shareBtn"
@@ -182,8 +183,8 @@ const STAT_ICONS: Record<string, string> = {
     </div>
 
     {stats.length > 0 && (
-      <div class="mt-6 pt-6 border-t border-black/10">
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="mt-6 pt-6 border-t border-black/10 lg:col-start-1 lg:min-w-0">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {stats.map(st => (
             <div class="text-center">
               <span class="mx-auto w-14 h-14 rounded-full bg-white border border-black/10 flex items-center justify-center text-bridge-700">
@@ -200,7 +201,7 @@ const STAT_ICONS: Record<string, string> = {
     )}
 
     {(u.intakeList.length > 0 || u.studyLevelList.length > 0 || u.facultyList.length > 0) && (
-      <div class="mt-6 flex flex-wrap gap-2">
+      <div class="mt-6 flex flex-wrap gap-2 lg:col-start-1 lg:min-w-0">
         {u.intakeList.map((i: string) => (
           <span class="rounded-full bg-white border border-black/10 px-3 py-1.5 text-xs text-ink/70">Intake: {i}</span>
         ))}
