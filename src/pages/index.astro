@@ -4,9 +4,6 @@ import EventModals from '../components/EventModals.astro';
 import { Image } from 'astro:assets';
 import { safeCssUrl } from '../lib/icons';
 import { getAllContent, c, cImage, getUniversities, getFaqs, getPublishedBlogPosts, getEventThisMonth, getDestinations, mediaUrl, eventPeriod, eventExcerpt } from '../lib/content';
-import heroSlide1 from '../assets/hero/slide1.jpg';
-import heroSlide2 from '../assets/hero/slide2.jpg';
-import heroSlide3 from '../assets/hero/slide3.jpg';
 import admissionExpert from '../assets/admission-expert.jpg';
 import entryConsultation from '../assets/entry-consultation.jpg';
 import blogStudyUk from '../assets/blog/study-uk.jpg';
@@ -28,6 +25,12 @@ const destPhoto = Object.fromEntries(
   (await getDestinations(db)).map(d => [d.slug, d.cardImage])
 );
 const cardPhoto = (slug: string, fallback: string) => safeCssUrl(destPhoto[slug] || fallback);
+
+/* Whichever image slide 1 actually renders — admin-uploaded or the default —
+   preloaded in <head> so the browser starts fetching it immediately instead
+   of discovering it only once it reaches this markup, which is what let the
+   section's own dark background show first. */
+const heroSlide1Src = cImage(cm, 'home.hero.slide1.image', '/assets/hero/slide1.jpg');
 
 /* FAQPage schema — only the questions actually rendered below, which is what
    Google requires for an FAQ rich result. */
@@ -75,7 +78,7 @@ const orderedCountries = Object.keys(grouped).sort((a, b) => {
 const uniByCountry: Record<string, any[]> = {};
 for (const country of orderedCountries) uniByCountry[country] = grouped[country];
 ---
-<Layout title={title} description={description} schema={faqSchema}>
+<Layout title={title} description={description} schema={faqSchema} preloadImage={heroSlide1Src}>
 
 <section class="relative overflow-hidden bg-bridge-950 text-white" id="heroSlider">
 
@@ -85,7 +88,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
     {cm['home.hero.slide1.image'] ? (
       <img src={cImage(cm, 'home.hero.slide1.image', '')} alt={c(cm, 'home.hero.slide1.heading', 'Your Bridge to Studying Abroad')} class="absolute inset-0 w-full h-full object-cover hero-img-1" loading="eager" fetchpriority="high">
     ) : (
-      <Image src={heroSlide1} alt="A student ready to study abroad, with landmarks from partner destination countries in the background" class="absolute inset-0 w-full h-full object-cover hero-img-1" loading="eager" fetchpriority="high" widths={[480, 768, 1200, 1920]} sizes="100vw" />
+      <img src="/assets/hero/slide1.jpg" alt="A student ready to study abroad, with landmarks from partner destination countries in the background" class="absolute inset-0 w-full h-full object-cover hero-img-1" loading="eager" fetchpriority="high">
     )}
     <div class="absolute inset-0 bg-gradient-to-r from-cloud/50 via-cloud/25 to-transparent"></div>
     <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
@@ -102,7 +105,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
     {cm['home.hero.slide2.image'] ? (
       <img src={cImage(cm, 'home.hero.slide2.image', '')} alt={c(cm, 'home.hero.slide2.heading', 'Fall 2026 Intake Open Now')} class="absolute inset-0 w-full h-full object-cover" style="object-position:76% center">
     ) : (
-      <Image src={heroSlide2} alt="A student ready to study in the UK, with Big Ben and London landmarks in the background" class="absolute inset-0 w-full h-full object-cover" style="object-position:76% center" widths={[480, 768, 1200, 1920]} sizes="100vw" />
+      <img src="/assets/hero/slide2.jpg" alt="A student ready to study in the UK, with Big Ben and London landmarks in the background" class="absolute inset-0 w-full h-full object-cover" style="object-position:76% center" loading="lazy">
     )}
     <div class="absolute inset-0 bg-gradient-to-r from-cloud/50 via-cloud/25 to-transparent"></div>
     <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">
@@ -119,7 +122,7 @@ for (const country of orderedCountries) uniByCountry[country] = grouped[country]
     {cm['home.hero.slide3.image'] ? (
       <img src={cImage(cm, 'home.hero.slide3.image', '')} alt={c(cm, 'home.hero.slide3.heading', 'Scholarships at 500+ Universities')} class="absolute inset-0 w-full h-full object-cover hero-img-3">
     ) : (
-      <Image src={heroSlide3} alt="A student ready to study abroad, with a university campus in the background" class="absolute inset-0 w-full h-full object-cover hero-img-3" widths={[480, 768, 1200, 1920]} sizes="100vw" />
+      <img src="/assets/hero/slide3.jpg" alt="A student ready to study abroad, with a university campus in the background" class="absolute inset-0 w-full h-full object-cover hero-img-3" loading="lazy">
     )}
     <div class="absolute inset-0 bg-gradient-to-r from-cloud/50 via-cloud/25 to-transparent"></div>
     <div class="relative max-w-container mx-auto px-4 md:px-8 w-full">

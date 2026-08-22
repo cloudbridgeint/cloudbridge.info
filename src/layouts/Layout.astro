@@ -22,10 +22,15 @@ export interface Props {
   publishedTime?: string;
   modifiedTime?: string;
   section?: string;
+  /* The single image most likely to be this page's Largest Contentful Paint —
+     e.g. the first hero slide. Preloading it lets the browser start the
+     request before it reaches that <img> in the HTML, instead of discovering
+     it only after the section's own background has already painted. */
+  preloadImage?: string;
 }
 const {
   title, description, schema = [], image, ogType = 'website',
-  breadcrumbs = [], publishedTime, modifiedTime, section,
+  breadcrumbs = [], publishedTime, modifiedTime, section, preloadImage,
 } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
@@ -238,6 +243,7 @@ import '../styles/site.css';
 <link rel="icon" type="image/png" href="/assets/logo.png">
 <link rel="shortcut icon" type="image/png" href="/assets/logo.png">
 <link rel="apple-touch-icon" href="/assets/logo.png">
+{preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high">}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
@@ -246,11 +252,11 @@ import '../styles/site.css';
   html { scroll-behavior: smooth; }
   body { font-family: 'Lato', sans-serif; }
   h1,h2,h3,h4,h5,h6,.font-display { font-family: 'Inter', sans-serif; }
-  .btn-primary { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; background:#e12d38; padding:0.75rem 1.5rem; font-weight:600; color:#fff; transition:.15s; cursor:pointer; border:none; }
+  .btn-primary { display:inline-flex; align-items:center; justify-content:center; border-radius:.75rem; background:#e12d38; padding:0.75rem 1.5rem; font-weight:600; color:#fff; transition:.15s; cursor:pointer; border:none; }
   .btn-primary:hover { background:#eb7077; }
-  .btn-secondary { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; border:1px solid rgba(255,255,255,.3); padding:0.75rem 1.5rem; font-weight:600; color:#fff; transition:.15s; cursor:pointer; background:transparent; }
+  .btn-secondary { display:inline-flex; align-items:center; justify-content:center; border-radius:.75rem; border:1px solid rgba(255,255,255,.3); padding:0.75rem 1.5rem; font-weight:600; color:#fff; transition:.15s; cursor:pointer; background:transparent; }
   .btn-secondary:hover { background:rgba(255,255,255,.1); }
-  .btn-outline { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; border:1px solid #0f1c30; padding:0.65rem 1.3rem; font-weight:600; color:#0f1c30; transition:.15s; cursor:pointer; background:transparent; font-size:.875rem; }
+  .btn-outline { display:inline-flex; align-items:center; justify-content:center; border-radius:.75rem; border:1px solid #0f1c30; padding:0.65rem 1.3rem; font-weight:600; color:#0f1c30; transition:.15s; cursor:pointer; background:transparent; font-size:.875rem; }
   .btn-outline:hover { background:#0f1c30; color:#fff; }
   .see-more-btn { -webkit-tap-highlight-color: transparent; }
   .see-more-btn:active, .see-more-btn:focus, .see-more-btn:hover { background-image: linear-gradient(90deg, #1c3255 0%, #1c3255 35%, #e12d38 100%); background-color: transparent; border-color: transparent; color: #fff; }
