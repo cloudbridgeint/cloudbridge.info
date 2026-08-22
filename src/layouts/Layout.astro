@@ -222,6 +222,9 @@ import '../styles/site.css';
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="p:domain_verify" content="3697364d62678911807d90d291d235d9"/>
+<!-- Requested first, ahead of everything else in <head>, since it's the one
+     image the loading screen needs before anything else on the page. -->
+<link rel="preload" as="image" href="/assets/logo.png" fetchpriority="high">
 <title>{title}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonicalURL}>
