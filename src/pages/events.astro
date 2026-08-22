@@ -1,12 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import EventModals from '../components/EventModals.astro';
-import { getPublishedEvents, mediaUrl, eventPeriod, eventExcerpt } from '../lib/content';
+import { getPublishedEvents, getAllContent, c, mediaUrl, eventPeriod, eventExcerpt } from '../lib/content';
 export const prerender = false;
-const title = "Events | CloudBridge Study Abroad";
-const description = "Upcoming CloudBridge education fairs, webinars, and campus events for students planning to study abroad.";
 const db = (Astro.locals as any).runtime.env.DB;
-const events = await getPublishedEvents(db);
+const [events, cm] = await Promise.all([getPublishedEvents(db), getAllContent(db)]);
+const title = c(cm, 'events.meta_title', 'Events | CloudBridge Study Abroad');
+const description = c(cm, 'events.meta_description', 'Upcoming CloudBridge education fairs, webinars, and campus events for students planning to study abroad.');
 
 const gradients = [
   'linear-gradient(160deg,#2e4a7a,#4d70a8)',
@@ -26,8 +26,8 @@ function formatDate(dateStr: string) {
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <p class="crumb"><a href="/">Home</a> / Events</p>
-    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Events</h1>
-    <p class="mt-4 max-w-xl text-white/75">Join our expos, seminars, and info sessions to get expert guidance in person.</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">{c(cm, 'events.hero.heading', 'Events')}</h1>
+    <p class="mt-4 max-w-xl text-white/75">{c(cm, 'events.hero.text', 'Join our expos, seminars, and info sessions to get expert guidance in person.')}</p>
   </div>
 </section>
 <section class="py-16">
@@ -62,9 +62,9 @@ function formatDate(dateStr: string) {
         ))}
       </div>
     ) : (
-      <p class="text-ink/60">No upcoming events right now — check back soon.</p>
+      <p class="text-ink/60">{c(cm, 'events.empty_text', 'No upcoming events right now — check back soon.')}</p>
     )}
-    <p class="mt-8 text-sm text-ink/50">More events added regularly — check back soon.</p>
+    <p class="mt-8 text-sm text-ink/50">{c(cm, 'events.footer_text', 'More events added regularly — check back soon.')}</p>
   </div>
 </section>
 

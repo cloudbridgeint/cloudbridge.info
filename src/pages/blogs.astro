@@ -1,12 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getPublishedBlogPosts, mediaUrl } from '../lib/content';
+import { getPublishedBlogPosts, getAllContent, c, mediaUrl } from '../lib/content';
 export const prerender = false;
-const title = "Blogs | CloudBridge Study Abroad";
-const description = "Study abroad tips, visa updates, and university guides from the CloudBridge team.";
 
 const db = (Astro.locals as any).runtime.env.DB;
-const posts = await getPublishedBlogPosts(db);
+const [posts, cm] = await Promise.all([getPublishedBlogPosts(db), getAllContent(db)]);
+const title = c(cm, 'blogs.meta_title', 'Blogs | CloudBridge Study Abroad');
+const description = c(cm, 'blogs.meta_description', 'Study abroad tips, visa updates, and university guides from the CloudBridge team.');
 
 // Every article lives at /blogs/<slug>. Six of them used to be linked at
 // /<slug> as well, which left search engines choosing between two identical
@@ -20,8 +20,8 @@ function postHref(slug: string) {
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <p class="crumb"><a href="/">Home</a> / Blogs</p>
-    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Blogs</h1>
-    <p class="mt-4 max-w-xl text-white/75">Guidance, tips, and updates for students planning to study abroad.</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">{c(cm, 'blogs.hero.heading', 'Blogs')}</h1>
+    <p class="mt-4 max-w-xl text-white/75">{c(cm, 'blogs.hero.text', 'Guidance, tips, and updates for students planning to study abroad.')}</p>
   </div>
 </section>
 <section class="py-16">
@@ -42,7 +42,7 @@ function postHref(slug: string) {
         ))}
       </div>
     ) : (
-      <p class="text-ink/60">No articles published yet — check back soon.</p>
+      <p class="text-ink/60">{c(cm, 'blogs.empty_text', 'No articles published yet — check back soon.')}</p>
     )}
   </div>
 </section>

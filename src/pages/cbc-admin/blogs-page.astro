@@ -1,0 +1,63 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ContentSections from '../../components/admin/ContentSections.astro';
+import type { Section } from '../../components/admin/ContentSections.astro';
+
+import content_fieldsUrl from '../../scripts/admin-content-fields.js?url';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('blogs.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+const sections: Section[] = [
+  {
+    title: 'Top banner',
+    description: 'The banner above the grid of blog posts. Individual posts are managed from Settings → Blogs.',
+    fields: [
+      { key: 'blogs.hero.heading', label: 'Heading', default: 'Blogs' },
+      { key: 'blogs.hero.text', label: 'Intro line', type: 'textarea', rows: 2, default: 'Guidance, tips, and updates for students planning to study abroad.' },
+    ],
+  },
+  {
+    title: 'When there are no posts yet',
+    fields: [
+      { key: 'blogs.empty_text', label: 'Message shown', default: 'No articles published yet — check back soon.' },
+    ],
+  },
+  {
+    title: 'Google search result',
+    fields: [
+      { key: 'blogs.meta_title', label: 'Title in Google', default: 'Blogs | CloudBridge Study Abroad' },
+      { key: 'blogs.meta_description', label: 'Description in Google', type: 'textarea', rows: 3, default: 'Study abroad tips, visa updates, and university guides from the CloudBridge team.' },
+    ],
+  },
+];
+---
+<AdminLayout title="Blogs Page Text" active="blogs-page">
+  <div class="flex items-start justify-between gap-4 flex-wrap mb-2">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Blogs Page Text</h1>
+      <p class="text-slate-500 mt-1 text-sm max-w-2xl">This is the banner and surrounding text on /blogs. To add or edit posts, go to Settings → Blogs instead.</p>
+    </div>
+    <a href="/blogs" target="_blank" rel="noopener"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+      View the live page ↗
+    </a>
+  </div>
+
+  <div class="mt-6 pb-24">
+    <ContentSections sections={sections} values={cm} />
+  </div>
+
+  <div class="sticky bottom-0 -mx-5 md:-mx-9 px-5 md:px-9 py-4 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center justify-end gap-4">
+    <span id="saveHint" class="text-xs text-slate-400">All changes saved</span>
+    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-7 py-3 shadow-lg transition">
+      Save changes
+    </button>
+  </div>
+</AdminLayout>
+
+<script src={content_fieldsUrl} is:inline></script>

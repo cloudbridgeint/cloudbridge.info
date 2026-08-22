@@ -1,0 +1,63 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ContentSections from '../../components/admin/ContentSections.astro';
+import type { Section } from '../../components/admin/ContentSections.astro';
+
+import content_fieldsUrl from '../../scripts/admin-content-fields.js?url';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('university-college.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+const sections: Section[] = [
+  {
+    title: 'Top banner',
+    fields: [
+      { key: 'university-college.hero.heading', label: 'Heading', default: 'University & College' },
+      { key: 'university-college.hero.text', label: 'Intro line', type: 'textarea', rows: 2, default: '500+ partner universities and colleges across 10 countries. Filter by country, city, tuition budget, and intake to find your fit.' },
+    ],
+  },
+  {
+    title: 'Above the directory',
+    note: 'The universities themselves are managed from Settings → University & Colleges, not here.',
+    fields: [
+      { key: 'university-college.results.heading', label: 'Heading', default: 'Select Your Preferred University and Apply Today' },
+    ],
+  },
+  {
+    title: 'Google search result',
+    fields: [
+      { key: 'university-college.meta_title', label: 'Title in Google', default: 'Universities & Colleges | CloudBridge Study Abroad' },
+      { key: 'university-college.meta_description', label: 'Description in Google', type: 'textarea', rows: 3, default: "Browse 500+ partner universities and colleges in the UK, Malaysia, and the USA with CloudBridge's study abroad directory." },
+    ],
+  },
+];
+---
+<AdminLayout title="University & College Page" active="university-college">
+  <div class="flex items-start justify-between gap-4 flex-wrap mb-2">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">University & College Page</h1>
+      <p class="text-slate-500 mt-1 text-sm max-w-2xl">Change what you need, then press Save once at the bottom.</p>
+    </div>
+    <a href="/university-college" target="_blank" rel="noopener"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+      View the live page ↗
+    </a>
+  </div>
+
+  <div class="mt-6 pb-24">
+    <ContentSections sections={sections} values={cm} />
+  </div>
+
+  <div class="sticky bottom-0 -mx-5 md:-mx-9 px-5 md:px-9 py-4 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center justify-end gap-4">
+    <span id="saveHint" class="text-xs text-slate-400">All changes saved</span>
+    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-7 py-3 shadow-lg transition">
+      Save changes
+    </button>
+  </div>
+</AdminLayout>
+
+<script src={content_fieldsUrl} is:inline></script>

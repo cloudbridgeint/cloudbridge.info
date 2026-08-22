@@ -1,11 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getCourses } from '../lib/content';
+import { getCourses, getAllContent, c } from '../lib/content';
 export const prerender = false;
-const title = "Courses & Programs | CloudBridge Study Abroad";
-const description = "Browse available courses and programs across partner universities in the UK, Malaysia, and the USA with CloudBridge.";
 const db = (Astro.locals as any).runtime.env.DB;
-const courses = await getCourses(db);
+const [courses, cm] = await Promise.all([getCourses(db), getAllContent(db)]);
+const title = c(cm, 'programs.meta_title', 'Courses & Programs | CloudBridge Study Abroad');
+const description = c(cm, 'programs.meta_description', 'Browse available courses and programs across partner universities in the UK, Malaysia, and the USA with CloudBridge.');
 ---
 <Layout title={title} description={description}>
 <script is:inline set:html={`window.courseDirectory = ${JSON.stringify(courses)};`}></script>
@@ -13,15 +13,15 @@ const courses = await getCourses(db);
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <p class="crumb"><a href="/">Home</a> / Course</p>
-    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Available Courses</h1>
-    <p class="mt-4 max-w-xl text-white/75">Search and filter real courses from our 40 partner universities across 10 countries — find the one that fits your subject, level, and schedule.</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">{c(cm, 'programs.hero.heading', 'Available Courses')}</h1>
+    <p class="mt-4 max-w-xl text-white/75">{c(cm, 'programs.hero.text', 'Search and filter real courses from our 40 partner universities across 10 countries — find the one that fits your subject, level, and schedule.')}</p>
   </div>
 </section>
 
 <section class="py-10 md:py-14 bg-white">
   <div class="max-w-container mx-auto px-4 md:px-8">
 
-    <h2 class="section-heading text-center mx-auto mb-2">Find Your Course and Apply Today</h2>
+    <h2 class="section-heading text-center mx-auto mb-2">{c(cm, 'programs.results.heading', 'Find Your Course and Apply Today')}</h2>
     <p id="courseResultsCount" class="text-sm text-ink/60 mb-8 text-center">Showing all courses</p>
 
     <button id="courseFilterToggle" class="lg:hidden w-full mb-4 flex items-center justify-between rounded-xl border border-black/10 px-4 py-3 font-display font-semibold text-bridge-900">

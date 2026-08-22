@@ -1,0 +1,69 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ContentSections from '../../components/admin/ContentSections.astro';
+import type { Section } from '../../components/admin/ContentSections.astro';
+
+import content_fieldsUrl from '../../scripts/admin-content-fields.js?url';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('events.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+const sections: Section[] = [
+  {
+    title: 'Top banner',
+    description: 'The banner above the grid of events. Individual events are managed from Settings → Events.',
+    fields: [
+      { key: 'events.hero.heading', label: 'Heading', default: 'Events' },
+      { key: 'events.hero.text', label: 'Intro line', type: 'textarea', rows: 2, default: 'Join our expos, seminars, and info sessions to get expert guidance in person.' },
+    ],
+  },
+  {
+    title: 'When there are no upcoming events',
+    fields: [
+      { key: 'events.empty_text', label: 'Message shown', default: 'No upcoming events right now — check back soon.' },
+    ],
+  },
+  {
+    title: 'Below the event grid',
+    fields: [
+      { key: 'events.footer_text', label: 'Line shown', default: 'More events added regularly — check back soon.' },
+    ],
+  },
+  {
+    title: 'Google search result',
+    fields: [
+      { key: 'events.meta_title', label: 'Title in Google', default: 'Events | CloudBridge Study Abroad' },
+      { key: 'events.meta_description', label: 'Description in Google', type: 'textarea', rows: 3, default: 'Upcoming CloudBridge education fairs, webinars, and campus events for students planning to study abroad.' },
+    ],
+  },
+];
+---
+<AdminLayout title="Events Page Text" active="events-page">
+  <div class="flex items-start justify-between gap-4 flex-wrap mb-2">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Events Page Text</h1>
+      <p class="text-slate-500 mt-1 text-sm max-w-2xl">This is the banner and surrounding text on /events. To add or edit events, go to Settings → Events instead.</p>
+    </div>
+    <a href="/events" target="_blank" rel="noopener"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+      View the live page ↗
+    </a>
+  </div>
+
+  <div class="mt-6 pb-24">
+    <ContentSections sections={sections} values={cm} />
+  </div>
+
+  <div class="sticky bottom-0 -mx-5 md:-mx-9 px-5 md:px-9 py-4 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center justify-end gap-4">
+    <span id="saveHint" class="text-xs text-slate-400">All changes saved</span>
+    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-7 py-3 shadow-lg transition">
+      Save changes
+    </button>
+  </div>
+</AdminLayout>
+
+<script src={content_fieldsUrl} is:inline></script>
