@@ -1,0 +1,87 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ContentSections from '../../components/admin/ContentSections.astro';
+import type { Section } from '../../components/admin/ContentSections.astro';
+
+import content_fieldsUrl from '../../scripts/admin-content-fields.js?url';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('free-consultation.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+const sections: Section[] = [
+  {
+    title: 'Top banner',
+    fields: [
+      { key: 'free-consultation.hero.heading', label: 'Heading', default: 'Book Your Free Consultation' },
+      { key: 'free-consultation.hero.text', label: 'Intro line', type: 'textarea', rows: 2, default: 'Tell us about your goals and a counsellor will get back to you — free, no obligation.' },
+    ],
+  },
+  {
+    title: 'Above the form',
+    fields: [
+      { key: 'free-consultation.intro.heading', label: 'Heading', default: 'Planning to Study Abroad?' },
+      { key: 'free-consultation.intro.text', label: 'Paragraph', type: 'textarea', rows: 3, default: 'Get personalised guidance on courses, universities, and available scholarships. Our team ensures a smooth application process, making your admission journey hassle-free.' },
+      { key: 'free-consultation.intro.subtext', label: 'Line under the paragraph', default: 'Book your FREE consultation today!' },
+    ],
+  },
+  {
+    title: 'After someone submits the form',
+    description: 'The form fields (name, phone, destination, etc.) are not editable here — they match what the leads list expects.',
+    fields: [
+      { key: 'free-consultation.form.thanks', label: 'Thank-you message', type: 'textarea', rows: 2, default: 'Thanks! One of our counsellors will call you shortly.' },
+    ],
+  },
+  {
+    title: 'Testimonials section',
+    description: 'The heading above the sliding testimonial cards. The testimonials themselves are set in the code.',
+    fields: [
+      { key: 'free-consultation.testimonials.heading', label: 'Heading', default: 'What Students Say About Us' },
+      { key: 'free-consultation.testimonials.text', label: 'Line under the heading', type: 'textarea', rows: 2, default: "Real experiences from students we've guided through their study abroad journey." },
+    ],
+  },
+  {
+    title: '"Visit Us" section',
+    description: 'The office addresses shown here are the same list used on the Contact page — edit them from Settings → Contact Page.',
+    fields: [
+      { key: 'free-consultation.visit.heading', label: 'Heading', default: 'Visit Us' },
+      { key: 'free-consultation.visit.text', label: 'Line under the heading', type: 'textarea', rows: 2, default: 'Our offices across Bangladesh and the UK.' },
+    ],
+  },
+  {
+    title: 'Google search result',
+    fields: [
+      { key: 'free-consultation.meta_title', label: 'Title in Google', default: 'Book Your Free Consultation | CloudBridge Study Abroad' },
+      { key: 'free-consultation.meta_description', label: 'Description in Google', type: 'textarea', rows: 3, default: 'Get personalised guidance on courses, universities, and scholarships — book a free consultation with a CloudBridge counsellor.' },
+    ],
+  },
+];
+---
+<AdminLayout title="Free Consultation Page" active="free-consultation">
+  <div class="flex items-start justify-between gap-4 flex-wrap mb-2">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Free Consultation Page</h1>
+      <p class="text-slate-500 mt-1 text-sm max-w-2xl">Change what you need, then press Save once at the bottom.</p>
+    </div>
+    <a href="/free-consultation" target="_blank" rel="noopener"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+      View the live page ↗
+    </a>
+  </div>
+
+  <div class="mt-6 pb-24">
+    <ContentSections sections={sections} values={cm} />
+  </div>
+
+  <div class="sticky bottom-0 -mx-5 md:-mx-9 px-5 md:px-9 py-4 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center justify-end gap-4">
+    <span id="saveHint" class="text-xs text-slate-400">All changes saved</span>
+    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-7 py-3 shadow-lg transition">
+      Save changes
+    </button>
+  </div>
+</AdminLayout>
+
+<script src={content_fieldsUrl} is:inline></script>

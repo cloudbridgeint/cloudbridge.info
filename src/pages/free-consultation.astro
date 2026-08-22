@@ -1,23 +1,37 @@
 ---
 import Layout from '../layouts/Layout.astro';
-const title = "Book Your Free Consultation | CloudBridge Study Abroad";
-const description = "Get personalised guidance on courses, universities, and scholarships — book a free consultation with a CloudBridge counsellor.";
+import { getAllContent, getPageItemGroups, c } from '../lib/content';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const [cm, groups] = await Promise.all([
+  getAllContent(db),
+  getPageItemGroups(db, ['contact.offices']),
+]);
+const offices = groups['contact.offices'];
+
+const title = c(cm, 'free-consultation.meta_title', 'Book Your Free Consultation | CloudBridge Study Abroad');
+const description = c(cm, 'free-consultation.meta_description', 'Get personalised guidance on courses, universities, and scholarships — book a free consultation with a CloudBridge counsellor.');
+
+const phoneIcon = '<path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/>';
+const mailIcon = '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/>';
 ---
 <Layout title={title} description={description}>
 
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <p class="crumb"><a href="/">Home</a> / Free Consultation</p>
-    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Book Your Free Consultation</h1>
-    <p class="mt-4 max-w-xl text-white/75">Tell us about your goals and a counsellor will get back to you — free, no obligation.</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">{c(cm, 'free-consultation.hero.heading', 'Book Your Free Consultation')}</h1>
+    <p class="mt-4 max-w-xl text-white/75">{c(cm, 'free-consultation.hero.text', 'Tell us about your goals and a counsellor will get back to you — free, no obligation.')}</p>
   </div>
 </section>
 
 <section class="py-16">
   <div class="mx-auto px-4 md:px-8 max-w-container text-center">
-    <h2 class="section-heading text-center">Planning to Study Abroad?</h2>
-    <p class="mt-3 text-ink/60">Get personalised guidance on courses, universities, and available scholarships. Our team ensures a smooth application process, making your admission journey hassle-free.</p>
-    <p class="mt-4 font-display font-bold text-sunrise-600">Book your FREE consultation today!</p>
+    <h2 class="section-heading text-center">{c(cm, 'free-consultation.intro.heading', 'Planning to Study Abroad?')}</h2>
+    <p class="mt-3 text-ink/60">{c(cm, 'free-consultation.intro.text', "Get personalised guidance on courses, universities, and available scholarships. Our team ensures a smooth application process, making your admission journey hassle-free.")}</p>
+    <p class="mt-4 font-display font-bold text-sunrise-600">{c(cm, 'free-consultation.intro.subtext', 'Book your FREE consultation today!')}</p>
 
     <!-- Filled in from ?course= when the student arrives from a course page.
          Shown rather than hidden: an enquiry that silently attaches something
@@ -79,15 +93,15 @@ const description = "Get personalised guidance on courses, universities, and sch
       <button type="submit" class="sm:col-span-2 rounded-2xl py-3.5 font-display font-semibold text-white shadow-sm transition hover:brightness-110" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%)">Submit</button>
     </form>
     <div class="demo-form-thanks hidden mt-6 rounded-2xl bg-harbor-500/10 p-6 text-center text-harbor-600 font-display font-semibold">
-      Thanks! One of our counsellors will call you shortly. <span class="block text-xs font-normal text-ink/40 mt-1">(demo only — nothing was actually sent)</span>
+      {c(cm, 'free-consultation.form.thanks', 'Thanks! One of our counsellors will call you shortly.')}
     </div>
   </div>
 </section>
 
 <section class="py-16 bg-bridge-50/50">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <h2 class="section-heading text-center mx-auto">What Students Say About Us</h2>
-    <p class="mt-3 text-ink/60 text-center max-w-xl mx-auto">Real experiences from students we've guided through their study abroad journey.</p>
+    <h2 class="section-heading text-center mx-auto">{c(cm, 'free-consultation.testimonials.heading', 'What Students Say About Us')}</h2>
+    <p class="mt-3 text-ink/60 text-center max-w-xl mx-auto">{c(cm, 'free-consultation.testimonials.text', "Real experiences from students we've guided through their study abroad journey.")}</p>
     <div class="mt-10 relative">
       <button onclick="testiMove(-1)" aria-label="Previous testimonials" class="hidden md:flex absolute top-1/2 -translate-y-1/2 -left-5 lg:-left-12 w-10 h-10 rounded-full bg-white ring-1 ring-black/10 shadow items-center justify-center text-bridge-900 text-2xl leading-none hover:bg-bridge-50 transition z-10">&#8249;</button>
       <div class="overflow-hidden">
@@ -105,60 +119,39 @@ const description = "Get personalised guidance on courses, universities, and sch
 
 <section class="py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <h2 class="section-heading text-center mx-auto">Visit Us</h2>
-    <p class="mt-3 text-ink/60 text-center max-w-xl mx-auto">Our offices across Bangladesh and the UK.</p>
+    <h2 class="section-heading text-center mx-auto">{c(cm, 'free-consultation.visit.heading', 'Visit Us')}</h2>
+    <p class="mt-3 text-ink/60 text-center max-w-xl mx-auto">{c(cm, 'free-consultation.visit.text', 'Our offices across Bangladesh and the UK.')}</p>
     <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="rounded-2xl border border-bridge-100 ring-1 ring-black/5 p-6">
-        <h3 class="font-display font-bold text-bridge-900 text-lg">Dhaka Office</h3>
-        <div class="mt-4 space-y-3">
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">Lift 3, House 27, Road 21, Nikunjo-2, Dhaka 1229, Bangladesh</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">+880 1686 007004</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">apply@cloudbridge.info</p>
-          </div>
-        </div>
-      </div>
-      <div class="rounded-2xl border border-bridge-100 ring-1 ring-black/5 p-6">
-        <h3 class="font-display font-bold text-bridge-900 text-lg">Sylhet Office</h3>
-        <div class="mt-4 space-y-3">
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">405-406 Manru Shopping City, 4th Floor, Chowhatta, Sylhet 3100, Bangladesh</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">+880 1619 130469</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">studyabroad.sylhet@cloudbridge.info</p>
+      {offices.map(o => (
+        <div class="rounded-2xl border border-bridge-100 ring-1 ring-black/5 p-6">
+          <h3 class="font-display font-bold text-bridge-900 text-lg">{o.title} Office</h3>
+          <div class="mt-4 space-y-3">
+            {o.body ? (
+              <div class="flex items-start gap-3">
+                <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`} />
+                <p class="text-sm text-ink/70 text-left">{o.body}</p>
+              </div>
+            ) : (
+              <div class="flex items-start gap-3">
+                <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 opacity-50" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`} />
+                <p class="text-sm text-ink/40 text-left italic">Details coming soon</p>
+              </div>
+            )}
+            {o.link_url && (
+              <div class="flex items-start gap-3">
+                <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${phoneIcon}</svg>`} />
+                <p class="text-sm text-ink/70 text-left">{o.link_url}</p>
+              </div>
+            )}
+            {o.link_label && (
+              <div class="flex items-start gap-3">
+                <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${mailIcon}</svg>`} />
+                <p class="text-sm text-ink/70 text-left">{o.link_label}</p>
+              </div>
+            )}
           </div>
         </div>
-      </div>
-      <div class="rounded-2xl border border-bridge-100 ring-1 ring-black/5 p-6">
-        <h3 class="font-display font-bold text-bridge-900 text-lg">UK Office</h3>
-        <div class="mt-4 space-y-3">
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 opacity-50" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
-            <p class="text-sm text-ink/40 text-left italic">Loading...</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 opacity-50" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/></svg></span>
-            <p class="text-sm text-ink/40 text-left italic">Loading...</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 opacity-50" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/></svg></span>
-            <p class="text-sm text-ink/40 text-left italic">Loading...</p>
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
   </div>
 </section>
