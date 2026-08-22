@@ -11,7 +11,23 @@ export const prerender = false;
     <button id="addBtn" class="bg-bridge-700 hover:bg-bridge-800 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition">+ New Event</button>
   </div>
 
-  <div id="listContainer" class="mt-8 space-y-3"></div>
+  <div class="mt-6 bg-white rounded-xl ring-1 ring-black/5 shadow-sm p-4 flex items-center justify-between gap-4">
+    <div>
+      <p class="font-medium text-slate-900 text-sm">Homepage event banner</p>
+      <p class="text-xs text-slate-500 mt-0.5 max-w-xl">
+        Shows the "Event On This Month" banner at the top of the homepage. When on, it appears
+        automatically whenever a Published event below falls inside the current month — turn it
+        off here to hide that banner even while such an event exists.
+      </p>
+    </div>
+    <label class="relative inline-flex items-center cursor-pointer shrink-0">
+      <input type="checkbox" id="homeEventToggle" class="sr-only peer">
+      <div class="w-11 h-6 bg-slate-300 peer-checked:bg-emerald-600 rounded-full transition-colors"></div>
+      <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+    </label>
+  </div>
+
+  <div id="listContainer" class="mt-6 space-y-3"></div>
 
   <div id="modal" class="hidden fixed inset-0 bg-black/40 z-40 flex items-center justify-center px-4 py-8 overflow-y-auto">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 my-auto">
@@ -52,6 +68,24 @@ export const prerender = false;
   function resolveImg(url) { if (!url) return '/assets/logo.png'; if (url.startsWith('media:')) return `/api/media/${url.slice(6)}`; return url; }
 
   async function load() { allEvents = await apiFetch('/api/events'); render(); }
+
+  async function loadHomeEventToggle() {
+    try {
+      const content = await apiFetch('/api/content');
+      document.getElementById('homeEventToggle').checked = content['home.event.enabled'] !== '0';
+    } catch (e) { showToast(e.message, 'error'); }
+  }
+
+  document.getElementById('homeEventToggle').addEventListener('change', async (e) => {
+    const value = e.target.checked ? '1' : '0';
+    try {
+      await apiFetch('/api/content', { method: 'PUT', body: JSON.stringify({ 'home.event.enabled': value }) });
+      showToast(e.target.checked ? 'Homepage event banner turned on' : 'Homepage event banner turned off');
+    } catch (err) {
+      e.target.checked = !e.target.checked; // revert the switch if the save failed
+      showToast(err.message, 'error');
+    }
+  });
 
   function render() {
     const container = document.getElementById('listContainer');
@@ -138,4 +172,5 @@ export const prerender = false;
   });
 
   load();
+  loadHomeEventToggle();
 </script>
