@@ -1,0 +1,87 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ContentSections from '../../components/admin/ContentSections.astro';
+import type { Section } from '../../components/admin/ContentSections.astro';
+
+import content_fieldsUrl from '../../scripts/admin-content-fields.js?url';
+import list_editorUrl from '../../scripts/admin-list-editor.js?url';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('contact.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+const sections: Section[] = [
+  {
+    title: 'Top banner',
+    fields: [
+      { key: 'contact.hero.heading', label: 'Heading', default: 'Contact Us' },
+      { key: 'contact.hero.text', label: 'Intro line', type: 'textarea', rows: 2, default: 'Have a quick question? Reach us directly, or send a message below.' },
+    ],
+  },
+  {
+    title: 'Offices',
+    description: 'Used in both the address list and the "Visit Us" cards further down — one entry updates both.',
+    note: 'Leave Address, Phone, or Email blank for an office that is not open yet — the page shows "Details coming soon" for that office instead of a broken line.',
+    fields: [
+      { key: 'contact.offices.heading', label: 'Heading above the address list', default: 'Our Offices' },
+    ],
+    list: {
+      group: 'contact.offices',
+      title: 'Office locations',
+      fields: ['title', 'subtitle', 'body', 'link_url', 'link_label'],
+      labels: { title: 'City', subtitle: 'Label (e.g. "(Head Office)")', body: 'Full address', link_url: 'Phone number', link_label: 'Email address' },
+    },
+  },
+  {
+    title: 'Contact form',
+    fields: [
+      { key: 'contact.form.heading', label: 'Heading above the form', default: 'Get In Touch' },
+      { key: 'contact.form.thanks', label: 'Message shown after someone submits', type: 'textarea', rows: 2, default: 'Thanks! One of our counsellors will get back to you shortly.' },
+    ],
+  },
+  {
+    title: '"Visit Us" section',
+    description: 'The three office cards near the bottom of the page.',
+    fields: [
+      { key: 'contact.visit.heading', label: 'Heading', default: 'Visit Us' },
+      { key: 'contact.visit.text', label: 'Line under the heading', type: 'textarea', rows: 2, default: 'Our offices across Bangladesh and the UK.' },
+    ],
+  },
+  {
+    title: 'Google search result',
+    fields: [
+      { key: 'contact.meta_title', label: 'Title in Google', default: 'Contact Us | CloudBridge Study Abroad Consultancy' },
+      { key: 'contact.meta_description', label: 'Description in Google', type: 'textarea', rows: 3, default: 'Get in touch with CloudBridge for a free consultation on studying in the UK, Malaysia, or the USA.' },
+    ],
+  },
+];
+---
+<AdminLayout title="Contact Page" active="contact">
+  <div class="flex items-start justify-between gap-4 flex-wrap mb-2">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Contact Page</h1>
+      <p class="text-slate-500 mt-1 text-sm max-w-2xl">Change what you need, then press Save once at the bottom.</p>
+    </div>
+    <a href="/contact" target="_blank" rel="noopener"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+      View the live page ↗
+    </a>
+  </div>
+
+  <div class="mt-6 pb-24">
+    <ContentSections sections={sections} values={cm} />
+  </div>
+
+  <div class="sticky bottom-0 -mx-5 md:-mx-9 px-5 md:px-9 py-4 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center justify-end gap-4">
+    <span id="saveHint" class="text-xs text-slate-400">All changes saved</span>
+    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-7 py-3 shadow-lg transition">
+      Save changes
+    </button>
+  </div>
+</AdminLayout>
+
+<script src={content_fieldsUrl} is:inline></script>
+<script src={list_editorUrl} is:inline></script>

@@ -1,0 +1,78 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ContentSections from '../../components/admin/ContentSections.astro';
+import type { Section } from '../../components/admin/ContentSections.astro';
+
+import content_fieldsUrl from '../../scripts/admin-content-fields.js?url';
+import list_editorUrl from '../../scripts/admin-list-editor.js?url';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('student-visa.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+const sections: Section[] = [
+  {
+    title: 'Top banner',
+    description: 'The dark blue band at the very top of the page.',
+    fields: [
+      { key: 'student-visa.hero.heading', label: 'Heading', default: 'Student Visa Support' },
+      { key: 'student-visa.hero.text', label: 'Intro line', type: 'textarea', rows: 2, default: 'We prepare your documents, coach you for the interview, and track every deadline — so nothing gets left to chance.' },
+    ],
+  },
+  {
+    title: 'The four steps',
+    description: 'The grid of step cards.',
+    list: {
+      group: 'student-visa.steps',
+      title: 'Steps',
+      note: 'Shown in this order, left to right then top to bottom.',
+      fields: ['subtitle', 'title', 'body'],
+      labels: { subtitle: 'Step label (e.g. "Step 1")', title: 'Step name', body: 'Description' },
+    },
+  },
+  {
+    title: 'Bottom button',
+    fields: [
+      { key: 'student-visa.cta.label', label: 'Button text', default: 'Start your visa process' },
+      { key: 'student-visa.cta.url', label: 'Where it goes', default: '/#lead-form' },
+    ],
+  },
+  {
+    title: 'Google search result',
+    description: 'Not on the page itself — this is the title and grey text people see in Google.',
+    fields: [
+      { key: 'student-visa.meta_title', label: 'Title in Google', default: 'Student Visa Support | CloudBridge' },
+      { key: 'student-visa.meta_description', label: 'Description in Google', type: 'textarea', rows: 3, default: 'Step-by-step student visa support for the UK, Malaysia, and USA — documentation, interviews, and approval guidance from CloudBridge.' },
+    ],
+  },
+];
+---
+<AdminLayout title="Student Visa Page" active="student-visa">
+  <div class="flex items-start justify-between gap-4 flex-wrap mb-2">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Student Visa Page</h1>
+      <p class="text-slate-500 mt-1 text-sm max-w-2xl">Change what you need, then press Save once at the bottom.</p>
+    </div>
+    <a href="/student-visa" target="_blank" rel="noopener"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+      View the live page ↗
+    </a>
+  </div>
+
+  <div class="mt-6 pb-24">
+    <ContentSections sections={sections} values={cm} />
+  </div>
+
+  <div class="sticky bottom-0 -mx-5 md:-mx-9 px-5 md:px-9 py-4 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center justify-end gap-4">
+    <span id="saveHint" class="text-xs text-slate-400">All changes saved</span>
+    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-7 py-3 shadow-lg transition">
+      Save changes
+    </button>
+  </div>
+</AdminLayout>
+
+<script src={content_fieldsUrl} is:inline></script>
+<script src={list_editorUrl} is:inline></script>

@@ -1,64 +1,73 @@
 ---
 import Layout from '../layouts/Layout.astro';
-const title = "Contact Us | CloudBridge Study Abroad Consultancy";
-const description = "Get in touch with CloudBridge for a free consultation on studying in the UK, Malaysia, or the USA.";
+import { getAllContent, getPageItemGroups, c } from '../lib/content';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const [cm, groups] = await Promise.all([
+  getAllContent(db),
+  getPageItemGroups(db, ['contact.offices']),
+]);
+const offices = groups['contact.offices'];
+const phoneOffices = offices.filter(o => o.link_url);
+const emailOffices = offices.filter(o => o.link_label);
+
+const title = c(cm, 'contact.meta_title', 'Contact Us | CloudBridge Study Abroad Consultancy');
+const description = c(cm, 'contact.meta_description', 'Get in touch with CloudBridge for a free consultation on studying in the UK, Malaysia, or the USA.');
+
+const pinIcon = '<path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/>';
+const phoneIcon = '<path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/>';
+const mailIcon = '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/>';
 ---
 <Layout title={title} description={description}>
 
 <section class="bg-dusk-gradient text-white py-16">
   <div class="max-w-container mx-auto px-4 md:px-8">
     <p class="crumb"><a href="/">Home</a> / Contact Us</p>
-    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">Contact Us</h1>
-    <p class="mt-4 max-w-xl text-white/75">Have a quick question? Reach us directly, or send a message below.</p>
+    <h1 class="mt-4 text-3xl md:text-5xl font-extrabold">{c(cm, 'contact.hero.heading', 'Contact Us')}</h1>
+    <p class="mt-4 max-w-xl text-white/75">{c(cm, 'contact.hero.text', 'Have a quick question? Reach us directly, or send a message below.')}</p>
   </div>
 </section>
 
 <section class="py-16">
   <div class="max-w-container mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-12">
     <div>
-      <h2 class="section-heading">Our Offices</h2>
+      <h2 class="section-heading">{c(cm, 'contact.offices.heading', 'Our Offices')}</h2>
       <div class="mt-8 space-y-5">
-        <div class="flex items-start gap-4">
-          <span class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>
-          <div>
-            <p class="font-display font-bold text-bridge-900 text-sm">Dhaka <span class="text-ink/40 font-normal">(Head Office)</span></p>
-            <p class="mt-1 text-sm text-ink/60">Lift 3, House 27, Road 21, Nikunjo-2, Dhaka 1229, Bangladesh</p>
+        {offices.map(o => (
+          <div class="flex items-start gap-4">
+            <span class:list={["w-11 h-11 rounded-xl flex items-center justify-center shrink-0", { 'opacity-50': !o.body }]} style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${pinIcon}</svg>`} />
+            <div>
+              <p class="font-display font-bold text-bridge-900 text-sm">{o.title} <span class="text-ink/40 font-normal">{o.subtitle}</span></p>
+              {o.body
+                ? <p class="mt-1 text-sm text-ink/60">{o.body}</p>
+                : <p class="mt-1 text-sm text-ink/40 italic">Details coming soon</p>}
+            </div>
           </div>
-        </div>
-        <div class="flex items-start gap-4">
-          <span class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>
-          <div>
-            <p class="font-display font-bold text-bridge-900 text-sm">Sylhet <span class="text-ink/40 font-normal">(Branch)</span></p>
-            <p class="mt-1 text-sm text-ink/60">405-406 Manru Shopping City, 4th Floor, Chowhatta, Sylhet 3100, Bangladesh</p>
+        ))}
+        {phoneOffices.length > 0 && (
+          <div class="flex items-start gap-4 pt-2 border-t border-black/10">
+            <span class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${phoneIcon}</svg>`} />
+            <div>
+              <p class="font-display font-bold text-bridge-900 text-sm">Call Us</p>
+              {phoneOffices.map(o => <p class="text-sm text-ink/60">{o.link_url} <span class="text-ink/40">({o.title})</span></p>)}
+            </div>
           </div>
-        </div>
-        <div class="flex items-start gap-4">
-          <span class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 opacity-50" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg></span>
-          <div>
-            <p class="font-display font-bold text-bridge-900 text-sm">UK <span class="text-ink/40 font-normal">(Branch)</span></p>
-            <p class="mt-1 text-sm text-ink/40 italic">Loading...</p>
+        )}
+        {emailOffices.length > 0 && (
+          <div class="flex items-start gap-4">
+            <span class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${mailIcon}</svg>`} />
+            <div>
+              <p class="font-display font-bold text-bridge-900 text-sm">Email</p>
+              {emailOffices.map(o => <p class="text-sm text-ink/60">{o.link_label} <span class="text-ink/40">({o.title})</span></p>)}
+            </div>
           </div>
-        </div>
-        <div class="flex items-start gap-4 pt-2 border-t border-black/10">
-          <span class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/></svg></span>
-          <div>
-            <p class="font-display font-bold text-bridge-900 text-sm">Call Us</p>
-            <p class="mt-1 text-sm text-ink/60">+880 1686 007004 <span class="text-ink/40">(Dhaka)</span></p>
-            <p class="text-sm text-ink/60">+880 1619 130469 <span class="text-ink/40">(Sylhet)</span></p>
-          </div>
-        </div>
-        <div class="flex items-start gap-4">
-          <span class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/></svg></span>
-          <div>
-            <p class="font-display font-bold text-bridge-900 text-sm">Email</p>
-            <p class="mt-1 text-sm text-ink/60">apply@cloudbridge.info <span class="text-ink/40">(Dhaka)</span></p>
-            <p class="text-sm text-ink/60">studyabroad.sylhet@cloudbridge.info <span class="text-ink/40">(Sylhet)</span></p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
     <div>
-      <h2 class="section-heading">Get In Touch</h2>
+      <h2 class="section-heading">{c(cm, 'contact.form.heading', 'Get In Touch')}</h2>
       <form class="demo-form mt-8 grid gap-4 bg-white rounded-2xl p-6 shadow-sm ring-1 ring-black/5" data-source="contact">
         <input name="name" required placeholder="Name" class="form-input rounded-xl border border-black/10 px-4 py-3 text-sm">
         <input name="email" type="email" required placeholder="Email" class="form-input rounded-xl border border-black/10 px-4 py-3 text-sm">
@@ -67,7 +76,7 @@ const description = "Get in touch with CloudBridge for a free consultation on st
         <button type="submit" class="rounded-xl py-3 font-display font-semibold text-white shadow-sm transition hover:brightness-110 justify-self-start px-8" style="background-image:linear-gradient(90deg,#1c3255 0%,#1c3255 35%,#e12d38 100%)">Submit</button>
       </form>
       <div class="demo-form-thanks hidden mt-6 rounded-2xl bg-harbor-500/10 p-6 text-center text-harbor-600 font-display font-semibold">
-        Thanks! One of our counsellors will get back to you shortly. <span class="block text-xs font-normal text-ink/40 mt-1">(demo only — nothing was actually sent)</span>
+        {c(cm, 'contact.form.thanks', 'Thanks! One of our counsellors will get back to you shortly.')}
       </div>
     </div>
   </div>
@@ -75,60 +84,39 @@ const description = "Get in touch with CloudBridge for a free consultation on st
 
 <section class="py-16 bg-bridge-50/50">
   <div class="max-w-container mx-auto px-4 md:px-8">
-    <h2 class="section-heading text-center mx-auto">Visit Us</h2>
-    <p class="mt-3 text-ink/60 text-center max-w-xl mx-auto">Our offices across Bangladesh and the UK.</p>
+    <h2 class="section-heading text-center mx-auto">{c(cm, 'contact.visit.heading', 'Visit Us')}</h2>
+    <p class="mt-3 text-ink/60 text-center max-w-xl mx-auto">{c(cm, 'contact.visit.text', 'Our offices across Bangladesh and the UK.')}</p>
     <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="rounded-2xl border border-bridge-100 ring-1 ring-black/5 p-6 bg-white">
-        <h3 class="font-display font-bold text-bridge-900 text-lg">Dhaka Office</h3>
-        <div class="mt-4 space-y-3">
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">Lift 3, House 27, Road 21, Nikunjo-2, Dhaka 1229, Bangladesh</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">+880 1686 007004</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">apply@cloudbridge.info</p>
-          </div>
-        </div>
-      </div>
-      <div class="rounded-2xl border border-bridge-100 ring-1 ring-black/5 p-6 bg-white">
-        <h3 class="font-display font-bold text-bridge-900 text-lg">Sylhet Office</h3>
-        <div class="mt-4 space-y-3">
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">405-406 Manru Shopping City, 4th Floor, Chowhatta, Sylhet 3100, Bangladesh</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">+880 1619 130469</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/></svg></span>
-            <p class="text-sm text-ink/70 text-left">studyabroad.sylhet@cloudbridge.info</p>
+      {offices.map(o => (
+        <div class="rounded-2xl border border-bridge-100 ring-1 ring-black/5 p-6 bg-white">
+          <h3 class="font-display font-bold text-bridge-900 text-lg">{o.title} Office</h3>
+          <div class="mt-4 space-y-3">
+            {o.body ? (
+              <div class="flex items-start gap-3">
+                <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`} />
+                <p class="text-sm text-ink/70 text-left">{o.body}</p>
+              </div>
+            ) : (
+              <div class="flex items-start gap-3">
+                <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 opacity-50" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>`} />
+                <p class="text-sm text-ink/40 text-left italic">Details coming soon</p>
+              </div>
+            )}
+            {o.link_url && (
+              <div class="flex items-start gap-3">
+                <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${phoneIcon}</svg>`} />
+                <p class="text-sm text-ink/70 text-left">{o.link_url}</p>
+              </div>
+            )}
+            {o.link_label && (
+              <div class="flex items-start gap-3">
+                <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)" set:html={`<svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${mailIcon}</svg>`} />
+                <p class="text-sm text-ink/70 text-left">{o.link_label}</p>
+              </div>
+            )}
           </div>
         </div>
-      </div>
-      <div class="rounded-2xl border border-bridge-100 ring-1 ring-black/5 p-6 bg-white">
-        <h3 class="font-display font-bold text-bridge-900 text-lg">UK Office</h3>
-        <div class="mt-4 space-y-3">
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 opacity-50" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.58 7-12.5A7 7 0 0 0 5 9.5C5 14.42 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
-            <p class="text-sm text-ink/40 text-left italic">Loading...</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 opacity-50" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4c0 9 7 16 16 16l2-4-6-2-2 2c-2-1-4-3-5-5l2-2-2-6-4 1Z"/></svg></span>
-            <p class="text-sm text-ink/40 text-left italic">Loading...</p>
-          </div>
-          <div class="flex items-start gap-3">
-            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 opacity-50" style="background-image:linear-gradient(135deg,#1c3255,#e12d38)"><svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6 8 6 8-6"/></svg></span>
-            <p class="text-sm text-ink/40 text-left italic">Loading...</p>
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
   </div>
 </section>

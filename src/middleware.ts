@@ -24,6 +24,16 @@ const SETTINGS_PAGES = [
   '/cbc-admin/faq',
   '/cbc-admin/footer',
   '/cbc-admin/users',
+  '/cbc-admin/student-visa',
+  '/cbc-admin/spouse-visa',
+  '/cbc-admin/contact',
+  '/cbc-admin/apply-now',
+  '/cbc-admin/free-consultation',
+  '/cbc-admin/our-team',
+  '/cbc-admin/programs',
+  '/cbc-admin/university-college',
+  '/cbc-admin/blogs-page',
+  '/cbc-admin/events-page',
 ];
 const SETTINGS_APIS = [
   '/api/content',
