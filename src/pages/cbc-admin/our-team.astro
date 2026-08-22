@@ -1,0 +1,72 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import ContentSections from '../../components/admin/ContentSections.astro';
+import type { Section } from '../../components/admin/ContentSections.astro';
+
+import content_fieldsUrl from '../../scripts/admin-content-fields.js?url';
+
+export const prerender = false;
+
+const db = (Astro.locals as any).runtime.env.DB;
+const { results } = await db.prepare('SELECT key, value FROM content WHERE key LIKE ?').bind('our-team.%').all();
+const cm: Record<string, string> = {};
+for (const row of results as any[]) cm[row.key] = row.value;
+
+const sections: Section[] = [
+  {
+    title: 'Top banner',
+    fields: [
+      { key: 'our-team.hero.heading', label: 'Heading', default: 'Our Team' },
+      { key: 'our-team.hero.text', label: 'Intro line', type: 'textarea', rows: 2, default: 'The counsellors and staff behind every successful application — real people who know your destination country inside out.' },
+    ],
+  },
+  {
+    title: 'Above the team grid',
+    note: 'The people themselves — photos, names, roles — are edited from Settings → About Page, in the Team section. This list is shared between both pages.',
+    fields: [
+      { key: 'our-team.intro.heading', label: 'Heading', default: "Meet the People You'll Work With" },
+      { key: 'our-team.intro.text', label: 'Line under the heading', type: 'textarea', rows: 2, default: 'Every student is matched with a dedicated counsellor from day one.' },
+    ],
+  },
+  {
+    title: 'Closing call to action',
+    fields: [
+      { key: 'our-team.cta.heading', label: 'Heading', default: 'Want to meet your counsellor?' },
+      { key: 'our-team.cta.label', label: 'Button text', default: 'Book Free Consultation' },
+      { key: 'our-team.cta.url', label: 'Where it goes', default: '/#lead-form' },
+    ],
+  },
+  {
+    title: 'Google search result',
+    fields: [
+      { key: 'our-team.meta_title', label: 'Title in Google', default: 'Our Team | CloudBridge Study Abroad Consultants' },
+      { key: 'our-team.meta_description', label: 'Description in Google', type: 'textarea', rows: 3, default: 'Meet the CloudBridge counselling team helping students in Bangladesh apply to universities in the UK, Malaysia, and the USA.' },
+    ],
+  },
+];
+---
+<AdminLayout title="Our Team Page" active="our-team">
+  <div class="flex items-start justify-between gap-4 flex-wrap mb-2">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Our Team Page</h1>
+      <p class="text-slate-500 mt-1 text-sm max-w-2xl">Change what you need, then press Save once at the bottom.</p>
+    </div>
+    <a href="/our-team" target="_blank" rel="noopener"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+      View the live page ↗
+    </a>
+  </div>
+
+  <div class="mt-6 pb-24">
+    <ContentSections sections={sections} values={cm} />
+  </div>
+
+  <div class="sticky bottom-0 -mx-5 md:-mx-9 px-5 md:px-9 py-4 bg-white/90 backdrop-blur border-t border-slate-200 flex items-center justify-end gap-4">
+    <span id="saveHint" class="text-xs text-slate-400">All changes saved</span>
+    <button id="saveContentBtn" class="bg-sunrise-600 hover:bg-sunrise-700 text-white font-semibold rounded-xl px-7 py-3 shadow-lg transition">
+      Save changes
+    </button>
+  </div>
+</AdminLayout>
+
+<script src={content_fieldsUrl} is:inline></script>

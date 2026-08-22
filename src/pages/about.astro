@@ -1,35 +1,28 @@
 ---
 /*
- * About us. Everything except the team carousel is editable in the admin:
- * simple fields live in the content table under about.*, and the three
- * repeating lists (skills, reasons, history) live in page_items.
+ * About us. Everything is editable in the admin: simple fields live in the
+ * content table under about.*, and the four repeating lists (skills, reasons,
+ * history, team) live in page_items.
  *
- * The team slides still come from src/assets because they are the same people
- * rendered on /our-team — moving one copy into the database and not the other
- * would leave two sources of truth for the same staff list.
+ * The team list is shared with /our-team — group key team.members — so
+ * editing a person here (or there) keeps both pages in sync automatically.
  */
 import Layout from '../layouts/Layout.astro';
 import { Image } from 'astro:assets';
 import { getAllContent, getPageItemGroups, c, cImage } from '../lib/content';
 import { iconPath, iconImage } from '../lib/icons';
-import teamShahan from '../assets/team/shahan.jpg';
-import teamAriful from '../assets/team/ariful.jpg';
-import teamSunny from '../assets/team/sunny.jpg';
-import teamMehedi from '../assets/team/mehedi.jpg';
-import teamMim from '../assets/team/mim.jpg';
-import teamMahi from '../assets/team/mahi.jpg';
-import teamFahim from '../assets/team/fahim.jpg';
 
 export const prerender = false;
 
 const db = (Astro.locals as any).runtime.env.DB;
 const [cm, groups] = await Promise.all([
   getAllContent(db),
-  getPageItemGroups(db, ['about.skills', 'about.reasons', 'about.history']),
+  getPageItemGroups(db, ['about.skills', 'about.reasons', 'about.history', 'team.members']),
 ]);
 const skills = groups['about.skills'];
 const reasons = groups['about.reasons'];
 const history = groups['about.history'];
+const team = groups['team.members'];
 
 const title = c(cm, 'about.meta_title', 'About Us | CloudBridge Study Abroad Consultancy');
 const description = c(cm, 'about.meta_description', 'Learn how CloudBridge supports students from university shortlisting to visa approval, with expert counsellors guiding every step abroad.');
@@ -199,67 +192,20 @@ const introFallback = "Cloud Bridge — International Student Consultancy (CBC) 
       </button>
       <div class="max-w-sm w-full">
         <div id="aboutTeamSlider">
-        <div class="team-slide active flex-col items-center text-center" data-slide="0">
-          <Image src={teamShahan} alt="Mohammed Shahan" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
-          <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Mohammed Shahan</h3>
-          <p class="text-sm text-ink/60">Founder &amp; CEO</p>
-        </div>
-        <div class="team-slide flex-col items-center text-center" data-slide="1">
-          <Image src={teamAriful} alt="Ariful Islam" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
-          <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Ariful Islam</h3>
-          <p class="text-sm text-ink/60">Branch Manager (UK Specialist)</p>
-          <p class="text-xs text-ink/40">ID: 102042025</p>
-          <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">UK Branch</a>
-        </div>
-        <div class="team-slide flex-col items-center text-center" data-slide="2">
-          <Image src={teamSunny} alt="Sunny Arafat" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
-          <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Sunny Arafat</h3>
-          <p class="text-sm text-ink/60">Sr. Executive — Digital Marketing</p>
-          <p class="text-xs text-ink/40">ID: 52012026</p>
-          <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Branch</a>
-        </div>
-        <div class="team-slide flex-col items-center text-center" data-slide="3">
-          <Image src={teamMehedi} alt="Mehedi Hasan" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
-          <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Mehedi Hasan</h3>
-          <p class="text-sm text-ink/60">Administrative Executive</p>
-          <p class="text-xs text-ink/40">ID: 201042025</p>
-          <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Branch</a>
-        </div>
-        <div class="team-slide flex-col items-center text-center" data-slide="4">
-          <Image src={teamMim} alt="Kazi Mim" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
-          <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Kazi Mim</h3>
-          <p class="text-sm text-ink/60">Application Team</p>
-          <p class="text-xs text-ink/40">ID: 301042025</p>
-          <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Branch</a>
-        </div>
-        <div class="team-slide flex-col items-center text-center" data-slide="5">
-          <Image src={teamMahi} alt="Mahpara Jahan Mahi" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
-          <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Mahpara Jahan Mahi</h3>
-          <p class="text-sm text-ink/60">Senior Counselor</p>
-          <p class="text-xs text-ink/40">ID: 501012026</p>
-          <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Sylhet Branch</a>
-        </div>
-        <div class="team-slide flex-col items-center text-center" data-slide="6">
-          <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><circle cx="12" cy="6.5" r="3.5"/><path d="M9.5 11h5l3.2 9.5a1 1 0 01-.95 1.5H7.25a1 1 0 01-.95-1.5L9.5 11z"/></svg></div>
-          <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Sharmin Hoque</h3>
-          <p class="text-sm text-ink/60">Student Counselor</p>
-          <p class="text-xs text-ink/40">ID: 601012026</p>
-          <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Sylhet Branch</a>
-        </div>
-        <div class="team-slide flex-col items-center text-center" data-slide="8">
-          <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><circle cx="12" cy="6.5" r="3.5"/><path d="M9.5 11h5l3.2 9.5a1 1 0 01-.95 1.5H7.25a1 1 0 01-.95-1.5L9.5 11z"/></svg></div>
-          <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Kaniz Mim</h3>
-          <p class="text-sm text-ink/60">Student Counselor</p>
-          <p class="text-xs text-ink/40">ID: 720072026</p>
-          <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Dhaka Branch</a>
-        </div>
-        <div class="team-slide flex-col items-center text-center" data-slide="10">
-          <Image src={teamFahim} alt="Fahim" class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" widths={[320, 480, 640]} sizes="(min-width: 768px) 25vw, 50vw" />
-          <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">Fahim</h3>
-          <p class="text-sm text-ink/60">Executive — Operations</p>
-          <p class="text-xs text-ink/40">ID: 01012026</p>
-          <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">Sylhet Branch</a>
-        </div>
+        {team.map((m, i) => {
+          const photo = iconImage(m.icon);
+          return (
+            <div class:list={["team-slide flex-col items-center text-center", { active: i === 0 }]} data-slide={i}>
+              {photo
+                ? <img src={photo} alt={m.title} class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl object-cover" loading="lazy">
+                : <div class="w-64 h-64 md:w-72 md:h-72 mx-auto rounded-2xl bg-bridge-50 flex items-center justify-center text-bridge-300"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20"><circle cx="12" cy="6.5" r="3.5"/><path d="M9.5 11h5l3.2 9.5a1 1 0 01-.95 1.5H7.25a1 1 0 01-.95-1.5L9.5 11z"/></svg></div>}
+              <h3 class="mt-4 font-display font-bold text-bridge-900 text-lg">{m.title}</h3>
+              <p class="text-sm text-ink/60">{m.subtitle}</p>
+              {m.link_label && <p class="text-xs text-ink/40">{m.link_label}</p>}
+              {m.body && <a href="/our-team" class="mt-1 text-sm text-sunrise-600 hover:underline nav-link cursor-pointer">{m.body}</a>}
+            </div>
+          );
+        })}
         </div>
         <div id="aboutTeamDots" class="mt-6 flex items-center justify-center gap-2"></div>
       </div>

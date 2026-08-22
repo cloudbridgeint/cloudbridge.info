@@ -125,12 +125,19 @@ const sections: Section[] = [
   },
   {
     title: 'Team section',
-    description: 'The heading above the sliding team photos.',
-    note: 'The people themselves are still set in the code, because the same list also appears on the Our Team page. Ask for the team to be moved into the panel and both pages will be driven from one place.',
+    description: 'The heading above the sliding team photos, and the team itself.',
+    note: 'This list is shared with the Our Team page — group key team.members — so a person edited here also updates there.',
     fields: [
       { key: 'about.team.heading', label: 'Heading', default: 'Our Team Members' },
       { key: 'about.team.text', label: 'Line under the heading', type: 'textarea', rows: 2, default: 'The counsellors and staff behind every successful application.' },
     ],
+    list: {
+      group: 'team.members',
+      title: 'Team members',
+      note: 'Photo: upload one, or leave it blank to show a plain silhouette (used for two people currently). Label: their role. Text: their branch — shown as a link on this page, plain text on Our Team. Link text: reused here for an ID number, shown under the role.',
+      fields: ['icon', 'title', 'subtitle', 'body', 'link_label'],
+      labels: { icon: 'Photo', title: 'Name', subtitle: 'Role', body: 'Branch', link_label: 'ID number' },
+    },
   },
   {
     title: 'Closing call to action',
